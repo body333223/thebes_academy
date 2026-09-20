@@ -14,6 +14,7 @@ import 'grades_screen.dart';
 import 'services_screen.dart';
 import 'exam_schedule_screen.dart';
 import 'campus_guide_screen.dart';
+import 'summer_course_screen.dart';
 import 'package:thebes_academy/features/settings/presentation/screens/settings_screen.dart';
 import 'package:thebes_academy/features/faculty/presentation/screens/faculty_dashboard.dart';
 
@@ -58,6 +59,10 @@ class HomeDashboardScreen extends StatelessWidget {
 
                   // 2. Next Lecture & QR Attendance Live Hero Banner
                   _buildLiveLectureHero(context, nextLecture, isArabic, isDark),
+                  const SizedBox(height: 18),
+
+                  // 2.5 Summer Course Registration & Fees Hero Banner
+                  _buildSummerCourseBanner(context, isArabic, isDark),
                   const SizedBox(height: 22),
 
                   // 3. Academic Vitals 4-Stat Row
@@ -79,6 +84,124 @@ class HomeDashboardScreen extends StatelessWidget {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSummerCourseBanner(BuildContext context, bool isArabic, bool isDark) {
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const SummerCourseScreen()),
+      ),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF1E1500), Color(0xFF332304), Color(0xFF191307)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: const Color(0xFFFFB300), width: 1.4),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFFF9800).withAlpha(45),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFFF9800), Color(0xFFFF6F00)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFFF9800).withAlpha(80),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: const Icon(Icons.wb_sunny_rounded, color: Colors.white, size: 26),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 8,
+                    runSpacing: 4,
+                    children: [
+                      Text(
+                        isArabic ? 'بوابة الفصل الصيفي والمصروفات' : 'Summer Term & Fees',
+                        style: GoogleFonts.cairo(
+                          color: Colors.white,
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFB300).withAlpha(40),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: const Color(0xFFFFB300)),
+                        ),
+                        child: Text(
+                          isArabic ? 'مفتوح الآن' : 'OPEN',
+                          style: GoogleFonts.cairo(
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFFFFD54F),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    isArabic
+                        ? 'تسجيل المواد، حساب تكلفة الساعات (450 ج.م/ساعة)، والسداد الفوري'
+                        : 'Register courses, calculate credit fees (450 EGP/hr), and pay',
+                    style: GoogleFonts.cairo(
+                      color: Colors.white70,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha(20),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                isArabic ? Icons.arrow_back_ios_new_rounded : Icons.arrow_forward_ios_rounded,
+                color: const Color(0xFFFFD54F),
+                size: 14,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -559,48 +682,14 @@ class HomeDashboardScreen extends StatelessWidget {
         final isWide = constraints.maxWidth > 580;
         final itemWidth = isWide ? (constraints.maxWidth - 36) / 4 : (constraints.maxWidth - 12) / 2;
 
-        final stats = [
-          {
-            'title': isArabic ? 'المعدل التراكمي' : 'Cumulative GPA',
-            'value': student.gpa.toStringAsFixed(2),
-            'sub': isArabic ? 'ممتاز مع مرتبة الشرف' : 'Excellent Honors',
-            'icon': Icons.star_rounded,
-            'color': ThebesColors.gold,
-          },
-          {
-            'title': isArabic ? 'نسبة الحضور' : 'Attendance Rate',
-            'value': '${student.attendanceRate}%',
-            'sub': isArabic ? 'سجل مثالي' : 'Good Standing',
-            'icon': Icons.verified_rounded,
-            'color': ThebesColors.emerald,
-          },
-          {
-            'title': isArabic ? 'الساعات المنجزة' : 'Completed Hours',
-            'value': '${student.completedHours} / ${student.totalRequiredHours}',
-            'sub': isArabic ? 'ساعة معتمدة' : 'Credit Hours',
-            'icon': Icons.school_rounded,
-            'color': ThebesColors.cyanAccent,
-          },
-          {
-            'title': isArabic ? 'المصروفات' : 'Tuition Fees',
-            'value': controller.remainingTuition == 0
-                ? (isArabic ? 'مسددة بالكامل' : 'Fully Paid')
-                : '${controller.remainingTuition.toInt()} ج.م',
-            'sub': controller.remainingTuition == 0
-                ? (isArabic ? 'لا توجد مستحقات' : 'Zero balance')
-                : (isArabic ? 'متبقي القسط الثاني' : 'Pending 2nd'),
-            'icon': Icons.account_balance_wallet_rounded,
-            'color': controller.remainingTuition == 0 ? ThebesColors.emerald : ThebesColors.warning,
-          },
-        ];
-
         return Wrap(
           spacing: 12,
           runSpacing: 12,
-          children: stats.map((s) {
-            return Container(
+          children: [
+            // 1. Cumulative GPA with Radial Progress Ring
+            Container(
               width: itemWidth,
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
               decoration: BoxDecoration(
                 color: isDark ? ThebesColors.darkCard : Colors.white,
                 borderRadius: BorderRadius.circular(18),
@@ -618,47 +707,370 @@ class HomeDashboardScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 38,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: (s['color'] as Color).withAlpha(25),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(s['icon'] as IconData, color: s['color'] as Color, size: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: ThebesColors.gold.withAlpha(25),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(Icons.star_rounded, color: ThebesColors.gold, size: 18),
+                      ),
+                      // Radial Progress Ring
+                      SizedBox(
+                        width: 30,
+                        height: 30,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            CircularProgressIndicator(
+                              value: (student.gpa / 4.0).clamp(0.0, 1.0),
+                              strokeWidth: 3,
+                              backgroundColor: ThebesColors.gold.withAlpha(40),
+                              valueColor: const AlwaysStoppedAnimation<Color>(ThebesColors.gold),
+                            ),
+                            Text(
+                              '${((student.gpa / 4.0) * 100).toInt()}%',
+                              style: GoogleFonts.cairo(
+                                fontSize: 8,
+                                fontWeight: FontWeight.w900,
+                                color: ThebesColors.gold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 12),
-                  Text(
-                    s['value'] as String,
-                    style: GoogleFonts.cairo(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w900,
-                      color: isDark ? Colors.white : ThebesColors.primary,
+                  const SizedBox(height: 10),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Text(
+                          student.gpa.toStringAsFixed(2),
+                          style: GoogleFonts.cairo(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            color: isDark ? Colors.white : ThebesColors.primary,
+                          ),
+                        ),
+                        const SizedBox(width: 3),
+                        Text(
+                          '/ 4.00',
+                          style: GoogleFonts.cairo(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   Text(
-                    s['title'] as String,
+                    isArabic ? 'المعدل التراكمي' : 'Cumulative GPA',
                     style: GoogleFonts.cairo(
-                      fontSize: 11.5,
+                      fontSize: 11,
                       fontWeight: FontWeight.w700,
                       color: Colors.grey,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    s['sub'] as String,
+                    isArabic ? 'ممتاز مع مرتبة الشرف' : 'Excellent Honors',
                     style: GoogleFonts.cairo(
-                      fontSize: 10.5,
-                      fontWeight: FontWeight.w600,
-                      color: s['color'] as Color,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      color: ThebesColors.gold,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
-            );
-          }).toList(),
+            ),
+
+            // 2. Attendance Rate with Circular Progress Ring
+            Container(
+              width: itemWidth,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+              decoration: BoxDecoration(
+                color: isDark ? ThebesColors.darkCard : Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: isDark ? ThebesColors.darkCardBorder : ThebesColors.lightCardBorder,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withAlpha(isDark ? 30 : 10),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: ThebesColors.emerald.withAlpha(25),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(Icons.verified_rounded, color: ThebesColors.emerald, size: 18),
+                      ),
+                      SizedBox(
+                        width: 30,
+                        height: 30,
+                        child: CircularProgressIndicator(
+                          value: (student.attendanceRate / 100.0).clamp(0.0, 1.0),
+                          strokeWidth: 3,
+                          backgroundColor: ThebesColors.emerald.withAlpha(40),
+                          valueColor: const AlwaysStoppedAnimation<Color>(ThebesColors.emerald),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      '${student.attendanceRate}%',
+                      style: GoogleFonts.cairo(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                        color: isDark ? Colors.white : ThebesColors.primary,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    isArabic ? 'نسبة الحضور' : 'Attendance Rate',
+                    style: GoogleFonts.cairo(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    isArabic ? 'سجل حضور مثالي' : 'Good Standing',
+                    style: GoogleFonts.cairo(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      color: ThebesColors.emerald,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+
+            // 3. Completed Hours with Linear Progress
+            Container(
+              width: itemWidth,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+              decoration: BoxDecoration(
+                color: isDark ? ThebesColors.darkCard : Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: isDark ? ThebesColors.darkCardBorder : ThebesColors.lightCardBorder,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withAlpha(isDark ? 30 : 10),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: ThebesColors.cyanAccent.withAlpha(25),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(Icons.school_rounded, color: ThebesColors.cyanAccent, size: 18),
+                      ),
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                          decoration: BoxDecoration(
+                            color: ThebesColors.cyanAccent.withAlpha(25),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            '${((student.completedHours / student.totalRequiredHours) * 100).toInt()}%',
+                            style: GoogleFonts.cairo(
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.bold,
+                              color: ThebesColors.cyanAccent,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      '${student.completedHours} / ${student.totalRequiredHours}',
+                      style: GoogleFonts.cairo(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        color: isDark ? Colors.white : ThebesColors.primary,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(
+                      value: (student.completedHours / student.totalRequiredHours).clamp(0.0, 1.0),
+                      minHeight: 4,
+                      backgroundColor: isDark ? Colors.white12 : Colors.grey.withAlpha(50),
+                      valueColor: const AlwaysStoppedAnimation<Color>(ThebesColors.cyanAccent),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    isArabic ? 'ساعة معتمدة منجزة' : 'Completed Hours',
+                    style: GoogleFonts.cairo(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+
+            // 4. Tuition Fees Card
+            Container(
+              width: itemWidth,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+              decoration: BoxDecoration(
+                color: isDark ? ThebesColors.darkCard : Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: isDark ? ThebesColors.darkCardBorder : ThebesColors.lightCardBorder,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withAlpha(isDark ? 30 : 10),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: (controller.remainingTuition == 0 ? ThebesColors.emerald : ThebesColors.warning)
+                              .withAlpha(25),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          Icons.account_balance_wallet_rounded,
+                          color: controller.remainingTuition == 0 ? ThebesColors.emerald : ThebesColors.warning,
+                          size: 18,
+                        ),
+                      ),
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                          decoration: BoxDecoration(
+                            color: (controller.remainingTuition == 0 ? ThebesColors.emerald : ThebesColors.warning)
+                                .withAlpha(20),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            controller.remainingTuition == 0
+                                ? (isArabic ? 'خالصة' : 'Clear')
+                                : (isArabic ? 'قسط ثان' : 'Due'),
+                            style: GoogleFonts.cairo(
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                              color: controller.remainingTuition == 0 ? ThebesColors.emerald : ThebesColors.warning,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      controller.remainingTuition == 0
+                          ? (isArabic ? 'مسددة بالكامل' : 'Fully Paid')
+                          : '${controller.remainingTuition.toInt()} ج.م',
+                      style: GoogleFonts.cairo(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        color: isDark ? Colors.white : ThebesColors.primary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Text(
+                    isArabic ? 'المصروفات الدراسية' : 'Tuition Fees',
+                    style: GoogleFonts.cairo(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    controller.remainingTuition == 0
+                        ? (isArabic ? 'لا توجد مستحقات' : 'Zero balance')
+                        : (isArabic ? 'متبقي القسط الثاني' : 'Pending payment'),
+                    style: GoogleFonts.cairo(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: controller.remainingTuition == 0 ? ThebesColors.emerald : ThebesColors.warning,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
         );
       },
     );
@@ -666,6 +1078,12 @@ class HomeDashboardScreen extends StatelessWidget {
 
   Widget _buildQuickActionDock(BuildContext context, bool isArabic, bool isDark) {
     final actions = [
+      {
+        'title': isArabic ? 'السمر كورس' : 'Summer Term',
+        'icon': Icons.wb_sunny_rounded,
+        'color': const Color(0xFFFF9800),
+        'action': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SummerCourseScreen())),
+      },
       {
         'title': isArabic ? 'حضور QR / كود' : 'QR / PIN',
         'icon': Icons.qr_code_scanner_rounded,

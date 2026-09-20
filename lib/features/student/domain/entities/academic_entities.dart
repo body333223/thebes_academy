@@ -248,3 +248,84 @@ class CourseAttendanceStatEntity {
     return isArabic ? 'حالة الحضور آمنة' : 'Safe Standing';
   }
 }
+
+enum SummerCourseCategory { retake, improvement, advance }
+
+class SummerCourseEntity {
+  final String code;
+  final String titleAr;
+  final String titleEn;
+  final int creditHours;
+  final double pricePerHour;
+  final double labFee;
+  final String prerequisite;
+  final bool isPrerequisiteMet;
+  final SummerCourseCategory category;
+  final String instructorAr;
+  final String instructorEn;
+  final String scheduleAr;
+  final String scheduleEn;
+  final String hall;
+
+  const SummerCourseEntity({
+    required this.code,
+    required this.titleAr,
+    required this.titleEn,
+    required this.creditHours,
+    this.pricePerHour = 450.0,
+    this.labFee = 350.0,
+    required this.prerequisite,
+    this.isPrerequisiteMet = true,
+    required this.category,
+    required this.instructorAr,
+    required this.instructorEn,
+    required this.scheduleAr,
+    required this.scheduleEn,
+    required this.hall,
+  });
+
+  double get tuitionTotal => (creditHours * pricePerHour) + labFee;
+
+  String getLocalizedTitle(bool isArabic) => isArabic ? titleAr : titleEn;
+  String getLocalizedInstructor(bool isArabic) => isArabic ? instructorAr : instructorEn;
+  String getLocalizedSchedule(bool isArabic) => isArabic ? scheduleAr : scheduleEn;
+
+  String getCategoryLabel(bool isArabic) {
+    switch (category) {
+      case SummerCourseCategory.retake:
+        return isArabic ? 'مقرر تخلف ورسوب' : 'Retake / Arrear';
+      case SummerCourseCategory.improvement:
+        return isArabic ? 'تحسين معدل (GPA)' : 'GPA Improvement';
+      case SummerCourseCategory.advance:
+        return isArabic ? 'تسجيل مسبق' : 'Fast-Track';
+    }
+  }
+}
+
+class SummerRegistrationSummary {
+  final List<SummerCourseEntity> selectedCourses;
+  final int maxCreditHoursAllowed;
+  final double administrativeFee;
+  final bool isSubmitted;
+  final bool isPaid;
+  final String? receiptNumber;
+  final String? registrationDate;
+
+  const SummerRegistrationSummary({
+    required this.selectedCourses,
+    this.maxCreditHoursAllowed = 9,
+    this.administrativeFee = 250.0,
+    this.isSubmitted = false,
+    this.isPaid = false,
+    this.receiptNumber,
+    this.registrationDate,
+  });
+
+  int get totalCreditHours => selectedCourses.fold(0, (sum, c) => sum + c.creditHours);
+  double get totalHoursTuition => selectedCourses.fold(0.0, (sum, c) => sum + (c.creditHours * c.pricePerHour));
+  double get totalLabFees => selectedCourses.fold(0.0, (sum, c) => sum + c.labFee);
+  double get grandTotalFees => selectedCourses.isEmpty ? 0.0 : totalHoursTuition + totalLabFees + administrativeFee;
+
+  bool get canAddMore => totalCreditHours < maxCreditHoursAllowed;
+  int get remainingHours => maxCreditHoursAllowed - totalCreditHours;
+}

@@ -427,4 +427,176 @@ class StudentController extends ChangeNotifier {
     _requests.insert(0, req);
     notifyListeners();
   }
+
+  // ==========================================
+  // SUMMER TERM (SUMMER COURSE) STATE & LOGIC
+  // ==========================================
+  final List<SummerCourseEntity> _availableSummerCourses = const [
+    SummerCourseEntity(
+      code: 'CS201',
+      titleAr: 'تراكيب البيانات والخوارزميات',
+      titleEn: 'Data Structures & Algorithms',
+      creditHours: 3,
+      pricePerHour: 450.0,
+      labFee: 350.0,
+      prerequisite: 'CS101 - مبادئ البرمجة',
+      isPrerequisiteMet: true,
+      category: SummerCourseCategory.retake,
+      instructorAr: 'أ.د. حازم عبد الرحمن',
+      instructorEn: 'Prof. Dr. Hazem Abdelrahman',
+      scheduleAr: 'الأحد والثلاثاء: 10:00 ص - 01:00 م',
+      scheduleEn: 'Sun & Tue: 10:00 AM - 01:00 PM',
+      hall: 'معمل الحاسب 304 - مبنى الهندسة',
+    ),
+    SummerCourseEntity(
+      code: 'MATH102',
+      titleAr: 'تفاضل وتكامل 2 والجبر الخطي',
+      titleEn: 'Calculus II & Linear Algebra',
+      creditHours: 3,
+      pricePerHour: 450.0,
+      labFee: 0.0,
+      prerequisite: 'MATH101 - تفاضل وتكامل 1',
+      isPrerequisiteMet: true,
+      category: SummerCourseCategory.retake,
+      instructorAr: 'د. عادل توفيق',
+      instructorEn: 'Dr. Adel Tawfik',
+      scheduleAr: 'الإثنين والأربعاء: 09:00 ص - 12:00 م',
+      scheduleEn: 'Mon & Wed: 09:00 AM - 12:00 PM',
+      hall: 'مدرج 201 - المبنى المركزي',
+    ),
+    SummerCourseEntity(
+      code: 'CS305',
+      titleAr: 'نظم التشغيل والبرمجة المتزامنة',
+      titleEn: 'Advanced Operating Systems',
+      creditHours: 3,
+      pricePerHour: 450.0,
+      labFee: 350.0,
+      prerequisite: 'CS202 - عمارة الحاسب',
+      isPrerequisiteMet: true,
+      category: SummerCourseCategory.improvement,
+      instructorAr: 'د. سامح عبد الفتاح',
+      instructorEn: 'Dr. Sameh Abdelfattah',
+      scheduleAr: 'السبت والإثنين: 12:30 م - 03:30 م',
+      scheduleEn: 'Sat & Mon: 12:30 PM - 03:30 PM',
+      hall: 'معمل النظم 402 - مبنى التكنولوجيا',
+    ),
+    SummerCourseEntity(
+      code: 'MIS202',
+      titleAr: 'تحليل وتصميم نظم المعلومات الإدارية',
+      titleEn: 'Systems Analysis & Design',
+      creditHours: 3,
+      pricePerHour: 450.0,
+      labFee: 200.0,
+      prerequisite: 'MIS101 - مقدمة نظم المعلومات',
+      isPrerequisiteMet: true,
+      category: SummerCourseCategory.advance,
+      instructorAr: 'د. سارة الشامي',
+      instructorEn: 'Dr. Sarah El-Shamy',
+      scheduleAr: 'الأحد والخميس: 11:00 ص - 02:00 م',
+      scheduleEn: 'Sun & Thu: 11:00 AM - 02:00 PM',
+      hall: 'قاعة السيمينار 105 - مبنى الإدارة',
+    ),
+    SummerCourseEntity(
+      code: 'ENG201',
+      titleAr: 'تصميم الدوائر المنطقية والمعالجات',
+      titleEn: 'Digital Logic & Microprocessors',
+      creditHours: 3,
+      pricePerHour: 450.0,
+      labFee: 400.0,
+      prerequisite: 'PHYS102 - فيزياء كهربائية',
+      isPrerequisiteMet: true,
+      category: SummerCourseCategory.retake,
+      instructorAr: 'د. محمد هاني',
+      instructorEn: 'Dr. Mohamed Hany',
+      scheduleAr: 'الثلاثاء والخميس: 08:30 ص - 11:30 ص',
+      scheduleEn: 'Tue & Thu: 08:30 AM - 11:30 AM',
+      hall: 'معمل الإلكترونيات 102 - ورش الهندسة',
+    ),
+    SummerCourseEntity(
+      code: 'STAT201',
+      titleAr: 'الاحتمالات والإحصاء التطبيقي',
+      titleEn: 'Probability & Applied Statistics',
+      creditHours: 3,
+      pricePerHour: 450.0,
+      labFee: 0.0,
+      prerequisite: 'MATH101 - تفاضل وتكامل 1',
+      isPrerequisiteMet: true,
+      category: SummerCourseCategory.improvement,
+      instructorAr: 'أ.د. إبراهيم شكري',
+      instructorEn: 'Prof. Dr. Ibrahim Shokry',
+      scheduleAr: 'السبت والأربعاء: 01:00 م - 04:00 م',
+      scheduleEn: 'Sat & Wed: 01:00 PM - 04:00 PM',
+      hall: 'مدرج 405 - مبنى الحاسبات',
+    ),
+  ];
+
+  List<SummerCourseEntity> get availableSummerCourses => _availableSummerCourses;
+
+  final Set<String> _selectedSummerCourseCodes = {'CS201'};
+  bool _isSummerRegistrationSubmitted = false;
+  bool _isSummerRegistrationPaid = false;
+  String? _summerReceiptNumber;
+
+  bool isCourseSelectedInSummer(String code) => _selectedSummerCourseCodes.contains(code);
+
+  void clearSummerCourses() {
+    _selectedSummerCourseCodes.clear();
+    _isSummerRegistrationSubmitted = false;
+    _isSummerRegistrationPaid = false;
+    _summerReceiptNumber = null;
+    notifyListeners();
+  }
+
+  SummerRegistrationSummary get summerSummary {
+    final selected = _availableSummerCourses.where((c) => _selectedSummerCourseCodes.contains(c.code)).toList();
+    return SummerRegistrationSummary(
+      selectedCourses: selected,
+      isSubmitted: _isSummerRegistrationSubmitted,
+      isPaid: _isSummerRegistrationPaid,
+      receiptNumber: _summerReceiptNumber,
+      registrationDate: _isSummerRegistrationSubmitted ? '2026-06-15' : null,
+    );
+  }
+
+  bool toggleSummerCourse(SummerCourseEntity course) {
+    if (_selectedSummerCourseCodes.contains(course.code)) {
+      _selectedSummerCourseCodes.remove(course.code);
+      notifyListeners();
+      return true;
+    } else {
+      final currentTotalHours = _availableSummerCourses
+          .where((c) => _selectedSummerCourseCodes.contains(c.code))
+          .fold(0, (sum, c) => sum + c.creditHours);
+      if (currentTotalHours + course.creditHours > 9) {
+        return false; // Exceeds max 9 credit hours allowed
+      }
+      _selectedSummerCourseCodes.add(course.code);
+      notifyListeners();
+      return true;
+    }
+  }
+
+  void submitAndPaySummerRegistration({required String paymentMethod}) {
+    _isSummerRegistrationSubmitted = true;
+    _isSummerRegistrationPaid = true;
+    _summerReceiptNumber = 'THB-SUMMER-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
+
+    // Also add to financial history as a paid installment
+    final summary = summerSummary;
+    _installments.insert(
+      0,
+      PaymentInstallmentEntity(
+        id: 'inst_summer_${DateTime.now().millisecondsSinceEpoch}',
+        titleAr: 'سداد رسوم الفصل الصيفي (Summer 2026)',
+        titleEn: 'Summer Term Tuition & Labs Fees',
+        amount: summary.grandTotalFees,
+        dueDate: '2026-06-25',
+        status: PaymentStatus.paid,
+        receiptNumber: _summerReceiptNumber,
+        paidDate: '2026-06-15',
+      ),
+    );
+
+    notifyListeners();
+  }
 }

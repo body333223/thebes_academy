@@ -96,33 +96,80 @@ class AdaptiveScaffold extends StatelessWidget {
       drawer: drawer,
       body: body,
       floatingActionButton: floatingActionButton,
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: isDark ? ThebesColors.darkSurface : Colors.white,
-          border: Border(
-            top: BorderSide(
-              color: isDark ? ThebesColors.darkCardBorder : ThebesColors.lightCardBorder,
-              width: 1,
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          child: Container(
+            height: 66,
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF0C182B).withAlpha(240) : Colors.white.withAlpha(245),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: isDark ? ThebesColors.darkCardBorder : ThebesColors.gold.withAlpha(80),
+                width: 1.2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: (isDark ? Colors.black : ThebesColors.primaryDark).withAlpha(isDark ? 80 : 35),
+                  blurRadius: 16,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: List.generate(destinations.length, (index) {
+                final d = destinations[index];
+                final isSelected = index == currentIndex;
+
+                return Expanded(
+                  child: InkWell(
+                    onTap: () => onNavigationIndexChanged(index),
+                    borderRadius: BorderRadius.circular(20),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? ThebesColors.gold.withAlpha(isDark ? 40 : 30)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: Icon(
+                              isSelected ? d.selectedIcon : d.icon,
+                              color: isSelected
+                                  ? ThebesColors.gold
+                                  : (isDark ? Colors.white60 : ThebesColors.lightTextSecondary),
+                              size: 22,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            d.label,
+                            style: TextStyle(
+                              fontSize: 10.5,
+                              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                              color: isSelected
+                                  ? ThebesColors.gold
+                                  : (isDark ? Colors.white54 : ThebesColors.lightTextSecondary),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }),
             ),
           ),
-        ),
-        child: BottomNavigationBar(
-          currentIndex: currentIndex,
-          onTap: onNavigationIndexChanged,
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: isDark ? ThebesColors.darkSurface : Colors.white,
-          selectedItemColor: ThebesColors.gold,
-          unselectedItemColor: isDark ? Colors.white60 : ThebesColors.lightTextSecondary,
-          selectedFontSize: 11.5,
-          unselectedFontSize: 10.5,
-          elevation: 0,
-          items: destinations.map((d) {
-            return BottomNavigationBarItem(
-              icon: Icon(d.icon),
-              activeIcon: Icon(d.selectedIcon),
-              label: d.label,
-            );
-          }).toList(),
         ),
       ),
     );
