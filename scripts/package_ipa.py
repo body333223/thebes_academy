@@ -65,8 +65,12 @@ def package_ipa():
                 
     shutil.rmtree(payload_dir)
     
+    # Also create ThebesAcademy.ipa as standard name
+    friendly_ipa_path = os.path.join(ipa_dir, "ThebesAcademy.ipa")
+    shutil.copyfile(ipa_path, friendly_ipa_path)
+    
     size_bytes = os.path.getsize(ipa_path)
-    print(f"Verified IPA: {ipa_path} ({size_bytes} bytes)")
+    print(f"Verified IPA: {ipa_path} & {friendly_ipa_path} ({size_bytes} bytes)")
     print(f"Bundle: {bundle_id}; AppName: {app_name}; Version: {version}; iOS: {min_os}")
     print("IPA packaged successfully for Sideloadly, AltStore, SideStore, TrollStore, or signing tool.")
 

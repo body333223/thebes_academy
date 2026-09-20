@@ -16,9 +16,10 @@ workflows:
           include: true
           source: true
     scripts:
-      - name: Flutter doctor
+      - name: Flutter doctor & precache
         script: |
           flutter doctor -v
+          flutter precache --ios
       - name: Install Flutter dependencies
         script: |
           flutter packages pub get
