@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../core/localization/locale_provider.dart';
-import '../core/responsive/adaptive_scaffold.dart';
-import '../features/student/presentation/controllers/student_controller.dart';
-import 'student/home_dashboard.dart';
-import 'student/schedule_screen.dart';
-import 'student/qr_attendance_screen.dart';
-import 'student/grades_screen.dart';
-import 'student/services_screen.dart';
+import 'package:thebes_academy/core/localization/locale_provider.dart';
+import 'package:thebes_academy/core/responsive/adaptive_scaffold.dart';
+import 'package:thebes_academy/features/student/presentation/controllers/student_controller.dart';
+import 'package:thebes_academy/features/student/presentation/screens/home_dashboard.dart';
+import 'package:thebes_academy/features/student/presentation/screens/schedule_screen.dart';
+import 'package:thebes_academy/features/student/presentation/screens/qr_attendance_screen.dart';
+import 'package:thebes_academy/features/student/presentation/screens/grades_screen.dart';
+import 'package:thebes_academy/features/student/presentation/screens/services_screen.dart';
 
 class MainScreen extends StatefulWidget {
   final int initialIndex;

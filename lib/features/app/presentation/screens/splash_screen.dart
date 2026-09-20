@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../core/theme/thebes_colors.dart';
-import '../core/widgets/thebes_logo.dart';
-import '../core/localization/locale_provider.dart';
-import 'auth/login_screen.dart';
+import 'package:thebes_academy/core/theme/thebes_colors.dart';
+import 'package:thebes_academy/core/widgets/thebes_logo.dart';
+import 'package:thebes_academy/core/localization/locale_provider.dart';
+import 'package:thebes_academy/features/auth/presentation/screens/login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

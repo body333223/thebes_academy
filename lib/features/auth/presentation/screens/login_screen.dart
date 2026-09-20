@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../../core/theme/thebes_colors.dart';
-import '../../core/widgets/thebes_logo.dart';
-import '../../core/localization/locale_provider.dart';
-import '../../core/responsive/responsive_helper.dart';
-import '../../features/student/presentation/controllers/student_controller.dart';
-import '../main_screen.dart';
+import 'package:thebes_academy/core/theme/thebes_colors.dart';
+import 'package:thebes_academy/core/widgets/thebes_logo.dart';
+import 'package:thebes_academy/core/localization/locale_provider.dart';
+import 'package:thebes_academy/core/responsive/responsive_helper.dart';
+import 'package:thebes_academy/features/student/presentation/controllers/student_controller.dart';
+import 'package:thebes_academy/features/app/presentation/screens/main_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

@@ -4,10 +4,10 @@ import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import '../../core/theme/thebes_colors.dart';
-import '../../core/localization/locale_provider.dart';
-import '../../core/responsive/responsive_helper.dart';
-import '../../features/student/presentation/controllers/student_controller.dart';
+import 'package:thebes_academy/core/theme/thebes_colors.dart';
+import 'package:thebes_academy/core/localization/locale_provider.dart';
+import 'package:thebes_academy/core/responsive/responsive_helper.dart';
+import 'package:thebes_academy/features/student/presentation/controllers/student_controller.dart';
 
 class DigitalIdScreen extends StatefulWidget {
   const DigitalIdScreen({super.key});

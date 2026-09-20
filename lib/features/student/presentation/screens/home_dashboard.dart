@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../../core/theme/thebes_colors.dart';
-import '../../core/localization/locale_provider.dart';
-import '../../core/responsive/responsive_helper.dart';
-import '../../core/widgets/user_avatar_widget.dart';
-import '../../features/student/presentation/controllers/student_controller.dart';
+import 'package:thebes_academy/core/theme/thebes_colors.dart';
+import 'package:thebes_academy/core/localization/locale_provider.dart';
+import 'package:thebes_academy/core/responsive/responsive_helper.dart';
+import 'package:thebes_academy/core/widgets/user_avatar_widget.dart';
+import 'package:thebes_academy/features/student/presentation/controllers/student_controller.dart';
 import 'notifications_screen.dart';
 import 'digital_id_screen.dart';
 import 'qr_attendance_screen.dart';
@@ -14,8 +14,8 @@ import 'grades_screen.dart';
 import 'services_screen.dart';
 import 'exam_schedule_screen.dart';
 import 'campus_guide_screen.dart';
-import '../common/settings_screen.dart';
-import '../faculty/faculty_dashboard.dart';
+import 'package:thebes_academy/features/settings/presentation/screens/settings_screen.dart';
+import 'package:thebes_academy/features/faculty/presentation/screens/faculty_dashboard.dart';
 
 class HomeDashboardScreen extends StatelessWidget {
   final Function(int)? onNavigateTab;

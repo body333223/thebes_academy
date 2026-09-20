@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thebes_academy/core/localization/locale_provider.dart';
 import 'package:thebes_academy/core/di/service_locator.dart';
 import 'package:thebes_academy/features/student/presentation/controllers/student_controller.dart';
-import 'package:thebes_academy/screens/student/qr_attendance_screen.dart';
+import 'package:thebes_academy/features/student/presentation/screens/qr_attendance_screen.dart';
 
 void main() {
   setUpAll(() async {

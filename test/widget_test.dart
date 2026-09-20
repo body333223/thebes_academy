@@ -4,7 +4,7 @@ import 'package:thebes_academy/core/localization/locale_provider.dart';
 import 'package:thebes_academy/core/di/service_locator.dart';
 import 'package:thebes_academy/features/student/presentation/controllers/student_controller.dart';
 import 'package:thebes_academy/main.dart';
-import 'package:thebes_academy/screens/auth/login_screen.dart';
+import 'package:thebes_academy/features/auth/presentation/screens/login_screen.dart';
 
 void main() {
   setUpAll(() async {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../../core/localization/locale_provider.dart';
-import '../../core/theme/thebes_colors.dart';
+import 'package:thebes_academy/core/localization/locale_provider.dart';
+import 'package:thebes_academy/core/theme/thebes_colors.dart';
 
 class CampusGuideScreen extends StatefulWidget {
   const CampusGuideScreen({super.key});

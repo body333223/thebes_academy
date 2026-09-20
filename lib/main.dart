@@ -5,7 +5,7 @@ import 'core/theme/thebes_theme.dart';
 import 'core/localization/locale_provider.dart';
 import 'core/di/service_locator.dart';
 import 'features/student/presentation/controllers/student_controller.dart';
-import 'screens/splash_screen.dart';
+import 'features/app/presentation/screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

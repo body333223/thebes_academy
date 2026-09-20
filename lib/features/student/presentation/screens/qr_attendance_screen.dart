@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import '../../core/localization/locale_provider.dart';
-import '../../core/responsive/responsive_helper.dart';
-import '../../core/theme/thebes_colors.dart';
-import '../../features/student/presentation/controllers/student_controller.dart';
-import '../faculty/faculty_dashboard.dart';
+import 'package:thebes_academy/core/localization/locale_provider.dart';
+import 'package:thebes_academy/core/responsive/responsive_helper.dart';
+import 'package:thebes_academy/core/theme/thebes_colors.dart';
+import 'package:thebes_academy/features/student/presentation/controllers/student_controller.dart';
+import 'package:thebes_academy/features/faculty/presentation/screens/faculty_dashboard.dart';
 
 class QrAttendanceScreen extends StatefulWidget {
   const QrAttendanceScreen({super.key});

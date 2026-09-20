@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/theme/thebes_colors.dart';
-import '../../core/localization/locale_provider.dart';
-import '../../core/responsive/responsive_helper.dart';
-import '../../core/widgets/user_avatar_widget.dart';
-import '../../features/student/domain/entities/student_entity.dart';
-import '../../features/student/presentation/controllers/student_controller.dart';
-import '../student/digital_id_screen.dart';
-import '../student/campus_guide_screen.dart';
-import '../auth/login_screen.dart';
+import 'package:thebes_academy/core/theme/thebes_colors.dart';
+import 'package:thebes_academy/core/localization/locale_provider.dart';
+import 'package:thebes_academy/core/responsive/responsive_helper.dart';
+import 'package:thebes_academy/core/widgets/user_avatar_widget.dart';
+import 'package:thebes_academy/features/student/domain/entities/student_entity.dart';
+import 'package:thebes_academy/features/student/presentation/controllers/student_controller.dart';
+import 'package:thebes_academy/features/student/presentation/screens/digital_id_screen.dart';
+import 'package:thebes_academy/features/student/presentation/screens/campus_guide_screen.dart';
+import 'package:thebes_academy/features/auth/presentation/screens/login_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
