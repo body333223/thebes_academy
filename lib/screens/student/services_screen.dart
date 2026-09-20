@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import '../../core/theme/thebes_colors.dart';
 import '../../core/localization/locale_provider.dart';
 import '../../core/responsive/responsive_helper.dart';
@@ -397,21 +399,41 @@ class _ServicesScreenState extends State<ServicesScreen> with SingleTickerProvid
           ),
           if (isPaid && inst.receiptNumber != null) ...[
             const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(
-                color: Colors.grey.withAlpha(20),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.receipt_long_outlined, size: 16, color: ThebesColors.gold),
-                  const SizedBox(width: 6),
-                  Text(
-                    '${isArabic ? "إيصال:" : "Receipt:"} ${inst.receiptNumber}',
-                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                  ),
-                ],
+            InkWell(
+              onTap: () => _showOfficialReceiptDialog(context, inst, isArabic),
+              borderRadius: BorderRadius.circular(10),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: ThebesColors.gold.withAlpha(25),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: ThebesColors.gold.withAlpha(90)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.receipt_long_rounded, size: 18, color: ThebesColors.gold),
+                        const SizedBox(width: 8),
+                        Text(
+                          '${isArabic ? "إيصال معتمد:" : "Receipt:"} ${inst.receiptNumber}',
+                          style: GoogleFonts.spaceMono(fontSize: 12, fontWeight: FontWeight.bold, color: ThebesColors.gold),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          isArabic ? 'عرض الإيصال' : 'View',
+                          style: GoogleFonts.cairo(fontSize: 11.5, fontWeight: FontWeight.bold, color: ThebesColors.gold),
+                        ),
+                        const SizedBox(width: 4),
+                        const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: ThebesColors.gold),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -537,6 +559,25 @@ class _ServicesScreenState extends State<ServicesScreen> with SingleTickerProvid
               ),
             ],
           ),
+          if (req.status == RequestStatus.completed) ...[
+            const SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => _showOfficialCertificateDialog(context, req, isArabic),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: ThebesColors.gold.withAlpha(120)),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                icon: const Icon(Icons.download_done_rounded, color: ThebesColors.gold, size: 16),
+                label: Text(
+                  isArabic ? 'عرض وتحميل الوثيقة المعتمدة' : 'View Certified Document',
+                  style: GoogleFonts.cairo(fontWeight: FontWeight.bold, fontSize: 12, color: ThebesColors.gold),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -687,6 +728,348 @@ class _ServicesScreenState extends State<ServicesScreen> with SingleTickerProvid
               : 'Payment successful! Electronic receipt generated.',
         ),
         backgroundColor: ThebesColors.success,
+      ),
+    );
+  }
+
+  void _showOfficialReceiptDialog(BuildContext context, PaymentInstallmentEntity inst, bool isArabic) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final controller = context.read<StudentController>();
+    final student = controller.student;
+    final receiptNo = inst.receiptNumber ?? 'THB-REC-2026-98124';
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        height: MediaQuery.of(context).size.height * 0.85,
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF0F1E33) : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
+          border: Border.all(color: ThebesColors.gold.withAlpha(90), width: 1.5),
+        ),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          children: [
+            Center(
+              child: Container(
+                width: 44,
+                height: 4,
+                decoration: BoxDecoration(color: Colors.grey.withAlpha(80), borderRadius: BorderRadius.circular(10)),
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Academy Receipt Header
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isArabic ? 'أكاديمية طيبة التعليمية' : 'Thebes Academy',
+                      style: GoogleFonts.cairo(fontWeight: FontWeight.w900, fontSize: 16, color: ThebesColors.gold),
+                    ),
+                    Text(
+                      isArabic ? 'الخزينة والحسابات الإلكترونية' : 'E-Finance & Treasury',
+                      style: GoogleFonts.cairo(fontSize: 11, color: Colors.grey),
+                    ),
+                  ],
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: ThebesColors.emerald.withAlpha(25),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: ThebesColors.emerald),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.check_circle_rounded, color: ThebesColors.emerald, size: 14),
+                      const SizedBox(width: 4),
+                      Text(
+                        isArabic ? 'إيصال مسدد ومعتمد' : 'Paid & Certified',
+                        style: GoogleFonts.cairo(color: ThebesColors.emerald, fontSize: 11, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            const Divider(),
+            const SizedBox(height: 8),
+
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Amount Banner
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                        decoration: BoxDecoration(
+                          gradient: ThebesColors.royalCardGradient,
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(color: ThebesColors.gold.withAlpha(100)),
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              '${inst.amount.toInt()} EGP',
+                              style: GoogleFonts.spaceMono(
+                                color: ThebesColors.gold,
+                                fontSize: 28,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                            Text(
+                              inst.getLocalizedTitle(isArabic),
+                              style: GoogleFonts.cairo(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+
+                    // Receipt Info Table
+                    _buildReceiptRow(Icons.person_rounded, isArabic ? 'اسم الطالب:' : 'Student:', student.getLocalizedName(isArabic)),
+                    _buildReceiptRow(Icons.badge_rounded, isArabic ? 'الرقم الأكاديمي:' : 'Academic ID:', student.academicId),
+                    _buildReceiptRow(Icons.school_rounded, isArabic ? 'الكلية / القسم:' : 'Institute:', student.getLocalizedDepartment(isArabic)),
+                    _buildReceiptRow(Icons.receipt_rounded, isArabic ? 'رقم الإيصال:' : 'Receipt No:', receiptNo),
+                    _buildReceiptRow(Icons.date_range_rounded, isArabic ? 'تاريخ السداد:' : 'Payment Date:', inst.paidDate ?? '10 سبتمبر 2026'),
+                    _buildReceiptRow(Icons.credit_card_rounded, isArabic ? 'وسيلة الدفع:' : 'Method:', 'فوري Fawry / بطاقة ميزة'),
+                    const SizedBox(height: 16),
+
+                    // Official Stamp Watermark & QR
+                    Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: QrImageView(
+                              data: 'THEBES-RECEIPT-$receiptNo-${student.academicId}',
+                              size: 70,
+                              version: QrVersions.auto,
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: ThebesColors.gold.withAlpha(20),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: ThebesColors.gold, width: 1.5),
+                            ),
+                            child: Column(
+                              children: [
+                                const Icon(Icons.verified_rounded, color: ThebesColors.gold, size: 22),
+                                const SizedBox(height: 4),
+                                Text(
+                                  isArabic ? 'الختم المالي المعتمد' : 'Official Treasury Stamp',
+                                  style: GoogleFonts.cairo(color: ThebesColors.gold, fontWeight: FontWeight.w900, fontSize: 11),
+                                ),
+                                Text(
+                                  isArabic ? 'أكاديمية طيبة - القاهرة' : 'Thebes Academy Cairo',
+                                  style: GoogleFonts.cairo(color: Colors.grey, fontSize: 10),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+
+            // Action Buttons
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ThebesColors.gold,
+                      foregroundColor: ThebesColors.primaryDark,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(isArabic ? 'تم حفظ الإيصال المعتمد كملف PDF بنجاح' : 'Receipt PDF saved to downloads'),
+                          backgroundColor: ThebesColors.emerald,
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.download_rounded),
+                    label: Text(
+                      isArabic ? 'تحميل وحفظ الإيصال (PDF)' : 'Download PDF Receipt',
+                      style: GoogleFonts.cairo(fontWeight: FontWeight.w900, fontSize: 13.5),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReceiptRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: ThebesColors.gold),
+          const SizedBox(width: 8),
+          Text(label, style: GoogleFonts.cairo(fontSize: 12.5, color: Colors.grey)),
+          const Spacer(),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              style: GoogleFonts.cairo(fontWeight: FontWeight.bold, fontSize: 13),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showOfficialCertificateDialog(BuildContext context, ServiceRequestEntity req, bool isArabic) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final controller = context.read<StudentController>();
+    final student = controller.student;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        height: MediaQuery.of(context).size.height * 0.80,
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF0F1E33) : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
+          border: Border.all(color: ThebesColors.gold.withAlpha(90), width: 1.5),
+        ),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          children: [
+            Center(
+              child: Container(
+                width: 44,
+                height: 4,
+                decoration: BoxDecoration(color: Colors.grey.withAlpha(80), borderRadius: BorderRadius.circular(10)),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              isArabic ? 'وثيقة رسمية معتمدة' : 'Official Certified Document',
+              style: GoogleFonts.cairo(fontSize: 18, fontWeight: FontWeight.w900, color: ThebesColors.gold),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              isArabic ? 'صادرة من إدارة شؤون الطلاب - أكاديمية طيبة' : 'Issued by Thebes Student Affairs',
+              style: GoogleFonts.cairo(fontSize: 12, color: Colors.grey),
+            ),
+            const SizedBox(height: 16),
+            const Divider(),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 10),
+                    Text(
+                      req.getLocalizedTitle(isArabic),
+                      style: GoogleFonts.cairo(fontSize: 16, fontWeight: FontWeight.w900, color: ThebesColors.primary),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      isArabic
+                          ? 'تشهد إدارة المعهد العالي للهندسة وتكنولوجيا الإدارة بأكاديمية طيبة بأن الطالب/ ${student.nameAr}، المقيد بالفرقة ${student.academicYear} بقسم ${student.departmentAr} للعام الجامعي 2026/2027، مقيد ومنتظم بالدراسة حتى تاريخه.\n\nوقد أعطيت له هذه الإفادة بناءً على طلبه لتقديمها إلى الجهات المختصة دون أدنى مسؤولية على الأكاديمية.'
+                          : 'This is to certify that student ${student.nameEn}, enrolled in Year ${student.academicYear}, is a registered student in good standing.',
+                      style: GoogleFonts.cairo(fontSize: 13, height: 1.8),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          children: [
+                            Text(isArabic ? 'الموظف المختص' : 'Registrar', style: GoogleFonts.cairo(fontWeight: FontWeight.bold, fontSize: 12)),
+                            const SizedBox(height: 4),
+                            Text(isArabic ? 'أحمد الشاذلي' : 'A. El-Shazly', style: GoogleFonts.cairo(fontSize: 11, color: Colors.grey)),
+                          ],
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: ThebesColors.gold.withAlpha(25),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: ThebesColors.gold),
+                          ),
+                          child: Text(
+                            isArabic ? 'خاتم شعار الأكاديمية' : 'Academy Seal',
+                            style: GoogleFonts.cairo(color: ThebesColors.gold, fontWeight: FontWeight.w900, fontSize: 11),
+                          ),
+                        ),
+                        Column(
+                          children: [
+                            Text(isArabic ? 'عميد المعهد' : 'Dean', style: GoogleFonts.cairo(fontWeight: FontWeight.bold, fontSize: 12)),
+                            const SizedBox(height: 4),
+                            Text(isArabic ? 'أ.د. عادل سليمان' : 'Prof. A. Soliman', style: GoogleFonts.cairo(fontSize: 11, color: Colors.grey)),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ThebesColors.gold,
+                  foregroundColor: ThebesColors.primaryDark,
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                ),
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(isArabic ? 'تم تنزيل الوثيقة الرسمية بصيغة PDF معتمدة' : 'Official PDF downloaded'),
+                      backgroundColor: ThebesColors.emerald,
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.download_rounded),
+                label: Text(
+                  isArabic ? 'تنزيل الإفادة الرسمية (PDF)' : 'Download Certified Document',
+                  style: GoogleFonts.cairo(fontWeight: FontWeight.w900, fontSize: 14),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

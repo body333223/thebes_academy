@@ -5,6 +5,7 @@ import '../../core/localization/locale_provider.dart';
 import '../../core/responsive/responsive_helper.dart';
 import '../../features/student/domain/entities/academic_entities.dart';
 import '../../features/student/presentation/controllers/student_controller.dart';
+import 'exam_schedule_screen.dart';
 
 class ScheduleScreen extends StatefulWidget {
   final int initialTab;
@@ -272,7 +273,55 @@ class _ScheduleScreenState extends State<ScheduleScreen> with SingleTickerProvid
                       ),
                     ),
 
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 14),
+
+                    // Quick link to full Exam Schedule Screen
+                    InkWell(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const ExamScheduleScreen()),
+                      ),
+                      borderRadius: BorderRadius.circular(14),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: isDark ? ThebesColors.darkCard : Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: ThebesColors.gold.withAlpha(120)),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: ThebesColors.gold.withAlpha(30),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.assignment_outlined, color: ThebesColors.gold, size: 20),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    isArabic ? 'جدول الامتحانات الموسع واللجان' : 'Full Exam Schedule & Committees',
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                  ),
+                                  Text(
+                                    isArabic ? 'العد التنازلي للاختبار القادم، تعليمات الامتحان ومزامنة التقويم' : 'Countdown, exam regulations & calendar sync',
+                                    style: TextStyle(fontSize: 11, color: isDark ? Colors.grey : ThebesColors.lightTextMuted),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: ThebesColors.gold),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
 
                     // Responsive Exams Grid or Column
                     if (isTabletOrDesktop)

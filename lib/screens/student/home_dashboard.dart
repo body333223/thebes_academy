@@ -12,6 +12,8 @@ import 'qr_attendance_screen.dart';
 import 'schedule_screen.dart';
 import 'grades_screen.dart';
 import 'services_screen.dart';
+import 'exam_schedule_screen.dart';
+import 'campus_guide_screen.dart';
 import '../common/settings_screen.dart';
 import '../faculty/faculty_dashboard.dart';
 
@@ -723,6 +725,18 @@ class HomeDashboardScreen extends StatelessWidget {
             Navigator.push(context, MaterialPageRoute(builder: (_) => const ServicesScreen()));
           }
         },
+      },
+      {
+        'title': isArabic ? 'جدول الامتحانات' : 'Exams',
+        'icon': Icons.assignment_rounded,
+        'color': ThebesColors.gold,
+        'action': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ExamScheduleScreen())),
+      },
+      {
+        'title': isArabic ? 'دليل المقرات' : 'Campus Guide',
+        'icon': Icons.location_on_rounded,
+        'color': ThebesColors.cyanAccent,
+        'action': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CampusGuideScreen())),
       },
     ];
 

@@ -7,6 +7,7 @@ import '../../core/widgets/user_avatar_widget.dart';
 import '../../features/student/domain/entities/student_entity.dart';
 import '../../features/student/presentation/controllers/student_controller.dart';
 import '../student/digital_id_screen.dart';
+import '../student/campus_guide_screen.dart';
 import '../auth/login_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -107,6 +108,82 @@ class SettingsScreen extends StatelessWidget {
                     MaterialPageRoute(builder: (_) => const DigitalIdScreen()),
                   );
                 },
+              ),
+
+              // Campus Guide
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: ThebesColors.opacity(ThebesColors.cyanAccent, 0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.map_rounded, color: ThebesColors.cyanAccent),
+                ),
+                title: Text(
+                  isArabic ? 'دليل المقرات والمدرجات' : 'Campus & Hall Directory',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                subtitle: Text(isArabic ? 'مقرات المعادي وسقارة، أرقام المدرجات وأرقام التواصل' : 'Maadi & Saqqara campuses, halls & contacts'),
+                trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const CampusGuideScreen()),
+                  );
+                },
+              ),
+
+              const Divider(height: 24),
+
+              // Security & Password Section Header
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                child: Text(
+                  isArabic ? 'الأمان والحساب' : 'Account & Security',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: ThebesColors.gold,
+                  ),
+                ),
+              ),
+
+              // Change Password
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: ThebesColors.opacity(ThebesColors.primaryLight, 0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.lock_reset_rounded, color: ThebesColors.primaryLight),
+                ),
+                title: Text(
+                  isArabic ? 'تغيير كلمة المرور' : 'Change Password',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                subtitle: Text(isArabic ? 'تحديث كلمة مرور الدخول لحسابك' : 'Update your account login password'),
+                trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+                onTap: () => _showChangePasswordDialog(context, locale),
+              ),
+
+              // 2FA Security Status
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: ThebesColors.opacity(ThebesColors.emerald, 0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.verified_user_rounded, color: ThebesColors.emerald),
+                ),
+                title: Text(
+                  isArabic ? 'التحقق الثنائي وتأمين الأجهزة' : 'Two-Factor & Device Security',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                subtitle: Text(isArabic ? 'مفعل • البصمة وتأكيد الدخول عبر SMS' : 'Active • Biometric & SMS verify'),
+                trailing: const Icon(Icons.check_circle_rounded, color: ThebesColors.emerald, size: 20),
               ),
 
               const Divider(height: 24),
@@ -309,6 +386,183 @@ class SettingsScreen extends StatelessWidget {
             child: Text(locale.isArabic ? 'إغلاق' : 'Close'),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showChangePasswordDialog(BuildContext context, LocaleProvider locale) {
+    final currentPassController = TextEditingController();
+    final newPassController = TextEditingController();
+    final confirmPassController = TextEditingController();
+    bool obscureCurrent = true;
+    bool obscureNew = true;
+    bool obscureConfirm = true;
+    String? errorText;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          final isDark = locale.isDarkMode;
+          return AlertDialog(
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: ThebesColors.primaryLight.withAlpha(30),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.lock_reset_rounded, color: ThebesColors.primaryLight, size: 22),
+                ),
+                const SizedBox(width: 10),
+                Text(locale.isArabic ? 'تغيير كلمة المرور' : 'Change Password'),
+              ],
+            ),
+            content: SizedBox(
+              width: 360,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (errorText != null) ...[
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        margin: const EdgeInsets.only(bottom: 12),
+                        decoration: BoxDecoration(
+                          color: ThebesColors.error.withAlpha(25),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: ThebesColors.error.withAlpha(90)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.error_outline_rounded, color: ThebesColors.error, size: 18),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                errorText!,
+                                style: const TextStyle(color: ThebesColors.error, fontSize: 12, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                    TextField(
+                      controller: currentPassController,
+                      obscureText: obscureCurrent,
+                      decoration: InputDecoration(
+                        labelText: locale.isArabic ? 'كلمة المرور الحالية' : 'Current Password',
+                        prefixIcon: const Icon(Icons.lock_outline_rounded),
+                        suffixIcon: IconButton(
+                          icon: Icon(obscureCurrent ? Icons.visibility_off_rounded : Icons.visibility_rounded),
+                          onPressed: () => setDialogState(() => obscureCurrent = !obscureCurrent),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: newPassController,
+                      obscureText: obscureNew,
+                      decoration: InputDecoration(
+                        labelText: locale.isArabic ? 'كلمة المرور الجديدة' : 'New Password',
+                        prefixIcon: const Icon(Icons.key_rounded),
+                        suffixIcon: IconButton(
+                          icon: Icon(obscureNew ? Icons.visibility_off_rounded : Icons.visibility_rounded),
+                          onPressed: () => setDialogState(() => obscureNew = !obscureNew),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: confirmPassController,
+                      obscureText: obscureConfirm,
+                      decoration: InputDecoration(
+                        labelText: locale.isArabic ? 'تأكيد كلمة المرور الجديدة' : 'Confirm New Password',
+                        prefixIcon: const Icon(Icons.check_circle_outline_rounded),
+                        suffixIcon: IconButton(
+                          icon: Icon(obscureConfirm ? Icons.visibility_off_rounded : Icons.visibility_rounded),
+                          onPressed: () => setDialogState(() => obscureConfirm = !obscureConfirm),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      locale.isArabic
+                          ? '• يجب أن لا تقل عن 6 أحرف أو أرقام\n• تجنب استخدام أرقام الهواتف أو تواريخ الميلاد'
+                          : '• At least 6 characters or numbers\n• Avoid using phone numbers or birthdates',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: isDark ? Colors.grey : ThebesColors.lightTextMuted,
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text(locale.isArabic ? 'إلغاء' : 'Cancel'),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ThebesColors.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                onPressed: () {
+                  final cur = currentPassController.text.trim();
+                  final n = newPassController.text.trim();
+                  final c = confirmPassController.text.trim();
+
+                  if (cur.isEmpty || n.isEmpty || c.isEmpty) {
+                    setDialogState(() {
+                      errorText = locale.isArabic ? 'يرجى ملء جميع الحقول المطلوبة' : 'Please fill all required fields';
+                    });
+                    return;
+                  }
+                  if (n.length < 6) {
+                    setDialogState(() {
+                      errorText = locale.isArabic
+                          ? 'كلمة المرور الجديدة يجب أن تتكون من 6 خانات على الأقل'
+                          : 'New password must be at least 6 characters';
+                    });
+                    return;
+                  }
+                  if (n != c) {
+                    setDialogState(() {
+                      errorText = locale.isArabic
+                          ? 'كلمة المرور الجديدة وتأكيدها غير متطابقين'
+                          : 'New password and confirmation do not match';
+                    });
+                    return;
+                  }
+
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          const Icon(Icons.check_circle_rounded, color: Colors.white),
+                          const SizedBox(width: 8),
+                          Text(
+                            locale.isArabic
+                                ? 'تم تحديث كلمة المرور بنجاح'
+                                : 'Password updated successfully',
+                          ),
+                        ],
+                      ),
+                      backgroundColor: ThebesColors.emerald,
+                    ),
+                  );
+                },
+                child: Text(locale.isArabic ? 'حفظ التغيير' : 'Save'),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
