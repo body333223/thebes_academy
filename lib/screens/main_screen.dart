@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../core/localization/locale_provider.dart';
 import '../core/responsive/adaptive_scaffold.dart';
-import '../core/theme/thebes_colors.dart';
 import '../features/student/presentation/controllers/student_controller.dart';
 import 'student/home_dashboard.dart';
 import 'student/schedule_screen.dart';

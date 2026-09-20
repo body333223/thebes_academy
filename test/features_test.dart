@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:thebes_academy/core/storage/local_cache_service.dart';
 import 'package:thebes_academy/features/student/domain/entities/academic_entities.dart';
-import 'package:thebes_academy/features/student/domain/entities/notification_entity.dart';
 import 'package:thebes_academy/core/di/service_locator.dart';
 import 'package:thebes_academy/features/student/presentation/controllers/student_controller.dart';
 

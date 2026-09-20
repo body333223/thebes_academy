@@ -22,7 +22,7 @@ abstract class StudentRemoteDataSource {
 
 class StudentRemoteDataSourceImpl implements StudentRemoteDataSource {
   // In-memory data store simulating remote backend API with latency
-  StudentModel _student = const StudentModel(
+  final StudentModel _student = const StudentModel(
     id: 'THB-2022-0451',
     academicId: '20220451',
     nationalId: '30205140102938',
@@ -76,7 +76,7 @@ class StudentRemoteDataSourceImpl implements StudentRemoteDataSource {
     ),
   ];
 
-  List<ServiceRequestEntity> _requests = [
+  final List<ServiceRequestEntity> _requests = [
     const ServiceRequestEntity(
       id: 'req-01',
       titleAr: 'إفادة قيد رسمية موجهة للسفارة',

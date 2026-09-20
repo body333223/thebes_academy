@@ -186,7 +186,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         typeIcon = Icons.stars_rounded;
         break;
       case NotificationType.universityNews:
-      default:
         typeColor = ThebesColors.accentBlue;
         typeIcon = Icons.campaign_rounded;
         break;

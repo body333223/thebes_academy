@@ -29,7 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  Future<void> _handleLogin(BuildContext context) async {
+  Future<void> _handleLogin() async {
     setState(() => _isAuthenticating = true);
     await Future.delayed(const Duration(milliseconds: 350));
     if (!mounted) return;
@@ -375,7 +375,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             shadowColor: ThebesColors.gold.withAlpha(120),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                           ),
-                          onPressed: _isAuthenticating ? null : () => _handleLogin(context),
+                          onPressed: _isAuthenticating ? null : () => _handleLogin(),
                           child: _isAuthenticating
                               ? const SizedBox(
                                   width: 22,
@@ -408,7 +408,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                       // Biometric Fingerprint Option
                       InkWell(
-                        onTap: () => _handleLogin(context),
+                        onTap: () => _handleLogin(),
                         borderRadius: BorderRadius.circular(14),
                         child: Container(
                           width: double.infinity,

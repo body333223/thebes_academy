@@ -27,7 +27,6 @@ class HomeDashboardScreen extends StatelessWidget {
     final controller = context.watch<StudentController>();
     final student = controller.student;
     final nextLecture = controller.nextLecture;
-    final isTabletOrDesktop = context.isTablet || context.isDesktop;
 
     return Scaffold(
       body: SafeArea(
@@ -716,7 +715,7 @@ class HomeDashboardScreen extends StatelessWidget {
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: actions.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            separatorBuilder: (_, index) => const SizedBox(width: 12),
             itemBuilder: (context, i) {
               final a = actions[i];
               return InkWell(
