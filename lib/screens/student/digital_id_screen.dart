@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../core/theme/thebes_colors.dart';
 import '../../core/localization/locale_provider.dart';
@@ -228,9 +229,32 @@ class _DigitalIdScreenState extends State<DigitalIdScreen> {
                                 children: [
                                   Column(
                                     children: [
+                                      // Smart Campus Contactless Chip
+                                      Container(
+                                        width: 44,
+                                        height: 32,
+                                        margin: const EdgeInsets.only(bottom: 8),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(6),
+                                          gradient: const LinearGradient(
+                                            colors: [Color(0xFFE5C07B), Color(0xFFD4AF37), Color(0xFFB38F24)],
+                                          ),
+                                          border: Border.all(color: const Color(0xFF7A6014), width: 0.8),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withAlpha(50),
+                                              blurRadius: 4,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
+                                        ),
+                                        child: const Center(
+                                          child: Icon(Icons.nfc_rounded, size: 18, color: Color(0xFF0C2340)),
+                                        ),
+                                      ),
                                       Container(
                                         width: 86,
-                                        height: 104,
+                                        height: 98,
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(12),
                                           border: Border.all(color: ThebesColors.gold, width: 2),
@@ -407,7 +431,52 @@ class _DigitalIdScreenState extends State<DigitalIdScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
+
+                // Digital ID Action Dock (Export Card & Offline Pass)
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () => _showExportDialog(context, student, isArabic, isDark),
+                        icon: const Icon(Icons.share_rounded, size: 18),
+                        label: Text(
+                          isArabic ? 'تصدير الكارنيه' : 'Export ID',
+                          style: GoogleFonts.cairo(fontWeight: FontWeight.bold, fontSize: 13),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ThebesColors.gold,
+                          foregroundColor: ThebesColors.primaryNavy,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          elevation: 2,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => _showOfflinePassDialog(context, student, isArabic, isDark),
+                        icon: const Icon(Icons.offline_bolt_rounded, size: 18, color: ThebesColors.gold),
+                        label: Text(
+                          isArabic ? 'تصريح البوابات' : 'Gate Pass',
+                          style: GoogleFonts.cairo(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                            color: isDark ? Colors.white : ThebesColors.primaryNavy,
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: ThebesColors.gold, width: 1.5),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 18),
 
                 // Instructions Pill
                 Container(
@@ -439,6 +508,281 @@ class _DigitalIdScreenState extends State<DigitalIdScreen> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  void _showExportDialog(BuildContext context, dynamic student, bool isArabic, bool isDark) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF0D1B2A) : Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+          side: const BorderSide(color: ThebesColors.gold, width: 1.5),
+        ),
+        title: Row(
+          children: [
+            const Icon(Icons.verified_rounded, color: ThebesColors.gold, size: 24),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                isArabic ? 'البطاقة الرقمية الرسمية المعتمدة' : 'Official Verified Digital ID',
+                style: GoogleFonts.cairo(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : ThebesColors.primaryNavy,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Stamp Card Preview
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: ThebesColors.royalCardGradient,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: ThebesColors.gold),
+              ),
+              child: Stack(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isArabic ? 'أكاديمية طيبة المتكاملة للعلوم' : 'THEBES ACADEMY HIGHER INSTITUTES',
+                        style: GoogleFonts.cairo(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: ThebesColors.gold,
+                        ),
+                      ),
+                      const Divider(color: Colors.white24, height: 12),
+                      Text(
+                        isArabic ? student.nameAr : student.nameEn,
+                        style: GoogleFonts.cairo(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        'ID: ${student.academicId} • Seat: ${student.seatNumber}',
+                        style: const TextStyle(fontSize: 11, color: Colors.white70),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        student.getLocalizedDepartment(isArabic),
+                        style: GoogleFonts.cairo(fontSize: 11, color: Colors.white60),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                  // Golden Official Stamp
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Transform.rotate(
+                      angle: -0.2,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: ThebesColors.gold, width: 2),
+                          borderRadius: BorderRadius.circular(8),
+                          color: ThebesColors.gold.withAlpha(40),
+                        ),
+                        child: Text(
+                          isArabic ? 'معتمد رسمياً ★' : 'OFFICIAL PASS ★',
+                          style: GoogleFonts.cairo(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w900,
+                            color: ThebesColors.gold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              isArabic
+                  ? 'هذه البطاقة معتمدة رسمياً ومزودة بختم الأكاديمية الأمني للعام الأكاديمي الحالي.'
+                  : 'This verified credential is authenticated by Thebes Academy for the current academic year.',
+              style: GoogleFonts.cairo(fontSize: 12, color: Colors.grey, height: 1.4),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              isArabic ? 'إغلاق' : 'Close',
+              style: GoogleFonts.cairo(color: Colors.grey),
+            ),
+          ),
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: ThebesColors.primaryNavy,
+                  content: Row(
+                    children: [
+                      const Icon(Icons.check_circle_rounded, color: ThebesColors.emerald),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          isArabic
+                              ? 'تم حفظ بطاقة الطالب المعتمدة بنجاح على جهازك!'
+                              : 'Official ID card saved successfully to your device!',
+                          style: GoogleFonts.cairo(color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+            icon: const Icon(Icons.download_done_rounded, size: 18),
+            label: Text(
+              isArabic ? 'حفظ الكارنيه' : 'Save ID',
+              style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ThebesColors.gold,
+              foregroundColor: ThebesColors.primaryNavy,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showOfflinePassDialog(BuildContext context, dynamic student, bool isArabic, bool isDark) {
+    final offlineToken = 'THEBES-OFFLINE-GATE-PASS-${student.academicId}-${DateTime.now().day}${DateTime.now().month}';
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF0F172A) : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          border: Border.all(color: ThebesColors.gold, width: 1.5),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(
+              child: Container(
+                width: 44,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade400,
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              ),
+            ),
+            const SizedBox(height: 18),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.bolt_rounded, color: ThebesColors.emerald, size: 24),
+                const SizedBox(width: 8),
+                Text(
+                  isArabic ? 'تصريح البوابات السريع (دون إنترنت)' : 'Offline Contactless Gate Pass',
+                  style: GoogleFonts.cairo(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              isArabic
+                  ? 'وجه هذا الرمز المباشر إلى قارئ بوابات الدخول بمقرات الأكاديمية (المعادي / سقارة)'
+                  : 'Point this offline pass at Thebes Academy entrance turnstiles',
+              style: GoogleFonts.cairo(fontSize: 12, color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            // High-Contrast Gate QR Code
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: ThebesColors.gold, width: 2),
+                boxShadow: [
+                  BoxShadow(
+                    color: ThebesColors.gold.withAlpha(50),
+                    blurRadius: 16,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: QrImageView(
+                data: offlineToken,
+                version: QrVersions.auto,
+                size: 190.0,
+                eyeStyle: const QrEyeStyle(
+                  eyeShape: QrEyeShape.square,
+                  color: ThebesColors.primary,
+                ),
+                dataModuleStyle: const QrDataModuleStyle(
+                  dataModuleShape: QrDataModuleShape.square,
+                  color: ThebesColors.primary,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: ThebesColors.emerald.withAlpha(20),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: ThebesColors.emerald),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.check_circle_rounded, color: ThebesColors.emerald, size: 16),
+                  const SizedBox(width: 8),
+                  Text(
+                    isArabic ? 'تصريح ساري وصالح للمرور الفوري' : 'Pass Valid for Immediate Entry',
+                    style: GoogleFonts.cairo(
+                      color: ThebesColors.emerald,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(ctx),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ThebesColors.gold,
+                foregroundColor: ThebesColors.primaryNavy,
+                minimumSize: const Size(double.infinity, 48),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+              child: Text(
+                isArabic ? 'تم' : 'Done',
+                style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
         ),
       ),
     );

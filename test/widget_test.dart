@@ -8,7 +8,9 @@ import 'package:thebes_academy/screens/auth/login_screen.dart';
 
 void main() {
   setUpAll(() async {
-    await initServiceLocator();
+    if (!sl.isRegistered<StudentController>()) {
+      await initServiceLocator();
+    }
   });
 
   testWidgets('Thebes Academy App Smoke Test & Responsive Flow', (WidgetTester tester) async {
@@ -25,9 +27,9 @@ void main() {
     // Initial pump
     expect(find.byType(ThebesAcademyApp), findsOneWidget);
 
-    // Advance clock past splash timer
     await tester.pump(const Duration(milliseconds: 3000));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
 
     // Verify LoginScreen is shown
     expect(find.byType(LoginScreen), findsOneWidget);

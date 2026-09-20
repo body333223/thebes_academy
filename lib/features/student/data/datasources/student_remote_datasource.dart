@@ -15,6 +15,9 @@ abstract class StudentRemoteDataSource {
     required double fee,
   });
   Future<List<AnnouncementEntity>> getAnnouncements();
+  Future<List<CourseAttendanceStatEntity>> getAttendanceStats();
+  Future<List<AttendanceRecordEntity>> getAttendanceHistory();
+  Future<AttendanceRecordEntity> scanDoctorQr(String qrToken);
 }
 
 class StudentRemoteDataSourceImpl implements StudentRemoteDataSource {
@@ -350,4 +353,150 @@ class StudentRemoteDataSourceImpl implements StudentRemoteDataSource {
       ),
     ];
   }
+
+  final List<CourseAttendanceStatEntity> _attendanceStats = [
+    const CourseAttendanceStatEntity(
+      courseCode: 'CS301',
+      courseTitleAr: 'الذكاء الاصطناعي وتعلم الآلة',
+      courseTitleEn: 'Artificial Intelligence & ML',
+      totalLectures: 14,
+      attendedLectures: 13,
+      absentLectures: 1,
+      attendancePercentage: 92.8,
+      warningsCount: 0,
+    ),
+    const CourseAttendanceStatEntity(
+      courseCode: 'CS302',
+      courseTitleAr: 'إدارة قواعد البيانات المتقدمة',
+      courseTitleEn: 'Advanced Database Management',
+      totalLectures: 14,
+      attendedLectures: 14,
+      absentLectures: 0,
+      attendancePercentage: 100.0,
+      warningsCount: 0,
+    ),
+    const CourseAttendanceStatEntity(
+      courseCode: 'CS304',
+      courseTitleAr: 'أمن وسرية المعلومات والشبكات',
+      courseTitleEn: 'Information & Network Security',
+      totalLectures: 14,
+      attendedLectures: 12,
+      absentLectures: 2,
+      attendancePercentage: 85.7,
+      warningsCount: 0,
+    ),
+    const CourseAttendanceStatEntity(
+      courseCode: 'CS305',
+      courseTitleAr: 'تطوير تطبيقات الهواتف الذكية',
+      courseTitleEn: 'Mobile App Development',
+      totalLectures: 14,
+      attendedLectures: 14,
+      absentLectures: 0,
+      attendancePercentage: 100.0,
+      warningsCount: 0,
+    ),
+    const CourseAttendanceStatEntity(
+      courseCode: 'HUM201',
+      courseTitleAr: 'التفكير النقدي ومهارات الاتصال',
+      courseTitleEn: 'Critical Thinking & Communication',
+      totalLectures: 12,
+      attendedLectures: 10,
+      absentLectures: 2,
+      attendancePercentage: 83.3,
+      warningsCount: 1,
+    ),
+  ];
+
+  final List<AttendanceRecordEntity> _attendanceHistory = [
+    AttendanceRecordEntity(
+      id: 'att-1',
+      courseCode: 'CS301',
+      courseTitleAr: 'الذكاء الاصطناعي وتعلم الآلة',
+      courseTitleEn: 'Artificial Intelligence & ML',
+      doctorNameAr: 'أ.د. عادل سليمان',
+      doctorNameEn: 'Prof. Dr. Adel Soliman',
+      timestamp: DateTime.now().subtract(const Duration(hours: 3)),
+      hall: 'مدرج 402 - مبنى الهندسة',
+      sessionQrToken: 'THEBES-CS301-2026',
+      isVerified: true,
+    ),
+    AttendanceRecordEntity(
+      id: 'att-2',
+      courseCode: 'CS305',
+      courseTitleAr: 'تطوير تطبيقات الهواتف الذكية',
+      courseTitleEn: 'Mobile App Development',
+      doctorNameAr: 'د. سامح كمال الدين',
+      doctorNameEn: 'Dr. Sameh Kamal',
+      timestamp: DateTime.now().subtract(const Duration(days: 2, hours: 2)),
+      hall: 'معمل الحاسب 3 - الدور الثاني',
+      sessionQrToken: 'THEBES-CS305-2026',
+      isVerified: true,
+    ),
+  ];
+
+  @override
+  Future<List<CourseAttendanceStatEntity>> getAttendanceStats() async {
+    return _attendanceStats;
+  }
+
+  @override
+  Future<List<AttendanceRecordEntity>> getAttendanceHistory() async {
+    return _attendanceHistory;
+  }
+
+  @override
+  Future<AttendanceRecordEntity> scanDoctorQr(String qrToken) async {
+    final clean = qrToken.trim().toUpperCase();
+    if (!clean.startsWith('THEBES')) {
+      throw Exception('كود QR غير تابع لأكاديمية طيبة. يرجى مسح الكود المعروض بواسطة الدكتور.');
+    }
+
+    // Determine course from QR
+    String code = 'CS301';
+    String titleAr = 'الذكاء الاصطناعي وتعلم الآلة';
+    String titleEn = 'Artificial Intelligence & ML';
+    String docAr = 'أ.د. عادل سليمان';
+    String docEn = 'Prof. Dr. Adel Soliman';
+    String hall = 'مدرج 402 - مبنى الهندسة';
+
+    if (clean.contains('CS302') || clean.contains('DB')) {
+      code = 'CS302';
+      titleAr = 'إدارة قواعد البيانات المتقدمة';
+      titleEn = 'Advanced Database Management';
+      docAr = 'د. نادية حسن مصطفى';
+      docEn = 'Dr. Nadia Hassan';
+      hall = 'مدرج 204 - مبنى العلوم';
+    } else if (clean.contains('CS305') || clean.contains('MOBILE')) {
+      code = 'CS305';
+      titleAr = 'تطوير تطبيقات الهواتف الذكية';
+      titleEn = 'Mobile App Development';
+      docAr = 'د. سامح كمال الدين';
+      docEn = 'Dr. Sameh Kamal';
+      hall = 'معمل الحاسب 3';
+    } else if (clean.contains('CS304') || clean.contains('SEC')) {
+      code = 'CS304';
+      titleAr = 'أمن وسرية المعلومات والشبكات';
+      titleEn = 'Information & Network Security';
+      docAr = 'د. طارق عبد الوهاب';
+      docEn = 'Dr. Tarek Abdelwahab';
+      hall = 'مدرج 101 - مبنى الإدارة';
+    }
+
+    final newRecord = AttendanceRecordEntity(
+      id: 'att-${DateTime.now().millisecondsSinceEpoch}',
+      courseCode: code,
+      courseTitleAr: titleAr,
+      courseTitleEn: titleEn,
+      doctorNameAr: docAr,
+      doctorNameEn: docEn,
+      timestamp: DateTime.now(),
+      hall: hall,
+      sessionQrToken: clean,
+      isVerified: true,
+    );
+
+    _attendanceHistory.insert(0, newRecord);
+    return newRecord;
+  }
 }
+

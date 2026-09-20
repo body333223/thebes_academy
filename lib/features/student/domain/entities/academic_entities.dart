@@ -177,3 +177,74 @@ class AnnouncementEntity {
   String getLocalizedContent(bool isArabic) => isArabic ? contentAr : contentEn;
   String getLocalizedCategory(bool isArabic) => isArabic ? categoryAr : categoryEn;
 }
+
+class AttendanceRecordEntity {
+  final String id;
+  final String courseCode;
+  final String courseTitleAr;
+  final String courseTitleEn;
+  final String doctorNameAr;
+  final String doctorNameEn;
+  final DateTime timestamp;
+  final String hall;
+  final String sessionQrToken;
+  final bool isVerified;
+
+  const AttendanceRecordEntity({
+    required this.id,
+    required this.courseCode,
+    required this.courseTitleAr,
+    required this.courseTitleEn,
+    required this.doctorNameAr,
+    required this.doctorNameEn,
+    required this.timestamp,
+    required this.hall,
+    required this.sessionQrToken,
+    this.isVerified = true,
+  });
+
+  String getLocalizedCourseTitle(bool isArabic) => isArabic ? courseTitleAr : courseTitleEn;
+  String getLocalizedDoctorName(bool isArabic) => isArabic ? doctorNameAr : doctorNameEn;
+}
+
+class CourseAttendanceStatEntity {
+  final String courseCode;
+  final String courseTitleAr;
+  final String courseTitleEn;
+  final int totalLectures;
+  final int attendedLectures;
+  final int absentLectures;
+  final double attendancePercentage;
+  final int warningsCount; // 0, 1, 2, or 3 (Deprivation)
+
+  const CourseAttendanceStatEntity({
+    required this.courseCode,
+    required this.courseTitleAr,
+    required this.courseTitleEn,
+    required this.totalLectures,
+    required this.attendedLectures,
+    required this.absentLectures,
+    required this.attendancePercentage,
+    this.warningsCount = 0,
+  });
+
+  String getLocalizedTitle(bool isArabic) => isArabic ? courseTitleAr : courseTitleEn;
+
+  int get maxAllowedAbsence => (totalLectures * 0.25).floor();
+  int get remainingAbsencesAllowed {
+    final rem = maxAllowedAbsence - absentLectures;
+    return rem < 0 ? 0 : rem;
+  }
+  bool get isDeprived => absentLectures >= maxAllowedAbsence && maxAllowedAbsence > 0;
+  bool get isAtRisk => !isDeprived && remainingAbsencesAllowed <= 1 && maxAllowedAbsence > 0;
+
+  String getRiskBadgeText(bool isArabic) {
+    if (isDeprived) {
+      return isArabic ? 'محروم من الامتحان (تجاوز 25%)' : 'Deprived (Exceeded 25%)';
+    }
+    if (isAtRisk) {
+      return isArabic ? 'إنذار أكاديمي: باقي غياب واحد' : 'Warning: 1 Absence Left';
+    }
+    return isArabic ? 'حالة الحضور آمنة' : 'Safe Standing';
+  }
+}

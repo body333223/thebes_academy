@@ -113,3 +113,39 @@ class GetAnnouncementsUseCase implements UseCase<List<AnnouncementEntity>, NoPar
     return repository.getAnnouncements();
   }
 }
+
+class ScanDoctorQrParams {
+  final String qrToken;
+  const ScanDoctorQrParams(this.qrToken);
+}
+
+class ScanDoctorQrUseCase implements UseCase<AttendanceRecordEntity, ScanDoctorQrParams> {
+  final StudentRepository repository;
+  ScanDoctorQrUseCase(this.repository);
+
+  @override
+  Future<AttendanceRecordEntity> call(ScanDoctorQrParams params) {
+    return repository.scanDoctorQr(params.qrToken);
+  }
+}
+
+class GetAttendanceStatsUseCase implements UseCase<List<CourseAttendanceStatEntity>, NoParams> {
+  final StudentRepository repository;
+  GetAttendanceStatsUseCase(this.repository);
+
+  @override
+  Future<List<CourseAttendanceStatEntity>> call(NoParams params) {
+    return repository.getAttendanceStats();
+  }
+}
+
+class GetAttendanceHistoryUseCase implements UseCase<List<AttendanceRecordEntity>, NoParams> {
+  final StudentRepository repository;
+  GetAttendanceHistoryUseCase(this.repository);
+
+  @override
+  Future<List<AttendanceRecordEntity>> call(NoParams params) {
+    return repository.getAttendanceHistory();
+  }
+}
+

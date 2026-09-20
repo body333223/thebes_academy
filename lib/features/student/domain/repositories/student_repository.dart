@@ -15,4 +15,7 @@ abstract class StudentRepository {
     required double fee,
   });
   Future<List<AnnouncementEntity>> getAnnouncements();
+  Future<List<CourseAttendanceStatEntity>> getAttendanceStats();
+  Future<List<AttendanceRecordEntity>> getAttendanceHistory();
+  Future<AttendanceRecordEntity> scanDoctorQr(String qrToken);
 }

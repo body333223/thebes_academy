@@ -2,28 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../core/localization/locale_provider.dart';
 import '../core/responsive/adaptive_scaffold.dart';
-import '../features/student/domain/entities/student_entity.dart';
+import '../core/theme/thebes_colors.dart';
 import '../features/student/presentation/controllers/student_controller.dart';
 import 'student/home_dashboard.dart';
 import 'student/schedule_screen.dart';
+import 'student/qr_attendance_screen.dart';
 import 'student/grades_screen.dart';
 import 'student/services_screen.dart';
-import 'common/settings_screen.dart';
-import 'faculty/faculty_dashboard.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  final int initialIndex;
+  const MainScreen({super.key, this.initialIndex = 0});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 0;
+  late int _currentIndex;
 
   @override
   void initState() {
     super.initState();
+    _currentIndex = widget.initialIndex;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<StudentController>().loadInitialData();
     });
@@ -38,18 +39,13 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final locale = context.watch<LocaleProvider>();
-    final controller = context.watch<StudentController>();
-
-    if (controller.role == UserRole.faculty) {
-      return const FacultyDashboardScreen();
-    }
 
     final pages = [
       HomeDashboardScreen(onNavigateTab: _onTabTapped),
       const ScheduleScreen(),
+      const QrAttendanceScreen(),
       const GradesScreen(),
       const ServicesScreen(),
-      const SettingsScreen(),
     ];
 
     final destinations = [
@@ -64,29 +60,31 @@ class _MainScreenState extends State<MainScreen> {
         label: locale.tr('nav_schedule'),
       ),
       AdaptiveNavigationDestination(
+        icon: Icons.qr_code_scanner_rounded,
+        selectedIcon: Icons.qr_code_2_rounded,
+        label: locale.tr('nav_attendance'),
+      ),
+      AdaptiveNavigationDestination(
         icon: Icons.assessment_outlined,
         selectedIcon: Icons.assessment_rounded,
         label: locale.tr('nav_grades'),
       ),
       AdaptiveNavigationDestination(
-        icon: Icons.receipt_long_outlined,
-        selectedIcon: Icons.receipt_long_rounded,
+        icon: Icons.account_balance_wallet_outlined,
+        selectedIcon: Icons.account_balance_wallet_rounded,
         label: locale.tr('nav_services'),
-      ),
-      AdaptiveNavigationDestination(
-        icon: Icons.person_outline_rounded,
-        selectedIcon: Icons.person_rounded,
-        label: locale.tr('nav_profile'),
       ),
     ];
 
-    return AdaptiveScaffold(
-      currentIndex: _currentIndex,
-      onNavigationIndexChanged: _onTabTapped,
-      destinations: destinations,
-      body: IndexedStack(
-        index: _currentIndex,
-        children: pages,
+    return Scaffold(
+      body: AdaptiveScaffold(
+        currentIndex: _currentIndex,
+        onNavigationIndexChanged: _onTabTapped,
+        destinations: destinations,
+        body: IndexedStack(
+          index: _currentIndex,
+          children: pages,
+        ),
       ),
     );
   }

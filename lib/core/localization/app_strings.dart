@@ -17,12 +17,12 @@ class AppStrings {
       'quick_login_student': 'دخول تجريبي (طالب)',
       'quick_login_doctor': 'دخول تجريبي (دكتور/محاضر)',
       
-      // Bottom Navigation
       'nav_home': 'الرئيسية',
       'nav_schedule': 'الجدول',
+      'nav_attendance': 'تسجيل الحضور',
       'nav_grades': 'النتائج',
       'nav_services': 'الخدمات',
-      'nav_profile': 'حسابي',
+      'nav_profile': 'الإعدادات',
 
       // Home Dashboard
       'digital_id_btn': 'كارنيه الكلية الرقمي',
@@ -144,9 +144,10 @@ class AppStrings {
       // Bottom Navigation
       'nav_home': 'Home',
       'nav_schedule': 'Schedule',
+      'nav_attendance': 'Attendance',
       'nav_grades': 'Grades',
       'nav_services': 'Services',
-      'nav_profile': 'Profile',
+      'nav_profile': 'Settings',
 
       // Home Dashboard
       'digital_id_btn': 'Digital Student ID',

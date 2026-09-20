@@ -43,4 +43,14 @@ class StudentRepositoryImpl implements StudentRepository {
 
   @override
   Future<List<AnnouncementEntity>> getAnnouncements() => remoteDataSource.getAnnouncements();
+
+  @override
+  Future<List<CourseAttendanceStatEntity>> getAttendanceStats() => remoteDataSource.getAttendanceStats();
+
+  @override
+  Future<List<AttendanceRecordEntity>> getAttendanceHistory() => remoteDataSource.getAttendanceHistory();
+
+  @override
+  Future<AttendanceRecordEntity> scanDoctorQr(String qrToken) => remoteDataSource.scanDoctorQr(qrToken);
 }
+

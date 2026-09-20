@@ -17,3 +17,11 @@ class CacheFailure extends Failure {
 class ValidationFailure extends Failure {
   const ValidationFailure([super.message = 'بيانات الإدخال غير صحيحة']);
 }
+
+class ServerException implements Exception {
+  final String message;
+  const ServerException([this.message = 'حدث خطأ في الخادم']);
+  @override
+  String toString() => message;
+}
+
