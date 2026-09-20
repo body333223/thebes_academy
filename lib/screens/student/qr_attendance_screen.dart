@@ -6,6 +6,7 @@ import '../../core/localization/locale_provider.dart';
 import '../../core/responsive/responsive_helper.dart';
 import '../../core/theme/thebes_colors.dart';
 import '../../features/student/presentation/controllers/student_controller.dart';
+import '../faculty/faculty_dashboard.dart';
 
 class QrAttendanceScreen extends StatefulWidget {
   const QrAttendanceScreen({super.key});
@@ -19,6 +20,7 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
   late Animation<double> _laserPositionAnimation;
   final TextEditingController _manualCodeController = TextEditingController();
   bool _isFlashOn = false;
+  int _selectedMethodIndex = 0; // 0 = QR Camera Scanner, 1 = Enter PIN/Code
 
   @override
   void initState() {
@@ -231,100 +233,6 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
     );
   }
 
-  void _showManualEntrySheet() {
-    final isArabic = context.read<LocaleProvider>().isArabic;
-    _manualCodeController.clear();
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(ctx).viewInsets.bottom,
-          ),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0xFF0F1E33)
-                  : Colors.white,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-              border: Border.all(color: ThebesColors.gold.withAlpha(80), width: 1.5),
-            ),
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    width: 44,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.withAlpha(80),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 18),
-                Text(
-                  isArabic ? 'إدخال كود الجلسة يدوياً' : 'Enter Lecture Session Code',
-                  style: GoogleFonts.cairo(fontSize: 18, fontWeight: FontWeight.w800, color: ThebesColors.gold),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  isArabic
-                      ? 'يمكنك كتابة الرمز المعروض على شاشة الدكتور في حال تعذر المسح'
-                      : 'Type the code displayed on doctor\'s screen if scanner fails',
-                  style: GoogleFonts.cairo(fontSize: 12, color: Colors.grey),
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: _manualCodeController,
-                  textCapitalization: TextCapitalization.characters,
-                  decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.qr_code_2_rounded, color: ThebesColors.gold),
-                    hintText: 'e.g. THEBES-CS301-2026',
-                    filled: true,
-                    fillColor: ThebesColors.primary.withAlpha(15),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide(color: ThebesColors.gold.withAlpha(80)),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ThebesColors.gold,
-                      foregroundColor: ThebesColors.primaryDark,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                    ),
-                    onPressed: () {
-                      final code = _manualCodeController.text.trim();
-                      if (code.isNotEmpty) {
-                        Navigator.pop(ctx);
-                        _handleScan(code);
-                      }
-                    },
-                    child: Text(
-                      isArabic ? 'تأكيد الحضور' : 'Confirm Attendance',
-                      style: GoogleFonts.cairo(fontWeight: FontWeight.w800, fontSize: 16),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final isArabic = context.watch<LocaleProvider>().isArabic;
@@ -334,11 +242,19 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          isArabic ? 'تسجيل الحضور عبر QR' : 'Doctor QR Attendance',
+          isArabic ? 'تسجيل الحضور الأكاديمي' : 'Doctor QR & PIN Attendance',
           style: GoogleFonts.cairo(fontWeight: FontWeight.w800, fontSize: 18),
         ),
         centerTitle: true,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.school_rounded, color: ThebesColors.gold),
+            tooltip: isArabic ? 'لوحة الدكتور' : 'Faculty Dashboard',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const FacultyDashboard()),
+            ),
+          ),
           IconButton(
             icon: Icon(_isFlashOn ? Icons.flash_on_rounded : Icons.flash_off_rounded),
             color: _isFlashOn ? ThebesColors.gold : Colors.grey,
@@ -357,44 +273,409 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
               children: [
                 // 1. Live Attendance Summary Banner
                 _buildAttendanceStatsHero(context, controller, isArabic, isDark),
-                const SizedBox(height: 24),
-
-                // 2. Animated QR Scanner Viewfinder
-                _buildScannerViewfinder(context, controller, isArabic, isDark),
                 const SizedBox(height: 20),
 
-                // 3. Quick Demo Simulation Chips for immediate testing
-                _buildQuickDemoChips(isArabic),
-                const SizedBox(height: 16),
+                // 2. Dual Mode Method Selector (QR Camera vs Manual Code / PIN)
+                _buildMethodSelector(isArabic, isDark),
+                const SizedBox(height: 18),
 
-                // 4. Manual entry button
-                OutlinedButton.icon(
-                  onPressed: _showManualEntrySheet,
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: ThebesColors.gold.withAlpha(120)),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  ),
-                  icon: const Icon(Icons.keyboard_rounded, color: ThebesColors.gold),
-                  label: Text(
-                    isArabic ? 'إدخال كود المحاضرة يدوياً' : 'Enter Lecture Code Manually',
-                    style: GoogleFonts.cairo(
-                      fontWeight: FontWeight.w700,
-                      color: isDark ? Colors.white : ThebesColors.primary,
+                // 3. Dynamic Section based on chosen method
+                if (_selectedMethodIndex == 0) ...[
+                  _buildScannerViewfinder(context, controller, isArabic, isDark),
+                  const SizedBox(height: 16),
+                  _buildQuickDemoChips(isArabic),
+                  const SizedBox(height: 12),
+                  // Shortcut to PIN Entry
+                  Center(
+                    child: TextButton.icon(
+                      onPressed: () => setState(() => _selectedMethodIndex = 1),
+                      icon: const Icon(Icons.pin_outlined, color: ThebesColors.gold, size: 18),
+                      label: Text(
+                        isArabic ? 'أو اضغط هنا لكتابة كود المحاضرة (PIN) مباشرة' : 'Or tap here to type Lecture PIN directly',
+                        style: GoogleFonts.cairo(
+                          color: ThebesColors.gold,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 13,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 28),
+                ] else ...[
+                  _buildManualPinEntryCard(context, controller, isArabic, isDark),
+                  const SizedBox(height: 12),
+                  // Shortcut to QR Scan
+                  Center(
+                    child: TextButton.icon(
+                      onPressed: () => setState(() => _selectedMethodIndex = 0),
+                      icon: const Icon(Icons.qr_code_scanner_rounded, color: ThebesColors.gold, size: 18),
+                      label: Text(
+                        isArabic ? 'التبديل إلى مسح باركود الـ QR بالكاميرا' : 'Switch to Camera QR Scanner',
+                        style: GoogleFonts.cairo(
+                          color: ThebesColors.gold,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 26),
 
-                // 5. Subject-by-Subject Attendance Tracker
+                // 4. Subject-by-Subject Attendance Tracker
                 _buildCourseAttendanceSection(controller, isArabic, isDark),
                 const SizedBox(height: 28),
 
-                // 6. Attended Sessions Log
+                // 5. Attended Sessions Log
                 _buildAttendanceHistorySection(controller, isArabic, isDark),
                 const SizedBox(height: 40),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMethodSelector(bool isArabic, bool isDark) {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: isDark ? ThebesColors.darkCard : const Color(0xFFF1F5F9),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? ThebesColors.darkCardBorder : ThebesColors.lightCardBorder,
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: InkWell(
+              onTap: () => setState(() => _selectedMethodIndex = 0),
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 11),
+                decoration: BoxDecoration(
+                  color: _selectedMethodIndex == 0 ? ThebesColors.gold : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: _selectedMethodIndex == 0
+                      ? [BoxShadow(color: ThebesColors.gold.withAlpha(80), blurRadius: 10, offset: const Offset(0, 2))]
+                      : null,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.qr_code_scanner_rounded,
+                      size: 18,
+                      color: _selectedMethodIndex == 0 ? ThebesColors.primaryDark : (isDark ? Colors.white70 : Colors.black87),
+                    ),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Text(
+                        isArabic ? 'مسح باركود QR' : 'Scan QR',
+                        style: GoogleFonts.cairo(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 12.5,
+                          color: _selectedMethodIndex == 0 ? ThebesColors.primaryDark : (isDark ? Colors.white70 : Colors.black87),
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: InkWell(
+              onTap: () => setState(() => _selectedMethodIndex = 1),
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 11),
+                decoration: BoxDecoration(
+                  color: _selectedMethodIndex == 1 ? ThebesColors.gold : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: _selectedMethodIndex == 1
+                      ? [BoxShadow(color: ThebesColors.gold.withAlpha(80), blurRadius: 10, offset: const Offset(0, 2))]
+                      : null,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.pin_outlined,
+                      size: 18,
+                      color: _selectedMethodIndex == 1 ? ThebesColors.primaryDark : (isDark ? Colors.white70 : Colors.black87),
+                    ),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Text(
+                        isArabic ? 'كتابة الرمز (PIN)' : 'Enter PIN',
+                        style: GoogleFonts.cairo(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 12.5,
+                          color: _selectedMethodIndex == 1 ? ThebesColors.primaryDark : (isDark ? Colors.white70 : Colors.black87),
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildManualPinEntryCard(
+    BuildContext context,
+    StudentController controller,
+    bool isArabic,
+    bool isDark,
+  ) {
+    final activeCourse = controller.activeFacultySessionCourse;
+    final activePin = controller.activeFacultySessionCode;
+
+    return Container(
+      padding: const EdgeInsets.all(22),
+      decoration: BoxDecoration(
+        color: isDark ? ThebesColors.darkCard : Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: ThebesColors.gold.withAlpha(isDark ? 90 : 120),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: ThebesColors.primary.withAlpha(isDark ? 50 : 20),
+            blurRadius: 22,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: ThebesColors.gold.withAlpha(30),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.pin_outlined, color: ThebesColors.gold, size: 24),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isArabic ? 'كتابة رمز المحاضرة (PIN)' : 'Enter Lecture Session PIN',
+                      style: GoogleFonts.cairo(
+                        fontSize: 16.5,
+                        fontWeight: FontWeight.w900,
+                        color: isDark ? Colors.white : ThebesColors.primaryDark,
+                      ),
+                    ),
+                    Text(
+                      isArabic
+                          ? 'اكتب الرمز الرقمي المعروض على شاشة الدكتور لتأكيد حضورك'
+                          : 'Type the session PIN shown on doctor\'s projector',
+                      style: GoogleFonts.cairo(fontSize: 11.5, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+
+          // Live Active Session Hint Banner
+          if (controller.isFacultySessionActive)
+            Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: ThebesColors.emerald.withAlpha(25),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: ThebesColors.emerald.withAlpha(120)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.bolt_rounded, color: ThebesColors.emerald, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      isArabic
+                          ? 'جلسة نشطة الآن: $activeCourse • كود التحضير: $activePin'
+                          : 'Active Now: $activeCourse • PIN: $activePin',
+                      style: GoogleFonts.cairo(
+                        color: ThebesColors.emerald,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _manualCodeController.text = activePin;
+                      });
+                    },
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: Text(
+                      isArabic ? 'تعبئة الرمز' : 'Use PIN',
+                      style: GoogleFonts.cairo(
+                        color: ThebesColors.emerald,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 11.5,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+          // PIN Input Field with Large Clean Digits
+          TextField(
+            controller: _manualCodeController,
+            textCapitalization: TextCapitalization.characters,
+            style: GoogleFonts.spaceMono(
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 4,
+              color: isDark ? Colors.white : ThebesColors.primaryDark,
+            ),
+            textAlign: TextAlign.center,
+            decoration: InputDecoration(
+              hintText: 'e.g. 839204',
+              hintStyle: GoogleFonts.spaceMono(
+                fontSize: 18,
+                color: Colors.grey.withAlpha(120),
+                letterSpacing: 2,
+              ),
+              prefixIcon: const Icon(Icons.numbers_rounded, color: ThebesColors.gold),
+              suffixIcon: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (_manualCodeController.text.isNotEmpty)
+                    IconButton(
+                      icon: const Icon(Icons.clear_rounded, size: 18),
+                      onPressed: () => setState(() => _manualCodeController.clear()),
+                    ),
+                  IconButton(
+                    icon: const Icon(Icons.paste_rounded, color: ThebesColors.gold, size: 20),
+                    tooltip: isArabic ? 'لصق' : 'Paste',
+                    onPressed: () {
+                      setState(() {
+                        _manualCodeController.text = activePin;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              filled: true,
+              fillColor: isDark ? const Color(0xFF0F1E33) : const Color(0xFFF8FAFC),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: ThebesColors.gold.withAlpha(80), width: 1.5),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: ThebesColors.gold.withAlpha(90), width: 1.5),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: const BorderSide(color: ThebesColors.gold, width: 2),
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
+
+          // Quick Code Suggestions / Preset Chips
+          Wrap(
+            spacing: 8,
+            runSpacing: 6,
+            children: [
+              _buildPinPresetChip('839204 (كود الدكتور الحالي)', '839204'),
+              _buildPinPresetChip('CS301 (ذكاء اصطناعي)', 'CS301'),
+              _buildPinPresetChip('CS305 (موبايل)', 'CS305'),
+              _buildPinPresetChip('CS302 (قواعد بيانات)', 'CS302'),
+            ],
+          ),
+          const SizedBox(height: 20),
+
+          // Big Gold Submit Button
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ThebesColors.gold,
+                foregroundColor: ThebesColors.primaryDark,
+                elevation: 4,
+                shadowColor: ThebesColors.gold.withAlpha(120),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              ),
+              onPressed: () {
+                final code = _manualCodeController.text.trim();
+                if (code.isNotEmpty) {
+                  _handleScan(code);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        isArabic ? 'يرجى كتابة رمز المحاضرة أولاً' : 'Please enter code first',
+                      ),
+                      backgroundColor: ThebesColors.error,
+                    ),
+                  );
+                }
+              },
+              icon: const Icon(Icons.check_circle_rounded, size: 22),
+              label: Text(
+                isArabic ? 'تأكيد وتسجيل الحضور الآن' : 'Confirm & Register Attendance',
+                style: GoogleFonts.cairo(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPinPresetChip(String label, String code) {
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _manualCodeController.text = code;
+        });
+      },
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: ThebesColors.gold.withAlpha(20),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: ThebesColors.gold.withAlpha(80)),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.cairo(
+            fontSize: 11,
+            color: ThebesColors.gold,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),

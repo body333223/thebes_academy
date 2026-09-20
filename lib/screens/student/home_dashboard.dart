@@ -13,6 +13,7 @@ import 'schedule_screen.dart';
 import 'grades_screen.dart';
 import 'services_screen.dart';
 import '../common/settings_screen.dart';
+import '../faculty/faculty_dashboard.dart';
 
 class HomeDashboardScreen extends StatelessWidget {
   final Function(int)? onNavigateTab;
@@ -222,6 +223,23 @@ class HomeDashboardScreen extends StatelessWidget {
                 ),
             ],
           ),
+        ),
+        // Doctor / Faculty Dashboard Switch Button
+        IconButton(
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const FacultyDashboard()),
+          ),
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF13233A) : const Color(0xFFE9F0F8),
+              shape: BoxShape.circle,
+              border: Border.all(color: ThebesColors.gold.withAlpha(60)),
+            ),
+            child: const Icon(Icons.school_rounded, color: ThebesColors.gold, size: 20),
+          ),
+          tooltip: isArabic ? 'لوحة التحكم الأكاديمي' : 'Faculty Dashboard',
         ),
         // Settings / Profile Button
         IconButton(
@@ -514,7 +532,7 @@ class HomeDashboardScreen extends StatelessWidget {
               },
               icon: const Icon(Icons.qr_code_scanner_rounded, size: 20),
               label: Text(
-                isArabic ? 'مسح كود الـ QR وتسجيل الحضور الآن' : 'Scan Doctor QR & Log Attendance',
+                isArabic ? 'سجل حضورك الآن (كود PIN أو باركود QR)' : 'Register Attendance (PIN or QR)',
                 style: GoogleFonts.cairo(
                   fontWeight: FontWeight.w900,
                   fontSize: 14,
@@ -647,7 +665,7 @@ class HomeDashboardScreen extends StatelessWidget {
   Widget _buildQuickActionDock(BuildContext context, bool isArabic, bool isDark) {
     final actions = [
       {
-        'title': isArabic ? 'حضور QR' : 'QR Attend',
+        'title': isArabic ? 'حضور QR / كود' : 'QR / PIN',
         'icon': Icons.qr_code_scanner_rounded,
         'color': ThebesColors.gold,
         'action': () {
@@ -657,6 +675,12 @@ class HomeDashboardScreen extends StatelessWidget {
             Navigator.push(context, MaterialPageRoute(builder: (_) => const QrAttendanceScreen()));
           }
         },
+      },
+      {
+        'title': isArabic ? 'لوحة الدكتور' : 'Faculty',
+        'icon': Icons.school_rounded,
+        'color': ThebesColors.emerald,
+        'action': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FacultyDashboard())),
       },
       {
         'title': isArabic ? 'كارنيه الكلية' : 'Digital ID',

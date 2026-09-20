@@ -446,12 +446,12 @@ class StudentRemoteDataSourceImpl implements StudentRemoteDataSource {
 
   @override
   Future<AttendanceRecordEntity> scanDoctorQr(String qrToken) async {
-    final clean = qrToken.trim().toUpperCase();
-    if (!clean.startsWith('THEBES')) {
-      throw Exception('كود QR غير تابع لأكاديمية طيبة. يرجى مسح الكود المعروض بواسطة الدكتور.');
+    final raw = qrToken.trim().replaceAll(' ', '').toUpperCase();
+    if (raw.length < 3) {
+      throw Exception('يرجى إدخال رمز حضور صحيح مكون من 4 إلى 6 أرقام أو مسح باركود الـ QR.');
     }
 
-    // Determine course from QR
+    // Default course: CS301
     String code = 'CS301';
     String titleAr = 'الذكاء الاصطناعي وتعلم الآلة';
     String titleEn = 'Artificial Intelligence & ML';
@@ -459,27 +459,34 @@ class StudentRemoteDataSourceImpl implements StudentRemoteDataSource {
     String docEn = 'Prof. Dr. Adel Soliman';
     String hall = 'مدرج 402 - مبنى الهندسة';
 
-    if (clean.contains('CS302') || clean.contains('DB')) {
+    if (raw.contains('CS302') || raw.contains('DB') || raw.startsWith('204')) {
       code = 'CS302';
       titleAr = 'إدارة قواعد البيانات المتقدمة';
       titleEn = 'Advanced Database Management';
       docAr = 'د. نادية حسن مصطفى';
       docEn = 'Dr. Nadia Hassan';
       hall = 'مدرج 204 - مبنى العلوم';
-    } else if (clean.contains('CS305') || clean.contains('MOBILE')) {
+    } else if (raw.contains('CS305') || raw.contains('MOBILE') || raw.startsWith('305')) {
       code = 'CS305';
       titleAr = 'تطوير تطبيقات الهواتف الذكية';
       titleEn = 'Mobile App Development';
       docAr = 'د. سامح كمال الدين';
       docEn = 'Dr. Sameh Kamal';
       hall = 'معمل الحاسب 3';
-    } else if (clean.contains('CS304') || clean.contains('SEC')) {
+    } else if (raw.contains('CS304') || raw.contains('SEC') || raw.startsWith('101')) {
       code = 'CS304';
       titleAr = 'أمن وسرية المعلومات والشبكات';
       titleEn = 'Information & Network Security';
       docAr = 'د. طارق عبد الوهاب';
       docEn = 'Dr. Tarek Abdelwahab';
       hall = 'مدرج 101 - مبنى الإدارة';
+    } else if (raw.contains('IS302') || raw.contains('SE')) {
+      code = 'IS302';
+      titleAr = 'هندسة البرمجيات والمنظومات';
+      titleEn = 'Software Engineering';
+      docAr = 'د. إيمان عبد العزيز';
+      docEn = 'Dr. Eman Abdelaziz';
+      hall = 'مدرج 301 - مبنى النظم';
     }
 
     final newRecord = AttendanceRecordEntity(
@@ -491,7 +498,7 @@ class StudentRemoteDataSourceImpl implements StudentRemoteDataSource {
       doctorNameEn: docEn,
       timestamp: DateTime.now(),
       hall: hall,
-      sessionQrToken: clean,
+      sessionQrToken: raw,
       isVerified: true,
     );
 

@@ -351,6 +351,7 @@ class StudentController extends ChangeNotifier {
       _lastScannedRecord = record;
       _attendanceHistory = await getAttendanceHistoryUseCase(const NoParams());
       _attendanceStats = await getAttendanceStatsUseCase(const NoParams());
+      _facultySessionAttendees++;
       _isScanning = false;
       notifyListeners();
       return true;
@@ -360,6 +361,52 @@ class StudentController extends ChangeNotifier {
       notifyListeners();
       return false;
     }
+  }
+
+  // Doctor / Faculty Live Session State
+  bool _isFacultySessionActive = true;
+  bool get isFacultySessionActive => _isFacultySessionActive;
+
+  String _activeFacultySessionCode = '839204';
+  String get activeFacultySessionCode => _activeFacultySessionCode;
+
+  String _activeFacultySessionCourse = 'CS301';
+  String get activeFacultySessionCourse => _activeFacultySessionCourse;
+
+  int _facultySessionAttendees = 42;
+  int get facultySessionAttendees => _facultySessionAttendees;
+
+  void toggleFacultySession({String? courseCode, String? pin}) {
+    _isFacultySessionActive = !_isFacultySessionActive;
+    if (courseCode != null) _activeFacultySessionCourse = courseCode;
+    if (pin != null) _activeFacultySessionCode = pin;
+    notifyListeners();
+  }
+
+  void refreshFacultySessionPin() {
+    final randomDigits = (100000 + (DateTime.now().millisecondsSinceEpoch % 900000)).toString();
+    _activeFacultySessionCode = randomDigits;
+    notifyListeners();
+  }
+
+  void broadcastCourseAnnouncement({
+    required String courseCode,
+    required String titleAr,
+    required String messageAr,
+  }) {
+    final notif = NotificationEntity(
+      id: 'broadcast_${DateTime.now().millisecondsSinceEpoch}',
+      titleAr: titleAr,
+      titleEn: 'Academic Announcement: $courseCode',
+      messageAr: messageAr,
+      messageEn: messageAr,
+      timestamp: DateTime.now(),
+      type: NotificationType.universityNews,
+      isRead: false,
+    );
+    _notifications.insert(0, notif);
+    localCacheService.cacheNotificationsJson(_notifications.map((e) => e.toJson()).toList());
+    notifyListeners();
   }
 
   void clearScanError() {

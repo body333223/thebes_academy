@@ -39,18 +39,31 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
-    // Verify Scanner Viewfinder and demo chips
+    // Verify Dual-Mode Selector (Scan QR + Enter PIN)
     expect(find.byType(QrAttendanceScreen), findsOneWidget);
-    expect(find.byIcon(Icons.keyboard_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.pin_outlined), findsWidgets);
+    expect(find.byIcon(Icons.qr_code_scanner_rounded), findsWidgets);
 
-    // Test scanning a valid lecture code via controller
+    // Switch to PIN tab
+    await tester.tap(find.byIcon(Icons.pin_outlined).first);
+    await tester.pump(const Duration(milliseconds: 100));
+
+    // Verify PIN entry card is displayed
+    expect(find.byType(TextField), findsOneWidget);
+
+    // Test scanning a valid lecture code via controller (THEBES token)
     final success = await controller.scanDoctorQr('THEBES-CS301-2026');
     expect(success, isTrue);
     expect(controller.lastScannedRecord, isNotNull);
     expect(controller.lastScannedRecord!.courseCode, equals('CS301'));
 
-    // Test scanning an invalid code
-    final failed = await controller.scanDoctorQr('INVALID-CODE');
+    // Test 6-digit numeric PIN attendance
+    final pinSuccess = await controller.scanDoctorQr('839204');
+    expect(pinSuccess, isTrue);
+    expect(controller.lastScannedRecord!.courseCode, equals('CS301'));
+
+    // Test scanning an invalid short code (< 3 chars)
+    final failed = await controller.scanDoctorQr('12');
     expect(failed, isFalse);
     expect(controller.scanErrorMessage, isNotNull);
   });
