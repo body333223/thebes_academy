@@ -7,7 +7,6 @@ import 'package:thebes_academy/core/localization/locale_provider.dart';
 import 'package:thebes_academy/core/responsive/responsive_helper.dart';
 import 'package:thebes_academy/features/student/domain/entities/academic_entities.dart';
 import 'package:thebes_academy/features/student/presentation/controllers/student_controller.dart';
-import 'summer_course_screen.dart';
 
 class ServicesScreen extends StatefulWidget {
   final int initialTab;
@@ -170,104 +169,6 @@ class _ServicesScreenState extends State<ServicesScreen> with SingleTickerProvid
                           ],
                         ),
                       ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 14),
-
-                  // Summer Course Registration & Fees Card
-                  GestureDetector(
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const SummerCourseScreen()),
-                    ),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF1B1607), Color(0xFF2C2005), Color(0xFF1A1508)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: const Color(0xFFFFB300), width: 1.3),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFFFF9800).withAlpha(35),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFFFF9800), Color(0xFFFF6F00)],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            child: const Icon(Icons.wb_sunny_rounded, color: Colors.white, size: 24),
-                          ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      isArabic ? 'بوابة الفصل الصيفي ومصروفاته' : 'Summer Term Portal',
-                                      style: GoogleFonts.cairo(
-                                        color: Colors.white,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w900,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFFFB300).withAlpha(40),
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      child: Text(
-                                        isArabic ? '450 ج.م/ساعة' : '450 EGP/hr',
-                                        style: GoogleFonts.cairo(
-                                          fontSize: 9.5,
-                                          fontWeight: FontWeight.w800,
-                                          color: const Color(0xFFFFD54F),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  isArabic
-                                      ? 'تسجيل المواد، حساب تكلفة الساعات والسداد الإلكتروني الفوري'
-                                      : 'Add courses, calculate credit fees, and pay online',
-                                  style: GoogleFonts.cairo(
-                                    color: Colors.white70,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Icon(
-                            isArabic ? Icons.arrow_back_ios_new_rounded : Icons.arrow_forward_ios_rounded,
-                            color: const Color(0xFFFFD54F),
-                            size: 15,
-                          ),
-                        ],
-                      ),
                     ),
                   ),
 

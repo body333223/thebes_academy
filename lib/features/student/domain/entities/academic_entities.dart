@@ -329,3 +329,38 @@ class SummerRegistrationSummary {
   bool get canAddMore => totalCreditHours < maxCreditHoursAllowed;
   int get remainingHours => maxCreditHoursAllowed - totalCreditHours;
 }
+
+class AcademicAdvisingSessionEntity {
+  final bool isRegistrationOpen;
+  final String advisorNameAr;
+  final String advisorNameEn;
+  final String officeLocationAr;
+  final String officeLocationEn;
+  final String officeHoursAr;
+  final String officeHoursEn;
+  final String advisorEmail;
+  final String advisorNotesAr;
+  final String advisorNotesEn;
+  final int maxCreditHoursAllowed;
+  final List<SummerCourseEntity> approvedCourses;
+
+  const AcademicAdvisingSessionEntity({
+    this.isRegistrationOpen = false,
+    required this.advisorNameAr,
+    required this.advisorNameEn,
+    required this.officeLocationAr,
+    required this.officeLocationEn,
+    required this.officeHoursAr,
+    required this.officeHoursEn,
+    required this.advisorEmail,
+    required this.advisorNotesAr,
+    required this.advisorNotesEn,
+    this.maxCreditHoursAllowed = 9,
+    required this.approvedCourses,
+  });
+
+  String getLocalizedAdvisor(bool isArabic) => isArabic ? advisorNameAr : advisorNameEn;
+  String getLocalizedOffice(bool isArabic) => isArabic ? officeLocationAr : officeLocationEn;
+  String getLocalizedOfficeHours(bool isArabic) => isArabic ? officeHoursAr : officeHoursEn;
+  String getLocalizedNotes(bool isArabic) => isArabic ? advisorNotesAr : advisorNotesEn;
+}

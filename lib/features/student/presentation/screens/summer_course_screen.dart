@@ -26,8 +26,31 @@ class _SummerCourseScreenState extends State<SummerCourseScreen> {
     final isDark = locale.isDarkMode;
     final controller = context.watch<StudentController>();
     final summary = controller.summerSummary;
+    final advisingSession = controller.advisingSession;
+    final isWindowOpen = controller.isRegistrationWindowOpen;
 
-    final filteredCourses = controller.availableSummerCourses.where((c) {
+    if (!isWindowOpen) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(isArabic ? 'تسجيل المقررات (الإرشاد الأكاديمي)' : 'Course Registration & Advising'),
+          centerTitle: true,
+        ),
+        body: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 800),
+            child: ListView(
+              padding: const EdgeInsets.all(20),
+              children: [
+                _buildRegistrationClosedView(context, advisingSession, isArabic, isDark),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    final coursesPool = controller.advisorApprovedCourses;
+    final filteredCourses = coursesPool.where((c) {
       if (_selectedFilter != null && c.category != _selectedFilter) return false;
       if (_searchQuery.isNotEmpty) {
         final q = _searchQuery.toLowerCase();
@@ -40,7 +63,7 @@ class _SummerCourseScreenState extends State<SummerCourseScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isArabic ? 'التسجيل الصيفي ومصاريف السمر' : 'Summer Term Registration & Fees'),
+        title: Text(isArabic ? 'تسجيل المقررات المعتمدة' : 'Approved Course Registration'),
         centerTitle: true,
       ),
       body: Center(
@@ -57,7 +80,7 @@ class _SummerCourseScreenState extends State<SummerCourseScreen> {
                 ),
                 children: [
                   // 1. Summer Term Info Banner
-                  _buildSummerHeroBanner(context, isArabic, isDark, summary),
+                  _buildSummerHeroBanner(context, isArabic, isDark, summary, advisingSession),
                   const SizedBox(height: 18),
 
                   // 2. Rules & Tuition Regulations Card
@@ -73,7 +96,7 @@ class _SummerCourseScreenState extends State<SummerCourseScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        isArabic ? 'المقررات الصيفية المتاحة للتسجيل' : 'Available Summer Courses',
+                        isArabic ? 'المقررات المعتمدة لك من المرشد' : 'Advisor-Approved Courses',
                         style: GoogleFonts.cairo(
                           fontSize: 16,
                           fontWeight: FontWeight.w900,
@@ -88,7 +111,7 @@ class _SummerCourseScreenState extends State<SummerCourseScreen> {
                           border: Border.all(color: ThebesColors.gold.withAlpha(90)),
                         ),
                         child: Text(
-                          '${filteredCourses.length} ${isArabic ? "مقررات" : "courses"}',
+                          '${filteredCourses.length} ${isArabic ? "مقررات معتمدة" : "approved"}',
                           style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: ThebesColors.gold),
                         ),
                       ),
@@ -118,24 +141,225 @@ class _SummerCourseScreenState extends State<SummerCourseScreen> {
     );
   }
 
-  // 1. Hero Banner
-  Widget _buildSummerHeroBanner(BuildContext context, bool isArabic, bool isDark, SummerRegistrationSummary summary) {
+  Widget _buildRegistrationClosedView(
+    BuildContext context,
+    AcademicAdvisingSessionEntity session,
+    bool isArabic,
+    bool isDark,
+  ) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(22),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF0C1F3D), Color(0xFF16325C), Color(0xFF1E427B)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: isDark ? ThebesColors.darkCard : Colors.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: ThebesColors.gold.withAlpha(150), width: 1.5),
+        border: Border.all(
+          color: isDark ? ThebesColors.darkCardBorder : ThebesColors.lightCardBorder,
+        ),
         boxShadow: [
           BoxShadow(
-            color: ThebesColors.primaryDark.withAlpha(120),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
+            color: Colors.black.withAlpha(isDark ? 40 : 10),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 70,
+            height: 70,
+            decoration: BoxDecoration(
+              color: ThebesColors.gold.withAlpha(25),
+              shape: BoxShape.circle,
+              border: Border.all(color: ThebesColors.gold.withAlpha(80), width: 2),
+            ),
+            child: const Icon(Icons.school_rounded, color: ThebesColors.gold, size: 34),
+          ),
+          const SizedBox(height: 18),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1)),
+            ),
+            child: Text(
+              isArabic ? 'فترة التسجيل مغلقة حالياً' : 'Registration Window Closed',
+              style: GoogleFonts.cairo(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: isDark ? Colors.white70 : const Color(0xFF475569),
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            isArabic ? 'بوابة تسجيل المقررات الأكاديمية' : 'Academic Course Registration',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.cairo(
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+              color: isDark ? Colors.white : ThebesColors.primary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            isArabic
+                ? 'يتم فتح باب التسجيل وتحديد المواد المعتمدة لكل طالب حصرياً عبر المرشد الأكاديمي خلال فترات التسجيل الرسمية المعلنة من إدارة المعهد.'
+                : 'Course registration is opened and assigned exclusively by your Academic Advisor during official enrollment windows.',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.cairo(
+              fontSize: 12.5,
+              height: 1.5,
+              color: Colors.grey,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Divider(color: isDark ? Colors.white12 : Colors.black12),
+          const SizedBox(height: 16),
+          // Advisor Info Card
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF091424) : const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isDark ? ThebesColors.darkCardBorder : ThebesColors.lightCardBorder,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.person_pin_rounded, color: ThebesColors.gold, size: 22),
+                    const SizedBox(width: 8),
+                    Text(
+                      isArabic ? 'المرشد الأكاديمي الخاص بك' : 'Your Academic Advisor',
+                      style: GoogleFonts.cairo(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: ThebesColors.gold,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  session.getLocalizedAdvisor(isArabic),
+                  style: GoogleFonts.cairo(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: isDark ? Colors.white : ThebesColors.primary,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    const Icon(Icons.location_on_outlined, size: 16, color: Colors.grey),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        session.getLocalizedOffice(isArabic),
+                        style: GoogleFonts.cairo(fontSize: 11.5, color: Colors.grey),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    const Icon(Icons.access_time_rounded, size: 16, color: Colors.grey),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        session.getLocalizedOfficeHours(isArabic),
+                        style: GoogleFonts.cairo(fontSize: 11.5, color: Colors.grey),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: ThebesColors.gold.withAlpha(15),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: ThebesColors.gold.withAlpha(50)),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.info_outline_rounded, size: 18, color: ThebesColors.gold),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          session.getLocalizedNotes(isArabic),
+                          style: GoogleFonts.cairo(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.white70 : Colors.black87,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                side: const BorderSide(color: ThebesColors.gold),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      isArabic ? 'تم إرسال طلب استفسار إلى المرشد الأكاديمي.' : 'Inquiry sent to your Academic Advisor.',
+                      style: GoogleFonts.cairo(),
+                    ),
+                    backgroundColor: ThebesColors.primaryDark,
+                  ),
+                );
+              },
+              icon: const Icon(Icons.email_outlined, color: ThebesColors.gold, size: 18),
+              label: Text(
+                isArabic ? 'إرسال استفسار للمرشد الأكاديمي' : 'Contact Academic Advisor',
+                style: GoogleFonts.cairo(
+                  color: ThebesColors.gold,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 1. Hero Banner
+  Widget _buildSummerHeroBanner(BuildContext context, bool isArabic, bool isDark, SummerRegistrationSummary summary, AcademicAdvisingSessionEntity advising) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: isDark ? ThebesColors.darkCard : Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: ThebesColors.gold.withAlpha(120), width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(isDark ? 40 : 10),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
@@ -146,67 +370,61 @@ class _SummerCourseScreenState extends State<SummerCourseScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.orange.withAlpha(40),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.orangeAccent),
+                  color: ThebesColors.gold.withAlpha(25),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: ThebesColors.gold),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.wb_sunny_rounded, size: 16, color: Colors.orangeAccent),
+                    const Icon(Icons.verified_user_rounded, size: 15, color: ThebesColors.gold),
                     const SizedBox(width: 6),
                     Text(
-                      isArabic ? 'الفصل الدراسي الصيفي 2026' : 'Summer Semester 2026',
+                      isArabic ? 'معتمد من المرشد الأكاديمي' : 'Advisor Approved',
                       style: GoogleFonts.cairo(
-                        fontSize: 11.5,
+                        fontSize: 11,
                         fontWeight: FontWeight.w800,
-                        color: Colors.orangeAccent,
+                        color: ThebesColors.gold,
                       ),
                     ),
                   ],
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: Colors.redAccent.withAlpha(30),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.redAccent.withAlpha(120)),
+                  color: ThebesColors.emerald.withAlpha(25),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.timer_outlined, size: 14, color: Colors.redAccent),
-                    const SizedBox(width: 5),
-                    Text(
-                      isArabic ? 'متبقي 4 أيام على إغلاق التسجيل' : '4 Days Remaining',
-                      style: const TextStyle(color: Colors.redAccent, fontSize: 11, fontWeight: FontWeight.bold),
-                    ),
-                  ],
+                child: Text(
+                  isArabic ? 'فترة التسجيل مفتوحة' : 'Enrollment Open',
+                  style: GoogleFonts.cairo(
+                    color: ThebesColors.emerald,
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
           Text(
-            isArabic ? 'بوابة التسجيل الصيفي واحتساب المصروفات' : 'Summer Course Enrollment & Fees Calculator',
+            isArabic ? 'تسجيل المقررات المعتمدة للطالب' : 'Approved Course Enrollment',
             style: GoogleFonts.cairo(
-              fontSize: 18,
+              fontSize: 17,
               fontWeight: FontWeight.w900,
-              color: Colors.white,
+              color: isDark ? Colors.white : ThebesColors.primary,
             ),
           ),
           const SizedBox(height: 4),
           Text(
-            isArabic
-              ? 'يمكنك تسجيل مواد التخلف أو تحسين المعدل التراكمي (GPA) بحد أقصى 9 ساعات معتمدة (3 مقررات). تُحتسب مصاريف الساعة بـ 450 ج.م.'
-              : 'Enroll in arrear courses or improve your CGPA up to 9 credit hours (3 courses max) at 450 EGP per credit hour.',
-            style: TextStyle(
-              fontSize: 12.5,
+            advising.getLocalizedNotes(isArabic),
+            style: GoogleFonts.cairo(
+              fontSize: 12,
               height: 1.4,
-              color: Colors.white.withAlpha(210),
+              color: Colors.grey,
             ),
           ),
         ],

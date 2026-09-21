@@ -129,7 +129,11 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                 _buildCoursesManagementSection(context, controller, isArabic, isDark),
                 const SizedBox(height: 28),
 
-                // 5. Academic Absence Risk & Warnings
+                // 5. Academic Advising & Course Approval Governance
+                _buildAcademicAdvisingSection(context, controller, isArabic, isDark),
+                const SizedBox(height: 28),
+
+                // 6. Academic Absence Risk & Warnings
                 _buildAbsenceRiskSection(context, isArabic, isDark),
                 const SizedBox(height: 36),
               ],
@@ -1221,6 +1225,503 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Academic Advising & Summer Course Governance
+  Widget _buildAcademicAdvisingSection(
+    BuildContext context,
+    StudentController controller,
+    bool isArabic,
+    bool isDark,
+  ) {
+    final advising = controller.advisingSession;
+    final allCourses = controller.availableSummerCourses;
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: isDark ? ThebesColors.darkCard : Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: ThebesColors.gold.withAlpha(isDark ? 80 : 120),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(isDark ? 50 : 15),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header Row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: ThebesColors.gold.withAlpha(30),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.assignment_ind_rounded, color: ThebesColors.gold, size: 22),
+                  ),
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isArabic ? 'بوابة الإرشاد الأكاديمي والتحكم بالتسجيل' : 'Academic Advising & Course Approval',
+                        style: GoogleFonts.cairo(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
+                          color: isDark ? Colors.white : ThebesColors.primary,
+                        ),
+                      ),
+                      Text(
+                        isArabic
+                            ? 'إدارة صلاحيات تسجيل المقررات الصيفية للطالب'
+                            : 'Manage student registration access & approved courses',
+                        style: GoogleFonts.cairo(fontSize: 11.5, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: controller.isRegistrationWindowOpen
+                      ? ThebesColors.emerald.withAlpha(30)
+                      : Colors.orange.withAlpha(30),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: controller.isRegistrationWindowOpen
+                        ? ThebesColors.emerald.withAlpha(120)
+                        : Colors.orange.withAlpha(120),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      controller.isRegistrationWindowOpen ? Icons.lock_open_rounded : Icons.lock_outline_rounded,
+                      size: 14,
+                      color: controller.isRegistrationWindowOpen ? ThebesColors.emerald : Colors.orange,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      controller.isRegistrationWindowOpen
+                          ? (isArabic ? 'التسجيل مفعل' : 'Registration Open')
+                          : (isArabic ? 'التسجيل مغلق' : 'Registration Closed'),
+                      style: GoogleFonts.cairo(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: controller.isRegistrationWindowOpen ? ThebesColors.emerald : Colors.orange,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+
+          // Student Info Strip
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF0C1726) : const Color(0xFFF1F5F9),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: isDark ? ThebesColors.darkCardBorder : const Color(0xFFCBD5E1)),
+            ),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 20,
+                  backgroundColor: ThebesColors.primary,
+                  child: Text(
+                    'أ.ش',
+                    style: GoogleFonts.cairo(fontWeight: FontWeight.bold, color: ThebesColors.gold),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isArabic ? controller.student.nameAr : controller.student.nameEn,
+                        style: GoogleFonts.cairo(fontWeight: FontWeight.w800, fontSize: 13.5),
+                      ),
+                      Text(
+                        '${isArabic ? "كود الطالب:" : "ID:"} ${controller.student.academicId} | ${isArabic ? "المعدل التراكمي:" : "CGPA:"} ${controller.student.gpa} | ${isArabic ? "الساعات المنجزة:" : "Hours:"} ${controller.student.completedHours}h',
+                        style: GoogleFonts.cairo(fontSize: 11, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: ThebesColors.gold.withAlpha(20),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    isArabic ? 'طالب مُرشَد' : 'Advisee',
+                    style: GoogleFonts.cairo(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.bold,
+                      color: ThebesColors.gold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 18),
+
+          // Master Window Activation Switch
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: controller.isRegistrationWindowOpen
+                  ? ThebesColors.emerald.withAlpha(15)
+                  : ThebesColors.gold.withAlpha(12),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: controller.isRegistrationWindowOpen
+                    ? ThebesColors.emerald.withAlpha(60)
+                    : ThebesColors.gold.withAlpha(60),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  controller.isRegistrationWindowOpen
+                      ? Icons.check_circle_outline_rounded
+                      : Icons.info_outline_rounded,
+                  color: controller.isRegistrationWindowOpen ? ThebesColors.emerald : ThebesColors.gold,
+                  size: 22,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isArabic
+                            ? 'تفعيل نافذة تسجيل المقررات الصيفية للطالب'
+                            : 'Enable Summer Registration Window',
+                        style: GoogleFonts.cairo(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 13,
+                          color: isDark ? Colors.white : ThebesColors.primary,
+                        ),
+                      ),
+                      Text(
+                        controller.isRegistrationWindowOpen
+                            ? (isArabic
+                                ? 'النافذة مفتوحة حالياً: يمكن للطالب تسجيل المقررات المعتمدة أدناه'
+                                : 'Window is active: Student can enroll in approved courses below')
+                            : (isArabic
+                                ? 'النافذة مغلقة: يظهر للطالب إشعار بمراجعة المرشد الأكاديمي'
+                                : 'Window is closed: Student sees advisor contact requirement notice'),
+                        style: GoogleFonts.cairo(fontSize: 11, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                ),
+                Switch.adaptive(
+                  value: controller.isRegistrationWindowOpen,
+                  activeTrackColor: ThebesColors.emerald,
+                  onChanged: (val) {
+                    controller.setRegistrationWindowOpen(val);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          val
+                              ? (isArabic
+                                  ? 'تم فتح نافذة التسجيل للطالب بنجاح'
+                                  : 'Registration window opened for student')
+                              : (isArabic
+                                  ? 'تم إغلاق نافذة التسجيل للطالب'
+                                  : 'Registration window closed for student'),
+                        ),
+                        backgroundColor: val ? ThebesColors.emerald : ThebesColors.primary,
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Course Checklist Header
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    isArabic ? 'المقررات المصرح بها للطالب' : 'Advisor-Approved Courses',
+                    style: GoogleFonts.cairo(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      color: isDark ? Colors.white : ThebesColors.primary,
+                    ),
+                  ),
+                  Text(
+                    isArabic
+                        ? 'فقط المقررات المفعلة تظهر في صفحة التسجيل الخاصة بالطالب'
+                        : 'Only active courses are available in student enrollment portal',
+                    style: GoogleFonts.cairo(fontSize: 11, color: Colors.grey),
+                  ),
+                ],
+              ),
+              Text(
+                '${controller.advisorApprovedCourses.length}/${allCourses.length} ${isArabic ? "معتمد" : "Approved"}',
+                style: GoogleFonts.cairo(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: ThebesColors.gold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Course Checklist Cards
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: allCourses.length,
+            separatorBuilder: (_, _) => const SizedBox(height: 8),
+            itemBuilder: (context, index) {
+              final course = allCourses[index];
+              final isApproved = controller.isCourseApprovedByAdvisor(course.code);
+
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? (isApproved ? const Color(0xFF132338) : const Color(0xFF0F1A28))
+                      : (isApproved ? const Color(0xFFF8FAFC) : const Color(0xFFF1F5F9)),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: isApproved
+                        ? ThebesColors.gold.withAlpha(120)
+                        : (isDark ? ThebesColors.darkCardBorder : const Color(0xFFE2E8F0)),
+                    width: isApproved ? 1.2 : 1,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: ThebesColors.primaryDark,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        course.code,
+                        style: GoogleFonts.spaceMono(
+                          color: ThebesColors.gold,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            course.getLocalizedTitle(isArabic),
+                            style: GoogleFonts.cairo(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 12.5,
+                              color: isDark ? Colors.white : ThebesColors.primary,
+                            ),
+                          ),
+                          Text(
+                            '${course.creditHours} ${isArabic ? "ساعات معتمدة" : "Credit Hours"} | ${course.pricePerHour.toInt()} ${isArabic ? "ج.م/ساعة" : "EGP/hr"}',
+                            style: GoogleFonts.cairo(fontSize: 10.5, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ),
+                    InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () {
+                        controller.toggleAdvisorApprovedCourse(course.code);
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: isApproved ? ThebesColors.gold : Colors.grey.withAlpha(30),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              isApproved ? Icons.check_circle_rounded : Icons.add_circle_outline_rounded,
+                              size: 14,
+                              color: isApproved ? ThebesColors.primaryDark : Colors.grey,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              isApproved
+                                  ? (isArabic ? 'معتمد للطالب' : 'Approved')
+                                  : (isArabic ? 'غير مصرح' : 'Disallowed'),
+                              style: GoogleFonts.cairo(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.bold,
+                                color: isApproved ? ThebesColors.primaryDark : Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+
+          // Advisor Guidance Notes & Edit Button
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF0D1B2E) : const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: ThebesColors.gold.withAlpha(40)),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.rate_review_outlined, color: ThebesColors.gold, size: 18),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isArabic ? 'توصيات المرشد الأكاديمي للطالب:' : 'Academic Advisor Notes to Student:',
+                        style: GoogleFonts.cairo(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 11.5,
+                          color: ThebesColors.gold,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        advising.getLocalizedNotes(isArabic),
+                        style: GoogleFonts.cairo(fontSize: 11.5, color: isDark ? Colors.white70 : Colors.black87),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.edit_note_rounded, size: 20, color: ThebesColors.gold),
+                  tooltip: isArabic ? 'تعديل التوصيات' : 'Edit notes',
+                  onPressed: () => _showAdvisorNotesDialog(context, controller, isArabic, isDark),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAdvisorNotesDialog(
+    BuildContext context,
+    StudentController controller,
+    bool isArabic,
+    bool isDark,
+  ) {
+    final arController = TextEditingController(text: controller.advisorNotesAr);
+    final enController = TextEditingController(text: controller.advisorNotesEn);
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF0F1E33) : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            const Icon(Icons.edit_note_rounded, color: ThebesColors.gold),
+            const SizedBox(width: 8),
+            Text(
+              isArabic ? 'تعديل توجيهات المرشد الأكاديمي' : 'Edit Advising Guidance',
+              style: GoogleFonts.cairo(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: arController,
+              maxLines: 2,
+              decoration: InputDecoration(
+                labelText: isArabic ? 'التوجيهات (بالعربية)' : 'Notes (Arabic)',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: enController,
+              maxLines: 2,
+              decoration: InputDecoration(
+                labelText: isArabic ? 'التوجيهات (بالإنجليزية)' : 'Notes (English)',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(isArabic ? 'إلغاء' : 'Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ThebesColors.gold,
+              foregroundColor: ThebesColors.primaryDark,
+            ),
+            onPressed: () {
+              controller.updateAdvisorNotes(
+                notesAr: arController.text.trim(),
+                notesEn: enController.text.trim(),
+              );
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(isArabic ? 'تم تحديث توجيهات المرشد' : 'Advisor notes updated'),
+                  backgroundColor: ThebesColors.primary,
+                ),
+              );
+            },
+            child: Text(isArabic ? 'حفظ' : 'Save'),
           ),
         ],
       ),

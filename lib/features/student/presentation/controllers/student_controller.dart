@@ -532,6 +532,59 @@ class StudentController extends ChangeNotifier {
 
   List<SummerCourseEntity> get availableSummerCourses => _availableSummerCourses;
 
+  // Academic Advising & Registration Governance
+  bool _isRegistrationWindowOpen = false;
+  final int _maxAdvisorAllowedHours = 9;
+  String _advisorNotesAr = 'تمت دراسة سجلك الأكاديمي، ونوصي بتسجيل مقررات التخلف لرفع المعدل التراكمي.';
+  String _advisorNotesEn = 'Your academic transcript was reviewed. Retake courses recommended to boost your GPA.';
+  final Set<String> _advisorApprovedCourseCodes = {'CS201', 'MATH102', 'CS305'};
+
+  bool get isRegistrationWindowOpen => _isRegistrationWindowOpen;
+  int get maxAdvisorAllowedHours => _maxAdvisorAllowedHours;
+  String get advisorNotesAr => _advisorNotesAr;
+  String get advisorNotesEn => _advisorNotesEn;
+
+  bool isCourseApprovedByAdvisor(String code) => _advisorApprovedCourseCodes.contains(code);
+
+  List<SummerCourseEntity> get advisorApprovedCourses =>
+      _availableSummerCourses.where((c) => _advisorApprovedCourseCodes.contains(c.code)).toList();
+
+  AcademicAdvisingSessionEntity get advisingSession => AcademicAdvisingSessionEntity(
+        isRegistrationOpen: _isRegistrationWindowOpen,
+        advisorNameAr: student.academicAdvisorAr,
+        advisorNameEn: student.academicAdvisorEn,
+        officeLocationAr: 'مكتب الإرشاد الأكاديمي - مبنى الحاسبات (غرفة 304)',
+        officeLocationEn: 'Academic Advising Office - CS Bldg (Room 304)',
+        officeHoursAr: 'الأحد والثلاثاء: 10:00 ص - 01:00 م',
+        officeHoursEn: 'Sun & Tue: 10:00 AM - 01:00 PM',
+        advisorEmail: 'advisor.dean@thebes.edu.eg',
+        advisorNotesAr: _advisorNotesAr,
+        advisorNotesEn: _advisorNotesEn,
+        maxCreditHoursAllowed: _maxAdvisorAllowedHours,
+        approvedCourses: advisorApprovedCourses,
+      );
+
+  void setRegistrationWindowOpen(bool isOpen) {
+    _isRegistrationWindowOpen = isOpen;
+    notifyListeners();
+  }
+
+  void toggleAdvisorApprovedCourse(String courseCode) {
+    if (_advisorApprovedCourseCodes.contains(courseCode)) {
+      _advisorApprovedCourseCodes.remove(courseCode);
+      _selectedSummerCourseCodes.remove(courseCode);
+    } else {
+      _advisorApprovedCourseCodes.add(courseCode);
+    }
+    notifyListeners();
+  }
+
+  void updateAdvisorNotes({required String notesAr, required String notesEn}) {
+    _advisorNotesAr = notesAr;
+    _advisorNotesEn = notesEn;
+    notifyListeners();
+  }
+
   final Set<String> _selectedSummerCourseCodes = {'CS201'};
   bool _isSummerRegistrationSubmitted = false;
   bool _isSummerRegistrationPaid = false;

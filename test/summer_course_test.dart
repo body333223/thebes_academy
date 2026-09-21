@@ -138,5 +138,43 @@ void main() {
       expect(controller.summerSummary.isPaid, isTrue);
       expect(controller.summerSummary.receiptNumber, startsWith('THB-SUMMER-'));
     });
+
+    test('Academic Advisor governance controls registration window and approved courses', () {
+      final controller = sl<StudentController>();
+
+      // Initially closed or can be closed by advisor
+      controller.setRegistrationWindowOpen(false);
+      expect(controller.isRegistrationWindowOpen, isFalse);
+      expect(controller.advisingSession.isRegistrationOpen, isFalse);
+      expect(controller.advisingSession.advisorNameAr, isNotEmpty);
+      expect(controller.advisingSession.officeLocationAr, isNotEmpty);
+
+      // Advisor opens registration window
+      controller.setRegistrationWindowOpen(true);
+      expect(controller.isRegistrationWindowOpen, isTrue);
+      expect(controller.advisingSession.isRegistrationOpen, isTrue);
+
+      // Verify default approved courses
+      expect(controller.isCourseApprovedByAdvisor('CS201'), isTrue);
+      expect(controller.isCourseApprovedByAdvisor('MATH102'), isTrue);
+
+      // Advisor toggles off an approved course
+      controller.toggleAdvisorApprovedCourse('CS201');
+      expect(controller.isCourseApprovedByAdvisor('CS201'), isFalse);
+      expect(controller.advisorApprovedCourses.any((c) => c.code == 'CS201'), isFalse);
+
+      // Advisor re-approves the course
+      controller.toggleAdvisorApprovedCourse('CS201');
+      expect(controller.isCourseApprovedByAdvisor('CS201'), isTrue);
+      expect(controller.advisorApprovedCourses.any((c) => c.code == 'CS201'), isTrue);
+
+      // Advisor updates guidance notes
+      controller.updateAdvisorNotes(
+        notesAr: 'يرجى مراجعة المرشد لاعتماد الساعات الإضافية.',
+        notesEn: 'Please meet your advisor for extra hours approval.',
+      );
+      expect(controller.advisorNotesAr, equals('يرجى مراجعة المرشد لاعتماد الساعات الإضافية.'));
+      expect(controller.advisingSession.advisorNotesAr, equals('يرجى مراجعة المرشد لاعتماد الساعات الإضافية.'));
+    });
   });
 }
