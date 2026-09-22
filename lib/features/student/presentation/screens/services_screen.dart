@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -656,79 +657,577 @@ class _ServicesScreenState extends State<ServicesScreen> with SingleTickerProvid
   }
 
   void _showPaymentCheckoutDialog(BuildContext context, PaymentInstallmentEntity inst, bool isArabic) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    int selectedMethod = 0; // 0: Fawry, 1: Card, 2: InstaPay
+    bool isProcessing = false;
+    const fawryCode = '789 204 812';
+    const instaPayAddress = 'thebes.tuition@instapay';
+
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              isArabic ? 'سداد المصروفات الدراسية' : 'Tuition Payment Gateway',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 14),
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: ThebesColors.opacity(ThebesColors.primary, 0.08),
-                borderRadius: BorderRadius.circular(12),
+      builder: (modalCtx) => StatefulBuilder(
+        builder: (ctx, setModalState) => Container(
+          height: MediaQuery.of(context).size.height * 0.85,
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF0D1B2E) : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
+            border: Border.all(color: ThebesColors.gold.withAlpha(90), width: 1.5),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Container(
+                  width: 44,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withAlpha(90),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
               ),
-              child: Row(
+              const SizedBox(height: 14),
+
+              // Header
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(inst.getLocalizedTitle(isArabic)),
-                  Text(
-                    '${inst.amount.toInt()} ج.م',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: ThebesColors.gold),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isArabic ? 'بوابة السداد الإلكتروني المعتمدة' : 'Official E-Payment Gateway',
+                        style: GoogleFonts.cairo(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: isDark ? Colors.white : ThebesColors.primaryDark,
+                        ),
+                      ),
+                      Text(
+                        isArabic ? 'خزينة أكاديمية طيبة التعليمية' : 'Thebes Academy Finance & Treasury',
+                        style: GoogleFonts.cairo(
+                          fontSize: 11.5,
+                          color: ThebesColors.gold,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: ThebesColors.emerald.withAlpha(20),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: ThebesColors.emerald.withAlpha(90)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.lock_rounded, size: 12, color: ThebesColors.emerald),
+                        const SizedBox(width: 4),
+                        Text(
+                          '256-bit SSL',
+                          style: GoogleFonts.spaceMono(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: ThebesColors.emerald,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 18),
-            Text(
-              isArabic ? 'اختر طريقة الدفع:' : 'Select Payment Method:',
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            ListTile(
-              leading: const Icon(Icons.point_of_sale_rounded, color: Colors.orange),
-              title: const Text('فوري Fawry Pay'),
-              subtitle: Text(isArabic ? 'كود دفع فوري صالح لـ 48 ساعة' : 'Fawry Ref code valid 48h'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => _executePayment(context, inst, ctx, isArabic),
-            ),
-            ListTile(
-              leading: const Icon(Icons.credit_card_rounded, color: Colors.blue),
-              title: const Text('بطاقة بنكية (Visa / MasterCard / Meeza)'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => _executePayment(context, inst, ctx, isArabic),
-            ),
-          ],
+              const SizedBox(height: 14),
+
+              // Installment Info Card
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  gradient: ThebesColors.primaryGradient,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: ThebesColors.gold.withAlpha(110)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            inst.getLocalizedTitle(isArabic),
+                            style: GoogleFonts.cairo(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13.5,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '${isArabic ? "تاريخ الاستحقاق:" : "Due Date:"} ${inst.dueDate}',
+                            style: GoogleFonts.cairo(color: Colors.white70, fontSize: 11),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Text(
+                      '${inst.amount.toInt()} ج.م',
+                      style: GoogleFonts.spaceMono(
+                        color: ThebesColors.gold,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 14),
+
+              // Payment Method Selector Tabs
+              Row(
+                children: [
+                  _buildPaymentMethodTab(
+                    title: 'فوري Fawry',
+                    icon: Icons.point_of_sale_rounded,
+                    isSelected: selectedMethod == 0,
+                    onTap: () => setModalState(() => selectedMethod = 0),
+                  ),
+                  const SizedBox(width: 8),
+                  _buildPaymentMethodTab(
+                    title: isArabic ? 'بطاقة بنكية' : 'Bank Card',
+                    icon: Icons.credit_card_rounded,
+                    isSelected: selectedMethod == 1,
+                    onTap: () => setModalState(() => selectedMethod = 1),
+                  ),
+                  const SizedBox(width: 8),
+                  _buildPaymentMethodTab(
+                    title: isArabic ? 'إنستاباي' : 'InstaPay',
+                    icon: Icons.account_balance_wallet_rounded,
+                    isSelected: selectedMethod == 2,
+                    onTap: () => setModalState(() => selectedMethod = 2),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 14),
+
+              // Method Details Content
+              Expanded(
+                child: SingleChildScrollView(
+                  child: selectedMethod == 0
+                      ? _buildFawryMethodView(context, isDark, isArabic, fawryCode)
+                      : selectedMethod == 1
+                          ? _buildCardMethodView(isDark, isArabic)
+                          : _buildInstaPayMethodView(context, isDark, isArabic, instaPayAddress),
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              // Confirm Button
+              SizedBox(
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: isProcessing
+                      ? null
+                      : () async {
+                          setModalState(() => isProcessing = true);
+                          await Future.delayed(const Duration(milliseconds: 700));
+                          if (!context.mounted) return;
+                          Navigator.pop(modalCtx);
+                          final controller = context.read<StudentController>();
+                          await controller.payInstallment(inst.id);
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Row(
+                                children: [
+                                  const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    isArabic
+                                        ? 'تم تأكيد السداد وإصدار إيصال السداد المعتمد!'
+                                        : 'Payment confirmed & official receipt issued!',
+                                  ),
+                                ],
+                              ),
+                              backgroundColor: ThebesColors.success,
+                            ),
+                          );
+                          // Show the official receipt immediately
+                          final paidItem = controller.installments.firstWhere(
+                            (i) => i.id == inst.id,
+                            orElse: () => inst,
+                          );
+                          _showOfficialReceiptDialog(context, paidItem, isArabic);
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ThebesColors.gold,
+                    foregroundColor: ThebesColors.primaryDark,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    elevation: 0,
+                  ),
+                  child: isProcessing
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(strokeWidth: 2.5, color: ThebesColors.primaryDark),
+                        )
+                      : Text(
+                          isArabic ? 'تأكيد السداد وإصدار الإيصال الرسمي' : 'Confirm & Issue Official Receipt',
+                          style: GoogleFonts.cairo(fontWeight: FontWeight.bold, fontSize: 13.5),
+                        ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  void _executePayment(BuildContext context, PaymentInstallmentEntity inst, BuildContext modalCtx, bool isArabic) {
-    Navigator.pop(modalCtx);
-    context.read<StudentController>().payInstallment(inst.id);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          isArabic
-              ? 'تم سداد القسط بنجاح! تم إصدار إيصال السداد الإلكتروني.'
-              : 'Payment successful! Electronic receipt generated.',
+  Widget _buildPaymentMethodTab({
+    required String title,
+    required IconData icon,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: isSelected ? ThebesColors.gold.withAlpha(30) : Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected ? ThebesColors.gold : Colors.grey.withAlpha(70),
+              width: isSelected ? 1.5 : 1.0,
+            ),
+          ),
+          child: Column(
+            children: [
+              Icon(icon, size: 20, color: isSelected ? ThebesColors.gold : Colors.grey),
+              const SizedBox(height: 4),
+              Text(
+                title,
+                style: GoogleFonts.cairo(
+                  fontSize: 11,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                  color: isSelected ? ThebesColors.gold : Colors.grey,
+                ),
+              ),
+            ],
+          ),
         ),
-        backgroundColor: ThebesColors.success,
       ),
+    );
+  }
+
+  Widget _buildFawryMethodView(BuildContext context, bool isDark, bool isArabic, String fawryCode) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF14243B) : const Color(0xFFF7F9FC),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.orange.withAlpha(90)),
+          ),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.point_of_sale_rounded, color: Colors.orange, size: 18),
+                      const SizedBox(width: 8),
+                      Text(
+                        isArabic ? 'كود دفع فوري (الرقم المرجعي):' : 'Fawry Reference Code:',
+                        style: GoogleFonts.cairo(fontSize: 12, fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withAlpha(25),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.timer_outlined, size: 12, color: Colors.orange),
+                        const SizedBox(width: 4),
+                        Text(
+                          isArabic ? 'صالح 48 ساعة' : 'Valid 48h',
+                          style: GoogleFonts.cairo(fontSize: 10, color: Colors.orange, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    fawryCode,
+                    style: GoogleFonts.spaceMono(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 2,
+                      color: ThebesColors.gold,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  IconButton(
+                    icon: const Icon(Icons.copy_rounded, color: ThebesColors.gold, size: 20),
+                    tooltip: isArabic ? 'نسخ الكود' : 'Copy code',
+                    onPressed: () {
+                      Clipboard.setData(ClipboardData(text: fawryCode.replaceAll(' ', '')));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(isArabic ? 'تم نسخ كود فوري إلى الحافظة' : 'Fawry code copied to clipboard'),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF101E31) : const Color(0xFFF1F5F9),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                isArabic ? 'خطوات السداد عبر منافذ فوري:' : 'How to pay via Fawry:',
+                style: GoogleFonts.cairo(fontSize: 11.5, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                isArabic
+                    ? '1. توجه لأي منفذ فوري أو استخدم تطبيق myFawry.\n2. اطلب خدمة "مدفوعات أكاديمية طيبة" (كود الخدمة: 788).\n3. أدخل الرقم المرجعي الموضح أعلاه وسيتم السداد فورياً.'
+                    : '1. Visit any Fawry POS or open myFawry.\n2. Select "Thebes Academy Payments" (Service Code: 788).\n3. Enter the reference number above to complete payment.',
+                style: GoogleFonts.cairo(fontSize: 11, color: isDark ? Colors.white70 : Colors.black87, height: 1.5),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCardMethodView(bool isDark, bool isArabic) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF14243B) : const Color(0xFFF7F9FC),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: ThebesColors.gold.withAlpha(70)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    isArabic ? 'بيانات البطاقة البنكية' : 'Card Details',
+                    style: GoogleFonts.cairo(fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withAlpha(30),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          'Visa / Meeza',
+                          style: GoogleFonts.spaceMono(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.blue),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF0B1728) : Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.grey.withAlpha(60)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.credit_card_rounded, size: 18, color: ThebesColors.gold),
+                    const SizedBox(width: 8),
+                    Text(
+                      '5378  ••••  ••••  4128',
+                      style: GoogleFonts.spaceMono(fontSize: 13, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF0B1728) : Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.grey.withAlpha(60)),
+                      ),
+                      child: Text(
+                        '08 / 28',
+                        style: GoogleFonts.spaceMono(fontSize: 12, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF0B1728) : Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.grey.withAlpha(60)),
+                      ),
+                      child: Text(
+                        'CVV: •••',
+                        style: GoogleFonts.spaceMono(fontSize: 12, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            const Icon(Icons.security_rounded, size: 14, color: ThebesColors.emerald),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                isArabic
+                    ? 'متوافق مع بروتوكول 3D Secure ومعايير البنك المركزي المصري'
+                    : 'Compliant with 3D Secure & Central Bank of Egypt standards',
+                style: GoogleFonts.cairo(fontSize: 10.5, color: Colors.grey),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInstaPayMethodView(BuildContext context, bool isDark, bool isArabic, String instaPayAddress) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF14243B) : const Color(0xFFF7F9FC),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: ThebesColors.emerald.withAlpha(90)),
+          ),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    isArabic ? 'عنوان الدفع اللحظي (IPA):' : 'InstaPay IPA Address:',
+                    style: GoogleFonts.cairo(fontSize: 12, fontWeight: FontWeight.w600),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: ThebesColors.emerald.withAlpha(25),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      'InstaPay Direct',
+                      style: GoogleFonts.spaceMono(fontSize: 10, color: ThebesColors.emerald, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    instaPayAddress,
+                    style: GoogleFonts.spaceMono(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: ThebesColors.gold,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: const Icon(Icons.copy_rounded, color: ThebesColors.gold, size: 18),
+                    onPressed: () {
+                      Clipboard.setData(ClipboardData(text: instaPayAddress));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(isArabic ? 'تم نسخ عنوان إنستاباي بنجاح' : 'InstaPay address copied'),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF101E31) : const Color(0xFFF1F5F9),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            isArabic
+                ? 'يرجى وضع كود الطالب أو الرقم القومي في خانة "سبب التحويل" لسرعة التوثيق التلقائي.'
+                : 'Please include student ID or National ID in transfer notes for automatic verification.',
+            style: GoogleFonts.cairo(fontSize: 11, color: isDark ? Colors.white70 : Colors.black87),
+          ),
+        ),
+      ],
     );
   }
 

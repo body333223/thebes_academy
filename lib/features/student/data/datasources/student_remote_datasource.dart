@@ -400,10 +400,10 @@ class StudentRemoteDataSourceImpl implements StudentRemoteDataSource {
       courseTitleAr: 'التفكير النقدي ومهارات الاتصال',
       courseTitleEn: 'Critical Thinking & Communication',
       totalLectures: 12,
-      attendedLectures: 10,
-      absentLectures: 2,
-      attendancePercentage: 83.3,
-      warningsCount: 1,
+      attendedLectures: 12,
+      absentLectures: 0,
+      attendancePercentage: 100.0,
+      warningsCount: 0,
     ),
   ];
 

@@ -245,10 +245,13 @@ class HomeDashboardScreen extends StatelessWidget {
         ),
         // Settings / Profile Button
         IconButton(
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const SettingsScreen()),
-          ),
+          onPressed: () {
+            if (onNavigateTab != null) {
+              onNavigateTab!(4);
+            } else {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
+            }
+          },
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
@@ -337,32 +340,46 @@ class HomeDashboardScreen extends StatelessWidget {
   ) {
     final warningCount = controller.totalAbsenceWarnings;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF3A181A) : const Color(0xFFFFEBEE),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: ThebesColors.error.withAlpha(140)),
+        color: isDark ? const Color(0xFF231812) : const Color(0xFFFFF9EE),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: ThebesColors.gold.withAlpha(isDark ? 100 : 140), width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(isDark ? 40 : 10),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          const Icon(Icons.warning_amber_rounded, color: ThebesColors.error, size: 22),
-          const SizedBox(width: 10),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: ThebesColors.gold.withAlpha(30),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(Icons.info_outline_rounded, color: ThebesColors.gold, size: 20),
+          ),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isArabic ? 'إنذار أكاديمي للغياب' : 'Academic Absence Warning',
+                  isArabic ? 'إشعار نسبة الحضور الأكاديمي' : 'Academic Attendance Notice',
                   style: GoogleFonts.cairo(
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
-                    color: ThebesColors.error,
+                    color: isDark ? Colors.white : ThebesColors.primaryDark,
                   ),
                 ),
                 Text(
                   isArabic
-                      ? 'لديك $warningCount مقررات اقتربت من حد الحرمان (25%). تفقد سجل الحضور.'
-                      : 'You have $warningCount courses near the 25% deprivation limit. Check attendance.',
+                      ? 'يوجد $warningCount مقرر يتطلب متابعة نسبة الغياب لتفادي تخطي نسبة 25%.'
+                      : '$warningCount course(s) require attendance monitoring to stay within the 25% limit.',
                   style: GoogleFonts.cairo(
                     fontSize: 11,
                     color: isDark ? Colors.white70 : Colors.black87,
@@ -371,14 +388,17 @@ class HomeDashboardScreen extends StatelessWidget {
               ],
             ),
           ),
-          GestureDetector(
-            onTap: () => onNavigateTab != null ? onNavigateTab!(2) : null,
+          TextButton(
+            onPressed: () => onNavigateTab != null ? onNavigateTab!(2) : null,
+            style: TextButton.styleFrom(
+              foregroundColor: ThebesColors.gold,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            ),
             child: Text(
-              isArabic ? 'عرض' : 'View',
+              isArabic ? 'سجل الحضور' : 'Details',
               style: GoogleFonts.cairo(
                 fontSize: 12,
                 fontWeight: FontWeight.w900,
-                color: ThebesColors.error,
               ),
             ),
           ),
@@ -990,20 +1010,14 @@ class HomeDashboardScreen extends StatelessWidget {
       {
         'title': isArabic ? 'المعدل والنتائج' : 'Grades & GPA',
         'icon': Icons.assessment_rounded,
-        'action': () {
-          if (onNavigateTab != null) {
-            onNavigateTab!(3);
-          } else {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => const GradesScreen()));
-          }
-        },
+        'action': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const GradesScreen())),
       },
       {
         'title': isArabic ? 'سداد المصروفات' : 'E-Payment',
         'icon': Icons.payment_rounded,
         'action': () {
           if (onNavigateTab != null) {
-            onNavigateTab!(4);
+            onNavigateTab!(3);
           } else {
             Navigator.push(context, MaterialPageRoute(builder: (_) => const ServicesScreen()));
           }

@@ -309,12 +309,12 @@ class StudentController extends ChangeNotifier {
       ),
       NotificationEntity(
         id: 'notif_2',
-        titleAr: 'إنذار غياب أكاديمي ⚠️',
-        titleEn: 'Absence Risk Warning ⚠️',
-        messageAr: 'تنبيه: متبقي لك محاضرة غياب واحدة في مادة هياكل البيانات قبل تطبيق الحرمان (25%).',
-        messageEn: 'Alert: 1 absence remaining in Data Structures before 25% course deprivation.',
+        titleAr: 'انتظام الحضور الأكاديمي 🎖️',
+        titleEn: 'Academic Attendance Honors 🎖️',
+        messageAr: 'تهانينا، سجلك الأكاديمي خالٍ من أي إنذارات ونسبة الحضور العامة 94.5% منتظمة بالكامل.',
+        messageEn: 'Congratulations, your academic attendance record is in full good standing at 94.5%.',
         timestamp: now.subtract(const Duration(hours: 3)),
-        type: NotificationType.absenceWarning,
+        type: NotificationType.universityNews,
         isRead: false,
       ),
       NotificationEntity(

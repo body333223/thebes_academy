@@ -6,8 +6,8 @@ import 'package:thebes_academy/features/student/presentation/controllers/student
 import 'package:thebes_academy/features/student/presentation/screens/home_dashboard.dart';
 import 'package:thebes_academy/features/student/presentation/screens/schedule_screen.dart';
 import 'package:thebes_academy/features/student/presentation/screens/qr_attendance_screen.dart';
-import 'package:thebes_academy/features/student/presentation/screens/grades_screen.dart';
 import 'package:thebes_academy/features/student/presentation/screens/services_screen.dart';
+import 'package:thebes_academy/features/settings/presentation/screens/settings_screen.dart';
 
 class MainScreen extends StatefulWidget {
   final int initialIndex;
@@ -43,8 +43,8 @@ class _MainScreenState extends State<MainScreen> {
       HomeDashboardScreen(onNavigateTab: _onTabTapped),
       const ScheduleScreen(),
       const QrAttendanceScreen(),
-      const GradesScreen(),
       const ServicesScreen(),
+      const SettingsScreen(),
     ];
 
     final destinations = [
@@ -64,14 +64,14 @@ class _MainScreenState extends State<MainScreen> {
         label: locale.tr('nav_attendance'),
       ),
       AdaptiveNavigationDestination(
-        icon: Icons.assessment_outlined,
-        selectedIcon: Icons.assessment_rounded,
-        label: locale.tr('nav_grades'),
-      ),
-      AdaptiveNavigationDestination(
         icon: Icons.account_balance_wallet_outlined,
         selectedIcon: Icons.account_balance_wallet_rounded,
         label: locale.tr('nav_services'),
+      ),
+      AdaptiveNavigationDestination(
+        icon: Icons.settings_outlined,
+        selectedIcon: Icons.settings_rounded,
+        label: locale.tr('nav_profile'),
       ),
     ];
 
