@@ -43,6 +43,7 @@ dependencies:
   get_it: ^9.2.1
   shared_preferences: ^2.3.2
   mobile_scanner: ^7.4.2
+  local_auth: ^2.3.0
 
 dev_dependencies:
   flutter_test:

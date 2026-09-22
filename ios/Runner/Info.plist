@@ -70,5 +70,7 @@
 	<string>يحتاج تطبيق أكاديمية طيبة إلى إذن الكاميرا لمسح باركود QR الحضور الأكاديمي في المحاضرات.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>تطبيق أكاديمية طيبة لا يستخدم الميكروفون ولكن قد يتطلبه مشغل الكاميرا الداخلي.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>يستخدم تطبيق أكاديمية طيبة Face ID لتسجيل الدخول الآمن السريع إلى بوابة الطالب الإلكترونية.</string>
 </dict>
 </plist>

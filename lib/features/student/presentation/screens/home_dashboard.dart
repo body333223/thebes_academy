@@ -104,12 +104,16 @@ class HomeDashboardScreen extends StatelessWidget {
               Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: ThebesColors.gold, width: 2),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF5C4FF6), Color(0xFF8B3CF7)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                   boxShadow: [
                     BoxShadow(
-                      color: ThebesColors.gold.withAlpha(60),
-                      blurRadius: 10,
-                      spreadRadius: 1,
+                      color: Color(0x805C4FF6),
+                      blurRadius: 14,
+                      spreadRadius: 2,
                     ),
                   ],
                 ),
@@ -149,20 +153,20 @@ class HomeDashboardScreen extends StatelessWidget {
                     style: GoogleFonts.cairo(
                       fontSize: 17,
                       fontWeight: FontWeight.w900,
-                      color: isDark ? Colors.white : ThebesColors.primary,
+                      color: Colors.white,
                     ),
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: ThebesColors.gold.withAlpha(30),
+                      color: const Color(0xFF00E5FF).withAlpha(25),
                       borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: ThebesColors.gold.withAlpha(90)),
+                      border: Border.all(color: const Color(0xFF00E5FF).withAlpha(90)),
                     ),
                     child: Text(
                       isArabic ? 'طالب منتظم' : 'Active',
                       style: GoogleFonts.cairo(
-                        color: ThebesColors.gold,
+                        color: const Color(0xFF00E5FF),
                         fontSize: 9.5,
                         fontWeight: FontWeight.w800,
                       ),
@@ -174,7 +178,7 @@ class HomeDashboardScreen extends StatelessWidget {
                 '${student.getLocalizedDepartment(isArabic)} • ${isArabic ? "الفرقة ${student.academicYear}" : "Year ${student.academicYear}"}',
                 style: GoogleFonts.cairo(
                   fontSize: 12,
-                  color: isDark ? Colors.white60 : ThebesColors.lightTextSecondary,
+                  color: Colors.white54,
                   fontWeight: FontWeight.w600,
                 ),
                 maxLines: 1,
@@ -195,9 +199,9 @@ class HomeDashboardScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF13233A) : const Color(0xFFE9F0F8),
+                  color: Colors.white.withAlpha(12),
                   shape: BoxShape.circle,
-                  border: Border.all(color: ThebesColors.gold.withAlpha(60)),
+                  border: Border.all(color: Colors.white.withAlpha(25)),
                 ),
                 child: const Icon(Icons.notifications_outlined, color: ThebesColors.gold, size: 20),
               ),
