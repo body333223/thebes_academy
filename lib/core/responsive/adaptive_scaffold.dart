@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../theme/thebes_colors.dart';
 import 'responsive_helper.dart';
-
-const _indigo = Color(0xFF5C4FF6);
-const _violet = Color(0xFF8B3CF7);
-const _neonCyan = Color(0xFF00E5FF);
-const _voidBg = Color(0xFF000814);
-const _surfaceBg = Color(0xFF080D1A);
 
 class AdaptiveNavigationDestination {
   final IconData icon;
@@ -43,10 +38,11 @@ class AdaptiveScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isTabletOrDesktop = context.isTablet || context.isDesktop;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (isTabletOrDesktop) {
       return Scaffold(
-        backgroundColor: _voidBg,
+        backgroundColor: isDark ? ThebesColors.darkBackground : ThebesColors.pageBg,
         appBar: appBar,
         drawer: drawer,
         floatingActionButton: floatingActionButton,
@@ -56,44 +52,49 @@ class AdaptiveScaffold extends StatelessWidget {
               selectedIndex: currentIndex,
               onDestinationSelected: onNavigationIndexChanged,
               labelType: NavigationRailLabelType.all,
-              backgroundColor: _surfaceBg,
-              indicatorColor: _indigo.withAlpha(50),
-              selectedIconTheme: const IconThemeData(color: _neonCyan, size: 24),
-              unselectedIconTheme: const IconThemeData(color: Colors.white38, size: 22),
-              selectedLabelTextStyle: GoogleFonts.cairo(
-                color: _neonCyan,
+              backgroundColor: isDark ? ThebesColors.darkSurface : Colors.white,
+              indicatorColor: ThebesColors.orangePale,
+              selectedIconTheme: const IconThemeData(color: ThebesColors.orange, size: 24),
+              unselectedIconTheme: IconThemeData(
+                color: isDark ? ThebesColors.slateLight : ThebesColors.slate,
+                size: 22,
+              ),
+              selectedLabelTextStyle: GoogleFonts.poppins(
+                color: ThebesColors.orange,
                 fontWeight: FontWeight.w700,
                 fontSize: 11,
               ),
-              unselectedLabelTextStyle: GoogleFonts.cairo(
-                color: Colors.white38,
+              unselectedLabelTextStyle: GoogleFonts.poppins(
+                color: isDark ? ThebesColors.slateLight : ThebesColors.slate,
                 fontSize: 10,
                 fontWeight: FontWeight.w500,
               ),
               leading: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(vertical: 20),
                 child: Container(
-                  width: 44,
-                  height: 44,
+                  width: 48,
+                  height: 48,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    gradient: const LinearGradient(
-                      colors: [_indigo, _violet],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+                    gradient: ThebesColors.logoGradient,
                     boxShadow: [
                       BoxShadow(
-                        color: _indigo.withAlpha(100),
-                        blurRadius: 14,
-                        spreadRadius: 2,
+                        color: ThebesColors.orange.withAlpha(60),
+                        blurRadius: 12,
+                        spreadRadius: 1,
                       ),
                     ],
                   ),
-                  child: const Icon(
-                    Icons.account_balance_rounded,
-                    color: Color(0xFFFFD700),
-                    size: 22,
+                  child: const Center(
+                    child: Text(
+                      'TA',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 18,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -108,7 +109,7 @@ class AdaptiveScaffold extends StatelessWidget {
             VerticalDivider(
               thickness: 1,
               width: 1,
-              color: Colors.white.withAlpha(15),
+              color: isDark ? ThebesColors.darkCardBorder : ThebesColors.lightCardBorder,
             ),
             Expanded(child: body),
           ],
@@ -117,12 +118,12 @@ class AdaptiveScaffold extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: _voidBg,
+      backgroundColor: isDark ? ThebesColors.darkBackground : ThebesColors.pageBg,
       appBar: appBar,
       drawer: drawer,
       body: body,
       floatingActionButton: floatingActionButton,
-      bottomNavigationBar: _CosmicBottomBar(
+      bottomNavigationBar: _TheebaBottomBar(
         currentIndex: currentIndex,
         destinations: destinations,
         onTap: onNavigationIndexChanged,
@@ -131,12 +132,12 @@ class AdaptiveScaffold extends StatelessWidget {
   }
 }
 
-class _CosmicBottomBar extends StatelessWidget {
+class _TheebaBottomBar extends StatelessWidget {
   final int currentIndex;
   final List<AdaptiveNavigationDestination> destinations;
   final ValueChanged<int> onTap;
 
-  const _CosmicBottomBar({
+  const _TheebaBottomBar({
     required this.currentIndex,
     required this.destinations,
     required this.onTap,
@@ -144,21 +145,25 @@ class _CosmicBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? ThebesColors.darkSurface : Colors.white;
+    final borderColor = isDark ? ThebesColors.darkCardBorder : const Color(0xFFE2E8F0);
+
     return Container(
-      height: 70 + MediaQuery.of(context).padding.bottom,
+      height: 68 + MediaQuery.of(context).padding.bottom,
       decoration: BoxDecoration(
-        color: _surfaceBg,
+        color: bgColor,
         border: Border(
           top: BorderSide(
-            color: Colors.white.withAlpha(15),
+            color: borderColor,
             width: 1,
           ),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(150),
-            blurRadius: 20,
-            offset: const Offset(0, -5),
+            color: Colors.black.withAlpha(isDark ? 50 : 15),
+            blurRadius: 16,
+            offset: const Offset(0, -4),
           ),
         ],
       ),
@@ -169,8 +174,6 @@ class _CosmicBottomBar extends StatelessWidget {
           children: List.generate(destinations.length, (index) {
             final d = destinations[index];
             final isSelected = index == currentIndex;
-
-            // Center button (index 2 = Attendance) gets special treatment
             final isCenterBtn = index == 2;
 
             return Expanded(
@@ -178,10 +181,10 @@ class _CosmicBottomBar extends StatelessWidget {
                 onTap: () => onTap(index),
                 behavior: HitTestBehavior.opaque,
                 child: SizedBox(
-                  height: 70,
+                  height: 68,
                   child: isCenterBtn
                       ? _buildCenterButton(d, isSelected)
-                      : _buildNavItem(d, isSelected),
+                      : _buildNavItem(d, isSelected, isDark),
                 ),
               ),
             );
@@ -191,30 +194,33 @@ class _CosmicBottomBar extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem(AdaptiveNavigationDestination d, bool isSelected) {
+  Widget _buildNavItem(AdaptiveNavigationDestination d, bool isSelected, bool isDark) {
+    final activeColor = ThebesColors.orange;
+    final inactiveColor = isDark ? ThebesColors.slateLight : ThebesColors.slate;
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         AnimatedContainer(
-          duration: const Duration(milliseconds: 220),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
           decoration: BoxDecoration(
-            color: isSelected ? _indigo.withAlpha(50) : Colors.transparent,
-            borderRadius: BorderRadius.circular(14),
+            color: isSelected ? ThebesColors.orangePale : Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(
             isSelected ? d.selectedIcon : d.icon,
-            color: isSelected ? _neonCyan : Colors.white30,
+            color: isSelected ? activeColor : inactiveColor,
             size: 22,
           ),
         ),
-        const SizedBox(height: 3),
+        const SizedBox(height: 2),
         Text(
           d.label,
-          style: GoogleFonts.cairo(
+          style: GoogleFonts.poppins(
             fontSize: 10,
-            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
-            color: isSelected ? _neonCyan : Colors.white30,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+            color: isSelected ? activeColor : inactiveColor,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -223,27 +229,23 @@ class _CosmicBottomBar extends StatelessWidget {
     );
   }
 
-  Widget _buildCenterButton(
-      AdaptiveNavigationDestination d, bool isSelected) {
+  Widget _buildCenterButton(AdaptiveNavigationDestination d, bool isSelected) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Elevated center QR button
+        // Elevated Orange Gradient QR Button
         Container(
-          width: 48,
-          height: 48,
+          width: 46,
+          height: 46,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient: const LinearGradient(
-              colors: [_indigo, _violet],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            gradient: ThebesColors.orangeCtaGradient,
             boxShadow: [
               BoxShadow(
-                color: _indigo.withAlpha(isSelected ? 160 : 80),
-                blurRadius: isSelected ? 16 : 8,
-                spreadRadius: isSelected ? 2 : 0,
+                color: ThebesColors.orange.withAlpha(isSelected ? 140 : 80),
+                blurRadius: isSelected ? 14 : 8,
+                spreadRadius: isSelected ? 1 : 0,
+                offset: const Offset(0, 2),
               ),
             ],
           ),
@@ -253,13 +255,13 @@ class _CosmicBottomBar extends StatelessWidget {
             size: 22,
           ),
         ),
-        const SizedBox(height: 3),
+        const SizedBox(height: 2),
         Text(
           d.label,
-          style: GoogleFonts.cairo(
+          style: GoogleFonts.poppins(
             fontSize: 10,
-            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
-            color: isSelected ? _neonCyan : Colors.white30,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+            color: isSelected ? ThebesColors.orange : ThebesColors.slate,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,

@@ -1,10 +1,10 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:thebes_academy/core/localization/locale_provider.dart';
+import 'package:thebes_academy/core/theme/thebes_colors.dart';
 import 'package:thebes_academy/features/student/presentation/controllers/student_controller.dart';
 import 'package:thebes_academy/features/app/presentation/screens/main_screen.dart';
 
@@ -15,10 +15,9 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen>
-    with TickerProviderStateMixin {
+class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
   final _auth = LocalAuthentication();
-  final _idController = TextEditingController(text: '20220451');
+  final _idController = TextEditingController(text: 'S20210089');
   final _passwordController = TextEditingController(text: '12345678');
   bool _obscurePassword = true;
   bool _isAuthenticating = false;
@@ -26,53 +25,30 @@ class _LoginScreenState extends State<LoginScreen>
   bool _biometricSuccess = false;
   bool _biometricFail = false;
 
-  // Animation controllers
   late AnimationController _pulseController;
-  late AnimationController _particleController;
-  late AnimationController _glowController;
-  late AnimationController _fadeController;
-
   late Animation<double> _pulseAnim;
-  late Animation<double> _glowAnim;
-  late Animation<double> _fadeAnim;
 
   @override
   void initState() {
     super.initState();
-
     _pulseController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 2),
+      duration: const Duration(milliseconds: 1500),
     )..repeat(reverse: true);
 
-    _particleController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 8),
-    )..repeat();
-
-    _glowController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 3),
-    )..repeat(reverse: true);
-
-    _fadeController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    )..forward();
-
-    _pulseAnim = Tween<double>(begin: 0.85, end: 1.0).animate(
+    _pulseAnim = Tween<double>(begin: 0.95, end: 1.05).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
 
-    _glowAnim = Tween<double>(begin: 0.4, end: 1.0).animate(
-      CurvedAnimation(parent: _glowController, curve: Curves.easeInOut),
-    );
-
-    _fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _fadeController, curve: Curves.easeOut),
-    );
-
     _checkBiometrics();
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    _idController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   Future<void> _checkBiometrics() async {
@@ -98,8 +74,7 @@ class _LoginScreenState extends State<LoginScreen>
     bool authenticated = false;
     try {
       authenticated = await _auth.authenticate(
-        localizedReason:
-            'تسجيل الدخول إلى بوابة أكاديمية طيبة الطلابية',
+        localizedReason: 'Theeba Academy Portal — Student Biometric Authentication',
         options: const AuthenticationOptions(
           biometricOnly: false,
           stickyAuth: true,
@@ -117,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen>
         _biometricSuccess = true;
         _isAuthenticating = false;
       });
-      await Future.delayed(const Duration(milliseconds: 600));
+      await Future.delayed(const Duration(milliseconds: 400));
       await _navigateToMain();
     } else {
       setState(() {
@@ -133,7 +108,7 @@ class _LoginScreenState extends State<LoginScreen>
     if (_isAuthenticating) return;
     setState(() => _isAuthenticating = true);
     HapticFeedback.lightImpact();
-    await Future.delayed(const Duration(milliseconds: 400));
+    await Future.delayed(const Duration(milliseconds: 300));
     if (!mounted) return;
     final controller = context.read<StudentController>();
     await controller.loadInitialData();
@@ -148,13 +123,13 @@ class _LoginScreenState extends State<LoginScreen>
         transitionsBuilder: (ctx, anim, sec, child) => FadeTransition(
           opacity: anim,
           child: ScaleTransition(
-            scale: Tween<double>(begin: 0.95, end: 1.0).animate(
+            scale: Tween<double>(begin: 0.96, end: 1.0).animate(
               CurvedAnimation(parent: anim, curve: Curves.easeOutCubic),
             ),
             child: child,
           ),
         ),
-        transitionDuration: const Duration(milliseconds: 500),
+        transitionDuration: const Duration(milliseconds: 400),
       ),
     );
   }
@@ -163,47 +138,55 @@ class _LoginScreenState extends State<LoginScreen>
     showDialog(
       context: context,
       builder: (ctx) => Dialog(
-        backgroundColor: const Color(0xFF0D0D1A),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: BorderSide(color: CosmicColors.indigo.withAlpha(100)),
-        ),
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.help_outline_rounded,
-                  color: CosmicColors.neonGold, size: 36),
-              const SizedBox(height: 12),
+              Container(
+                width: 52,
+                height: 52,
+                decoration: const BoxDecoration(
+                  color: ThebesColors.sky,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.help_outline_rounded, color: ThebesColors.navy, size: 28),
+              ),
+              const SizedBox(height: 16),
               Text(
                 isArabic ? 'استعادة الحساب' : 'Account Recovery',
-                style: GoogleFonts.cairo(
-                  fontWeight: FontWeight.w900,
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w700,
                   fontSize: 16,
-                  color: Colors.white,
+                  color: ThebesColors.navy,
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 8),
               Text(
                 isArabic
-                    ? 'توجه لمكتب تكنولوجيا المعلومات أو اتصل بالخط الساخن: 19572'
-                    : 'Visit the IT center or call the academic hotline: 19572',
-                style: GoogleFonts.cairo(
-                  fontSize: 13,
-                  color: Colors.white60,
-                  height: 1.6,
+                    ? 'يرجى مراجعة إدارة تكنولوجيا المعلومات في الأكاديمية أو الاتصال بالخط الساخن: 19572'
+                    : 'Please visit the IT Academic Support Center or contact the student hotline: 19572',
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  color: ThebesColors.slate,
+                  height: 1.5,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: Text(
-                  isArabic ? 'حسناً' : 'OK',
-                  style: GoogleFonts.cairo(
-                    fontWeight: FontWeight.w800,
-                    color: CosmicColors.neonGold,
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ThebesColors.navy,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: Text(
+                    isArabic ? 'حسناً' : 'Close',
+                    style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -215,757 +198,430 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   @override
-  void dispose() {
-    _pulseController.dispose();
-    _particleController.dispose();
-    _glowController.dispose();
-    _fadeController.dispose();
-    _idController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final locale = context.watch<LocaleProvider>();
     final isArabic = locale.isArabic;
-    final size = MediaQuery.of(context).size;
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
-      child: Scaffold(
-        backgroundColor: CosmicColors.void_,
-        body: Stack(
+    return Scaffold(
+      backgroundColor: ThebesColors.pageBg,
+      body: SingleChildScrollView(
+        child: Column(
           children: [
-            // ─── Animated Particle Background ───
-            Positioned.fill(
-              child: AnimatedBuilder(
-                animation: _particleController,
-                builder: (_, child) => CustomPaint(
-                  painter: CosmicParticlePainter(_particleController.value),
-                ),
-              ),
-            ),
-
-            // ─── Ambient Glow Orbs ───
-            AnimatedBuilder(
-              animation: _glowAnim,
-              builder: (_, child) {
-                return Stack(
-                  children: [
-                    Positioned(
-                      top: -120,
-                      left: -80,
-                      child: _GlowOrb(
-                        size: 320,
-                        color: CosmicColors.indigo,
-                        opacity: _glowAnim.value * 0.18,
-                      ),
-                    ),
-                    Positioned(
-                      bottom: -60,
-                      right: -100,
-                      child: _GlowOrb(
-                        size: 280,
-                        color: CosmicColors.violet,
-                        opacity: _glowAnim.value * 0.14,
-                      ),
-                    ),
-                    Positioned(
-                      top: size.height * 0.4,
-                      left: -40,
-                      child: _GlowOrb(
-                        size: 160,
-                        color: CosmicColors.neonGold,
-                        opacity: _glowAnim.value * 0.10,
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-
-            // ─── Main Content ───
-            SafeArea(
-              child: FadeTransition(
-                opacity: _fadeAnim,
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 24, vertical: 16),
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 440),
-                      child: Column(
-                        children: [
-                          // ── Top Bar (Lang + Theme) ──
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              _buildTopChip(
-                                isArabic
-                                    ? 'بوابة الطالب'
-                                    : 'Student Portal',
-                              ),
-                              Row(
-                                children: [
-                                  _buildIconBtn(
-                                    icon: Icons.translate_rounded,
-                                    onTap: () => locale.toggleLocale(),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  _buildIconBtn(
-                                    icon: locale.isDarkMode
-                                        ? Icons.light_mode_rounded
-                                        : Icons.dark_mode_rounded,
-                                    onTap: () => locale.toggleTheme(),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(height: 36),
-
-                          // ── Academy Logo & Title ──
-                          _buildLogoSection(isArabic),
-
-                          const SizedBox(height: 40),
-
-                          // ── Glassmorphism Login Card ──
-                          _buildGlassCard(isArabic),
-
-                          const SizedBox(height: 28),
-
-                          // ── Biometric Ring Button ──
-                          if (_biometricAvailable)
-                            _buildBiometricRing(isArabic),
-
-                          const SizedBox(height: 32),
-
-                          // ── Footer ──
-                          _buildFooter(isArabic),
-                          const SizedBox(height: 20),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            _buildNavyHeader(context, isArabic),
+            _buildLoginFormCard(context, isArabic),
+            _buildFooter(isArabic),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTopChip(String label) {
+  Widget _buildNavyHeader(BuildContext context, bool isArabic) {
+    final topPadding = MediaQuery.of(context).padding.top;
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: CosmicColors.neonGold.withAlpha(18),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: CosmicColors.neonGold.withAlpha(70),
-          width: 1,
-        ),
+      width: double.infinity,
+      padding: EdgeInsets.fromLTRB(20, topPadding + 16, 20, 48),
+      decoration: const BoxDecoration(
+        gradient: ThebesColors.primaryHeaderGradient,
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
         children: [
-          Icon(Icons.school_rounded,
-              color: CosmicColors.neonGold, size: 12),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: GoogleFonts.cairo(
-              color: CosmicColors.neonGold,
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildIconBtn(
-      {required IconData icon, required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 36,
-        height: 36,
-        decoration: BoxDecoration(
-          color: Colors.white.withAlpha(12),
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withAlpha(25)),
-        ),
-        child: Icon(icon, color: Colors.white70, size: 16),
-      ),
-    );
-  }
-
-  Widget _buildLogoSection(bool isArabic) {
-    return Column(
-      children: [
-        // Glowing emblem ring
-        AnimatedBuilder(
-          animation: _pulseAnim,
-          builder: (_, child) => Transform.scale(
-            scale: _pulseAnim.value,
+          // Background subtle concentric rings
+          Positioned(
+            top: -30,
+            right: -30,
             child: Container(
-              width: 90,
-              height: 90,
+              width: 140,
+              height: 140,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: SweepGradient(
-                  colors: const [
-                    CosmicColors.indigo,
-                    CosmicColors.violet,
-                    CosmicColors.neonGold,
-                    CosmicColors.indigo,
-                  ],
-                  stops: const [0.0, 0.33, 0.66, 1.0],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: CosmicColors.indigo.withAlpha(130),
-                    blurRadius: 30,
-                    spreadRadius: 4,
-                  ),
-                  BoxShadow(
-                    color: CosmicColors.neonGold.withAlpha(60),
-                    blurRadius: 20,
-                  ),
-                ],
+                border: Border.all(color: Colors.white.withAlpha(12), width: 1.5),
               ),
-              padding: const EdgeInsets.all(3),
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: CosmicColors.void_,
-                  shape: BoxShape.circle,
+            ),
+          ),
+          Positioned(
+            top: -60,
+            right: -60,
+            child: Container(
+              width: 200,
+              height: 200,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white.withAlpha(8), width: 1.5),
+              ),
+            ),
+          ),
+
+          // Header Content
+          Column(
+            children: [
+              // Logo in orange gradient rounded box
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  gradient: ThebesColors.orangeCtaGradient,
+                  borderRadius: BorderRadius.circular(18),
+                  boxShadow: [
+                    BoxShadow(
+                      color: ThebesColors.orange.withAlpha(100),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
                 ),
                 child: const Center(
-                  child: Icon(
-                    Icons.account_balance_rounded,
-                    color: CosmicColors.neonGold,
-                    size: 38,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 18),
-
-        Text(
-          isArabic ? 'أكاديمية طيبة' : 'Thebes Academy',
-          style: GoogleFonts.cairo(
-            fontSize: 26,
-            fontWeight: FontWeight.w900,
-            color: Colors.white,
-            letterSpacing: 0.5,
-          ),
-        ),
-        const SizedBox(height: 4),
-        ShaderMask(
-          shaderCallback: (bounds) => const LinearGradient(
-            colors: [CosmicColors.indigo, CosmicColors.neonCyan, CosmicColors.violet],
-          ).createShader(bounds),
-          child: Text(
-            isArabic
-                ? 'بوابة الخدمات الطلابية الذكية'
-                : 'Smart Student Services Portal',
-            style: GoogleFonts.cairo(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-              letterSpacing: 1.2,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildGlassCard(bool isArabic) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        color: Colors.white.withAlpha(10),
-        border: Border.all(color: Colors.white.withAlpha(25), width: 1.2),
-        boxShadow: [
-          BoxShadow(
-            color: CosmicColors.indigo.withAlpha(40),
-            blurRadius: 40,
-            offset: const Offset(0, 20),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Header
-          Text(
-            isArabic ? 'تسجيل الدخول' : 'Sign In',
-            style: GoogleFonts.cairo(
-              fontSize: 20,
-              fontWeight: FontWeight.w900,
-              color: Colors.white,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 6),
-          Text(
-            isArabic
-                ? 'أدخل بياناتك الأكاديمية للمتابعة'
-                : 'Enter your academic credentials to continue',
-            style: GoogleFonts.cairo(
-              fontSize: 12,
-              color: Colors.white38,
-            ),
-            textAlign: TextAlign.center,
-          ),
-
-          const SizedBox(height: 24),
-
-          // Academic ID Field
-          _buildCosmicField(
-            controller: _idController,
-            label: isArabic ? 'الرقم الأكاديمي' : 'Academic ID',
-            hint: '20220451',
-            icon: Icons.badge_outlined,
-            keyboardType: TextInputType.number,
-          ),
-
-          const SizedBox(height: 16),
-
-          // Password Field
-          _buildCosmicField(
-            controller: _passwordController,
-            label: isArabic ? 'كلمة المرور' : 'Password',
-            hint: '••••••••',
-            icon: Icons.lock_outline_rounded,
-            isPassword: true,
-          ),
-
-          const SizedBox(height: 10),
-
-          // Forgot Password
-          Align(
-            alignment: isArabic ? Alignment.centerLeft : Alignment.centerRight,
-            child: TextButton(
-              onPressed: () => _showForgotPasswordDialog(isArabic),
-              child: Text(
-                isArabic ? 'نسيت كلمة المرور؟' : 'Forgot Password?',
-                style: GoogleFonts.cairo(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: CosmicColors.neonCyan,
-                ),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          // Login Button
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            height: 52,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                gradient: _isAuthenticating
-                    ? null
-                    : const LinearGradient(
-                        colors: [
-                          CosmicColors.indigo,
-                          CosmicColors.violet,
-                        ],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                      ),
-                color: _isAuthenticating
-                    ? Colors.white10
-                    : null,
-                boxShadow: _isAuthenticating
-                    ? null
-                    : [
-                        BoxShadow(
-                          color: CosmicColors.indigo.withAlpha(140),
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-              ),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                onPressed:
-                    _isAuthenticating ? null : _handlePasswordLogin,
-                child: _isAuthenticating
-                    ? const SizedBox(
-                        width: 22,
-                        height: 22,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.5,
-                          color: Colors.white,
-                        ),
-                      )
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            isArabic ? 'دخول' : 'Sign In',
-                            style: GoogleFonts.cairo(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Icon(
-                            isArabic
-                                ? Icons.arrow_back_rounded
-                                : Icons.arrow_forward_rounded,
-                            color: Colors.white,
-                            size: 18,
-                          ),
-                        ],
-                      ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCosmicField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    required IconData icon,
-    TextInputType keyboardType = TextInputType.text,
-    bool isPassword = false,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.cairo(
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
-            color: Colors.white60,
-          ),
-        ),
-        const SizedBox(height: 6),
-        TextField(
-          controller: controller,
-          keyboardType: keyboardType,
-          obscureText: isPassword ? _obscurePassword : false,
-          style: GoogleFonts.spaceMono(
-            color: Colors.white,
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: TextStyle(color: Colors.white24),
-            prefixIcon: Icon(icon,
-                color: CosmicColors.neonCyan.withAlpha(180), size: 20),
-            suffixIcon: isPassword
-                ? IconButton(
-                    icon: Icon(
-                      _obscurePassword
-                          ? Icons.visibility_off_rounded
-                          : Icons.visibility_rounded,
-                      color: Colors.white38,
-                      size: 18,
+                  child: Text(
+                    'TA',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 26,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -1,
                     ),
-                    onPressed: () => setState(
-                        () => _obscurePassword = !_obscurePassword),
-                  )
-                : null,
-            filled: true,
-            fillColor: Colors.white.withAlpha(8),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide(
-                  color: Colors.white.withAlpha(20), width: 1),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide(
-                  color: Colors.white.withAlpha(20), width: 1),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(
-                  color: CosmicColors.neonCyan, width: 1.5),
-            ),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+
+              // Title
+              Text(
+                isArabic ? 'بوابة أكاديمية طيبة' : 'Theeba Academy Portal',
+                style: GoogleFonts.poppins(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                  letterSpacing: -0.3,
+                ),
+              ),
+              const SizedBox(height: 4),
+
+              // Tagline
+              Text(
+                isArabic ? 'تمكين قادة المستقبل' : 'Empowering Future Leaders',
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFFE8EEFF).withAlpha(200),
+                ),
+              ),
+            ],
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  Widget _buildBiometricRing(bool isArabic) {
-    Color ringColor;
-    IconData ringIcon;
-    String ringLabel;
+  Widget _buildLoginFormCard(BuildContext context, bool isArabic) {
+    return Transform.translate(
+      offset: const Offset(0, -24),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Container(
+          padding: const EdgeInsets.all(22),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20), // rounded-2xl
+            border: Border.all(color: ThebesColors.lightCardBorder, width: 1),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x0C0F1A3D),
+                blurRadius: 24,
+                offset: Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                isArabic ? 'تسجيل الدخول' : 'Sign In',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: ThebesColors.navy,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                isArabic
+                    ? 'أدخل رقم القيد وكلمة المرور للمتابعة'
+                    : 'Enter your student ID and password to continue',
+                style: GoogleFonts.poppins(
+                  fontSize: 11,
+                  color: ThebesColors.slate,
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Student ID Field
+              _buildFieldLabel(isArabic ? 'رقم القيد الجامعي' : 'Student ID'),
+              const SizedBox(height: 6),
+              TextField(
+                controller: _idController,
+                keyboardType: TextInputType.text,
+                style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500),
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.badge_outlined, color: ThebesColors.slate, size: 20),
+                  hintText: isArabic ? 'مثال: S20210089' : 'e.g. S20210089',
+                  filled: true,
+                  fillColor: ThebesColors.pageBg,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: ThebesColors.lightCardBorder),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: ThebesColors.lightCardBorder),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: ThebesColors.orange, width: 1.5),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Password Field
+              _buildFieldLabel(isArabic ? 'كلمة المرور' : 'Password'),
+              const SizedBox(height: 6),
+              TextField(
+                controller: _passwordController,
+                obscureText: _obscurePassword,
+                style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500),
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.lock_outline_rounded, color: ThebesColors.slate, size: 20),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                      color: ThebesColors.slate,
+                      size: 20,
+                    ),
+                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                  ),
+                  hintText: '••••••••',
+                  filled: true,
+                  fillColor: ThebesColors.pageBg,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: ThebesColors.lightCardBorder),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: ThebesColors.lightCardBorder),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: ThebesColors.orange, width: 1.5),
+                  ),
+                ),
+              ),
+
+              // Forgot password link
+              Align(
+                alignment: isArabic ? Alignment.centerLeft : Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () => _showForgotPasswordDialog(isArabic),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  child: Text(
+                    isArabic ? 'نسيت كلمة المرور؟' : 'Forgot Password?',
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: ThebesColors.orange,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              // Orange CTA Sign In Button
+              Container(
+                height: 48,
+                decoration: BoxDecoration(
+                  gradient: ThebesColors.orangeCtaGradient,
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: ThebesColors.orange.withAlpha(90),
+                      blurRadius: 14,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(14),
+                    onTap: _isAuthenticating ? null : _handlePasswordLogin,
+                    child: Center(
+                      child: _isAuthenticating
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                            )
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  isArabic ? 'تسجيل الدخول' : 'Sign In',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 18),
+                              ],
+                            ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Biometric Authentication Section
+              if (_biometricAvailable) ...[
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    const Expanded(child: Divider(color: ThebesColors.lightCardBorder)),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Text(
+                        isArabic ? 'أو الدخول السريع' : 'Or Quick Access',
+                        style: GoogleFonts.poppins(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                          color: ThebesColors.slate,
+                        ),
+                      ),
+                    ),
+                    const Expanded(child: Divider(color: ThebesColors.lightCardBorder)),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                _buildBiometricTile(isArabic),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFieldLabel(String label) {
+    return Text(
+      label,
+      style: GoogleFonts.poppins(
+        fontSize: 11,
+        fontWeight: FontWeight.w600,
+        color: ThebesColors.slateDark,
+      ),
+    );
+  }
+
+  Widget _buildBiometricTile(bool isArabic) {
+    Color tileBg = ThebesColors.sky;
+    Color tileBorder = ThebesColors.navy.withAlpha(20);
+    Color contentColor = ThebesColors.navy;
 
     if (_biometricSuccess) {
-      ringColor = const Color(0xFF00E676);
-      ringIcon = Icons.check_circle_rounded;
-      ringLabel = isArabic ? 'تم التحقق بنجاح!' : 'Verified!';
+      tileBg = ThebesColors.mint.withAlpha(30);
+      tileBorder = ThebesColors.mint;
+      contentColor = ThebesColors.mint;
     } else if (_biometricFail) {
-      ringColor = const Color(0xFFFF1744);
-      ringIcon = Icons.cancel_rounded;
-      ringLabel = isArabic ? 'فشل التحقق' : 'Auth Failed';
-    } else {
-      ringColor = CosmicColors.neonGold;
-      ringIcon = Icons.fingerprint_rounded;
-      ringLabel = isArabic
-          ? 'الدخول عبر البصمة / Face ID'
-          : 'Fingerprint / Face ID Login';
+      tileBg = ThebesColors.error.withAlpha(20);
+      tileBorder = ThebesColors.error;
+      contentColor = ThebesColors.error;
     }
 
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-                child: Divider(color: Colors.white.withAlpha(20))),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text(
-                isArabic ? 'أو' : 'or',
-                style: GoogleFonts.cairo(
-                  fontSize: 12,
-                  color: Colors.white30,
-                ),
-              ),
-            ),
-            Expanded(
-                child: Divider(color: Colors.white.withAlpha(20))),
-          ],
-        ),
-        const SizedBox(height: 24),
-        GestureDetector(
+    return ScaleTransition(
+      scale: _pulseAnim,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
           onTap: _isAuthenticating ? null : _handleBiometricLogin,
-          child: AnimatedBuilder(
-            animation: _pulseController,
-            builder: (_, child) {
-              return Stack(
-                alignment: Alignment.center,
-                children: [
-                  // Outer glow ring
-                  Transform.scale(
-                    scale:
-                        _biometricSuccess || _biometricFail
-                            ? 1.0
-                            : 0.9 + _pulseAnim.value * 0.15,
-                    child: Container(
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: ringColor.withAlpha(80),
-                          width: 2,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: ringColor.withAlpha(90),
-                            blurRadius: 24,
-                            spreadRadius: 4,
-                          ),
-                        ],
-                      ),
-                    ),
+          borderRadius: BorderRadius.circular(14),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            decoration: BoxDecoration(
+              color: tileBg,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: tileBorder, width: 1.2),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  _biometricSuccess
+                      ? Icons.check_circle_rounded
+                      : (_biometricFail ? Icons.error_outline_rounded : Icons.fingerprint_rounded),
+                  color: contentColor,
+                  size: 24,
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  _biometricSuccess
+                      ? (isArabic ? 'تم التحقق بنجاح!' : 'Authenticated!')
+                      : (_biometricFail
+                          ? (isArabic ? 'فشل التحقق، حاول مجدداً' : 'Failed, try again')
+                          : (isArabic
+                              ? 'تسجيل الدخول بالبصمة / Face ID'
+                              : 'Sign in with Biometrics / Face ID')),
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: contentColor,
                   ),
-                  // Inner button
-                  Container(
-                    width: 76,
-                    height: 76,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white.withAlpha(10),
-                      border: Border.all(
-                        color: ringColor.withAlpha(160),
-                        width: 1.5,
-                      ),
-                    ),
-                    child: _isAuthenticating
-                        ? const Padding(
-                            padding: EdgeInsets.all(20),
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white60,
-                            ),
-                          )
-                        : Icon(ringIcon,
-                            color: ringColor, size: 34),
-                  ),
-                ],
-              );
-            },
+                ),
+              ],
+            ),
           ),
         ),
-        const SizedBox(height: 14),
-        Text(
-          ringLabel,
-          style: GoogleFonts.cairo(
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-            color: Colors.white60,
-          ),
-        ),
-      ],
+      ),
     );
   }
 
   Widget _buildFooter(bool isArabic) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(Icons.headset_mic_rounded,
-            size: 13, color: Colors.white24),
-        const SizedBox(width: 6),
-        Text(
-          isArabic
-              ? 'الخط الساخن الأكاديمي: 19572'
-              : 'Academic Hotline: 19572',
-          style: GoogleFonts.cairo(
-            fontSize: 11,
-            color: Colors.white24,
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.headset_mic_outlined, size: 14, color: ThebesColors.slate),
+              const SizedBox(width: 6),
+              Text(
+                isArabic ? 'الدعم الفني والخط الساخن: 19572' : 'Academic Hotline & Support: 19572',
+                style: GoogleFonts.poppins(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: ThebesColors.slate,
+                ),
+              ),
+            ],
           ),
-        ),
-      ],
-    );
-  }
-}
-
-// ─────────────────────────────────────────────
-// Cosmic Color Palette
-// ─────────────────────────────────────────────
-class CosmicColors {
-  static const Color void_ = Color(0xFF000814);
-  static const Color surface = Color(0xFF070B14);
-  static const Color card = Color(0xFF0D1120);
-  static const Color indigo = Color(0xFF5C4FF6);
-  static const Color violet = Color(0xFF8B3CF7);
-  static const Color neonGold = Color(0xFFFFD700);
-  static const Color neonCyan = Color(0xFF00E5FF);
-  static const Color emerald = Color(0xFF00E676);
-}
-
-// ─────────────────────────────────────────────
-// Glow Orb Widget
-// ─────────────────────────────────────────────
-class _GlowOrb extends StatelessWidget {
-  final double size;
-  final Color color;
-  final double opacity;
-
-  const _GlowOrb({
-    required this.size,
-    required this.color,
-    required this.opacity,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: color.withAlpha((opacity * 255).round()),
-            blurRadius: size * 0.6,
-            spreadRadius: size * 0.1,
+          const SizedBox(height: 6),
+          Text(
+            'Theeba Academy Portal · v1.0',
+            style: GoogleFonts.poppins(
+              fontSize: 10,
+              color: ThebesColors.slateLight,
+            ),
           ),
         ],
-        color: color.withAlpha((opacity * 0.3 * 255).round()),
       ),
     );
   }
-}
-
-// ─────────────────────────────────────────────
-// Cosmic Particle Painter
-// ─────────────────────────────────────────────
-class CosmicParticlePainter extends CustomPainter {
-  final double progress;
-
-  CosmicParticlePainter(this.progress);
-
-  static final List<_Particle> _particles = List.generate(
-    55,
-    (i) {
-      final rand = math.Random(i * 31 + 7);
-      return _Particle(
-        x: rand.nextDouble(),
-        y: rand.nextDouble(),
-        size: rand.nextDouble() * 2.2 + 0.4,
-        speed: rand.nextDouble() * 0.012 + 0.003,
-        opacity: rand.nextDouble() * 0.5 + 0.2,
-        color: i % 5 == 0
-            ? CosmicColors.neonGold
-            : i % 5 == 1
-                ? CosmicColors.indigo
-                : i % 5 == 2
-                    ? CosmicColors.neonCyan
-                    : i % 5 == 3
-                        ? CosmicColors.violet
-                        : Colors.white,
-      );
-    },
-  );
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    for (final p in _particles) {
-      final y = (p.y - progress * p.speed * 4) % 1.0;
-      final paint = Paint()
-        ..color = p.color.withAlpha((p.opacity * 255).round())
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.2);
-      canvas.drawCircle(
-        Offset(p.x * size.width, y * size.height),
-        p.size,
-        paint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(CosmicParticlePainter old) => old.progress != progress;
-}
-
-class _Particle {
-  final double x, y, size, speed, opacity;
-  final Color color;
-  const _Particle({
-    required this.x,
-    required this.y,
-    required this.size,
-    required this.speed,
-    required this.opacity,
-    required this.color,
-  });
 }

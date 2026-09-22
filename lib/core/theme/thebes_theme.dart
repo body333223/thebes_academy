@@ -1,93 +1,104 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'thebes_colors.dart';
 
 class ThebesTheme {
-  static ThemeData get lightTheme => _buildCosmicTheme(Brightness.light);
-  static ThemeData get darkTheme => _buildCosmicTheme(Brightness.dark);
+  static ThemeData get lightTheme => _buildTheebaTheme(Brightness.light);
+  static ThemeData get darkTheme => _buildTheebaTheme(Brightness.dark);
 
-  static ThemeData _buildCosmicTheme(Brightness brightness) {
+  static ThemeData _buildTheebaTheme(Brightness brightness) {
     final isDark = brightness == Brightness.dark;
 
-    // Cosmic palette
-    const voidColor = Color(0xFF000814);
-    const surfaceColor = Color(0xFF080D1A);
-    const cardColor = Color(0xFF0D1220);
-    const indigoColor = Color(0xFF5C4FF6);
-    const neonGold = Color(0xFFFFD700);
-    const neonCyan = Color(0xFF00E5FF);
-    const borderColor = Color(0xFF1A2035);
+    final bgColor = isDark ? ThebesColors.darkBackground : ThebesColors.pageBg;
+    final surfaceColor = isDark ? ThebesColors.darkSurface : ThebesColors.lightSurface;
+    final cardColor = isDark ? ThebesColors.darkCard : Colors.white;
+    final borderColor = isDark ? ThebesColors.darkCardBorder : ThebesColors.lightCardBorder;
+    final textPrimary = isDark ? ThebesColors.darkTextPrimary : ThebesColors.lightTextPrimary;
+    final textSecondary = isDark ? ThebesColors.darkTextSecondary : ThebesColors.lightTextSecondary;
 
-    final textBase = isDark ? Colors.white : Colors.white;
-    final textTheme = GoogleFonts.cairoTextTheme(
-      isDark ? ThemeData.dark().textTheme : ThemeData.dark().textTheme,
-    ).apply(bodyColor: textBase, displayColor: textBase);
+    final baseTextTheme = isDark ? ThemeData.dark().textTheme : ThemeData.light().textTheme;
+    final textTheme = GoogleFonts.poppinsTextTheme(baseTextTheme).apply(
+      bodyColor: textPrimary,
+      displayColor: textPrimary,
+    );
 
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.dark,
-      primaryColor: indigoColor,
-      scaffoldBackgroundColor: voidColor,
-      colorScheme: ColorScheme.dark(
-        primary: indigoColor,
-        secondary: neonCyan,
-        surface: surfaceColor,
-        error: const Color(0xFFFF1744),
-        onPrimary: Colors.white,
-        onSecondary: Colors.black,
-        onSurface: Colors.white,
-        outline: borderColor,
-      ),
+      brightness: brightness,
+      primaryColor: ThebesColors.navy,
+      scaffoldBackgroundColor: bgColor,
+      colorScheme: isDark
+          ? ColorScheme.dark(
+              primary: ThebesColors.orange,
+              secondary: ThebesColors.mint,
+              surface: surfaceColor,
+              error: ThebesColors.error,
+              onPrimary: Colors.white,
+              onSecondary: Colors.white,
+              onSurface: textPrimary,
+              outline: borderColor,
+            )
+          : ColorScheme.light(
+              primary: ThebesColors.navy,
+              secondary: ThebesColors.orange,
+              surface: surfaceColor,
+              error: ThebesColors.error,
+              onPrimary: Colors.white,
+              onSecondary: Colors.white,
+              onSurface: textPrimary,
+              outline: borderColor,
+            ),
       textTheme: textTheme,
       appBarTheme: AppBarTheme(
-        backgroundColor: surfaceColor,
+        backgroundColor: ThebesColors.navy,
         foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         surfaceTintColor: Colors.transparent,
-        titleTextStyle: GoogleFonts.cairo(
+        titleTextStyle: GoogleFonts.poppins(
           color: Colors.white,
-          fontSize: 17,
-          fontWeight: FontWeight.bold,
+          fontSize: 16,
+          fontWeight: FontWeight.w700,
         ),
-        iconTheme: const IconThemeData(color: Colors.white70),
-        actionsIconTheme: const IconThemeData(color: Colors.white70),
-        shadowColor: Colors.black87,
+        iconTheme: const IconThemeData(color: Colors.white),
+        actionsIconTheme: const IconThemeData(color: Colors.white),
       ),
       cardTheme: CardThemeData(
         color: cardColor,
-        elevation: 0,
+        elevation: 1,
+        shadowColor: const Color(0x0A000000),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(16), // rounded-2xl
           side: BorderSide(
-            color: Colors.white.withAlpha(18),
+            color: borderColor,
             width: 1,
           ),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: indigoColor,
+          backgroundColor: ThebesColors.orange,
           foregroundColor: Colors.white,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
-          textStyle: GoogleFonts.cairo(
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
+          textStyle: GoogleFonts.poppins(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: neonGold,
-          side: BorderSide(color: neonGold.withAlpha(120), width: 1.5),
+          foregroundColor: ThebesColors.navy,
+          side: const BorderSide(color: ThebesColors.navy, width: 1.5),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
           ),
-          textStyle: GoogleFonts.cairo(
+          textStyle: GoogleFonts.poppins(
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -95,98 +106,80 @@ class ThebesTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.white.withAlpha(8),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        fillColor: isDark ? ThebesColors.darkSurface : Colors.white,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.white.withAlpha(20)),
+          borderSide: BorderSide(color: borderColor),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.white.withAlpha(20)),
+          borderSide: BorderSide(color: borderColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: neonCyan, width: 1.5),
+          borderSide: const BorderSide(color: ThebesColors.orange, width: 1.5),
         ),
-        hintStyle: GoogleFonts.cairo(
-          color: Colors.white30,
+        hintStyle: GoogleFonts.poppins(
+          color: textSecondary,
           fontSize: 13,
         ),
       ),
       dividerTheme: DividerThemeData(
-        color: Colors.white.withAlpha(15),
+        color: borderColor,
         thickness: 1,
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: surfaceColor,
-        indicatorColor: indigoColor.withAlpha(60),
+        indicatorColor: ThebesColors.orangePale,
         iconTheme: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return const IconThemeData(color: neonCyan, size: 24);
+            return const IconThemeData(color: ThebesColors.orange, size: 24);
           }
-          return const IconThemeData(color: Colors.white38, size: 22);
+          return IconThemeData(color: textSecondary, size: 22);
         }),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return GoogleFonts.cairo(
+            return GoogleFonts.poppins(
               fontSize: 11,
-              fontWeight: FontWeight.bold,
-              color: neonCyan,
+              fontWeight: FontWeight.w700,
+              color: ThebesColors.orange,
             );
           }
-          return GoogleFonts.cairo(
+          return GoogleFonts.poppins(
             fontSize: 10,
             fontWeight: FontWeight.w500,
-            color: Colors.white38,
+            color: textSecondary,
           );
         }),
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        height: 70,
+        height: 68,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-        shadowColor: Colors.black87,
       ),
       tabBarTheme: TabBarThemeData(
-        indicatorColor: neonCyan,
+        indicatorColor: ThebesColors.orange,
         indicatorSize: TabBarIndicatorSize.label,
-        labelColor: neonCyan,
-        unselectedLabelColor: Colors.white38,
-        labelStyle: GoogleFonts.cairo(
+        labelColor: ThebesColors.orange,
+        unselectedLabelColor: textSecondary,
+        labelStyle: GoogleFonts.poppins(
           fontSize: 12,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w700,
         ),
-        unselectedLabelStyle: GoogleFonts.cairo(fontSize: 12),
-      ),
-      switchTheme: SwitchThemeData(
-        thumbColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) return neonCyan;
-          return Colors.white38;
-        }),
-        trackColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return neonCyan.withAlpha(80);
-          }
-          return Colors.white.withAlpha(20);
-        }),
+        unselectedLabelStyle: GoogleFonts.poppins(fontSize: 12),
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: Colors.white.withAlpha(10),
-        labelStyle:
-            GoogleFonts.cairo(color: Colors.white70, fontSize: 12),
-        side: BorderSide(color: Colors.white.withAlpha(25)),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        padding:
-            const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+        backgroundColor: ThebesColors.sky,
+        labelStyle: GoogleFonts.poppins(color: ThebesColors.navy, fontSize: 12, fontWeight: FontWeight.w600),
+        side: BorderSide.none,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
       ),
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: cardColor,
-        contentTextStyle:
-            GoogleFonts.cairo(color: Colors.white, fontSize: 13),
+        backgroundColor: ThebesColors.navyDark,
+        contentTextStyle: GoogleFonts.poppins(color: Colors.white, fontSize: 13),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: Colors.white.withAlpha(20)),
         ),
         behavior: SnackBarBehavior.floating,
       ),
@@ -202,20 +195,14 @@ class ThebesTheme {
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
-          side: BorderSide(color: Colors.white.withAlpha(20)),
+          side: BorderSide(color: borderColor),
         ),
       ),
-      listTileTheme: ListTileThemeData(
-        textColor: Colors.white,
-        iconColor: Colors.white60,
-        tileColor: Colors.transparent,
-      ),
-      iconTheme: const IconThemeData(color: Colors.white70),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: indigoColor,
+        backgroundColor: ThebesColors.orange,
         foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        elevation: 4,
+        elevation: 3,
       ),
     );
   }
