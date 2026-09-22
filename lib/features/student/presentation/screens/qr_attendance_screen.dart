@@ -7,6 +7,7 @@ import 'package:thebes_academy/core/responsive/responsive_helper.dart';
 import 'package:thebes_academy/core/theme/thebes_colors.dart';
 import 'package:thebes_academy/features/student/presentation/controllers/student_controller.dart';
 import 'package:thebes_academy/features/faculty/presentation/screens/faculty_dashboard.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 class QrAttendanceScreen extends StatefulWidget {
   const QrAttendanceScreen({super.key});
@@ -18,6 +19,7 @@ class QrAttendanceScreen extends StatefulWidget {
 class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTickerProviderStateMixin {
   late AnimationController _scannerController;
   late Animation<double> _laserPositionAnimation;
+  MobileScannerController? _mobileScannerController;
   final TextEditingController _manualCodeController = TextEditingController();
   bool _isFlashOn = false;
   int _selectedMethodIndex = 0; // 0 = QR Camera Scanner, 1 = Enter PIN/Code
@@ -25,6 +27,12 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
   @override
   void initState() {
     super.initState();
+    _mobileScannerController = MobileScannerController(
+      detectionSpeed: DetectionSpeed.normal,
+      facing: CameraFacing.back,
+      torchEnabled: false,
+    );
+
     _scannerController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
@@ -37,6 +45,7 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
 
   @override
   void dispose() {
+    _mobileScannerController?.dispose();
     _scannerController.dispose();
     _manualCodeController.dispose();
     super.dispose();
@@ -259,7 +268,10 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
             icon: Icon(_isFlashOn ? Icons.flash_on_rounded : Icons.flash_off_rounded),
             color: _isFlashOn ? ThebesColors.gold : Colors.grey,
             tooltip: isArabic ? 'الكشاف' : 'Flashlight',
-            onPressed: () => setState(() => _isFlashOn = !_isFlashOn),
+            onPressed: () {
+              setState(() => _isFlashOn = !_isFlashOn);
+              _mobileScannerController?.toggleTorch();
+            },
           ),
         ],
       ),
@@ -283,8 +295,6 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
                 if (_selectedMethodIndex == 0) ...[
                   _buildScannerViewfinder(context, controller, isArabic, isDark),
                   const SizedBox(height: 16),
-                  _buildQuickDemoChips(isArabic),
-                  const SizedBox(height: 12),
                   // Shortcut to PIN Entry
                   Center(
                     child: TextButton.icon(
@@ -800,11 +810,11 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
     bool isDark,
   ) {
     return Container(
-      height: 320,
+      height: 330,
       decoration: BoxDecoration(
         color: const Color(0xFF07111E),
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: ThebesColors.gold.withAlpha(110), width: 1.5),
+        border: Border.all(color: ThebesColors.gold.withAlpha(120), width: 1.5),
         boxShadow: [
           BoxShadow(
             color: ThebesColors.gold.withAlpha(35),
@@ -813,120 +823,165 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
           ),
         ],
       ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Background grid simulation
-          Opacity(
-            opacity: 0.1,
-            child: GridPaper(
-              color: ThebesColors.gold,
-              divisions: 2,
-              subdivisions: 1,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(26),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // 1. Live Camera Preview Feed via MobileScanner
+            Positioned.fill(
+              child: MobileScanner(
+                controller: _mobileScannerController,
+                fit: BoxFit.cover,
+                onDetect: (capture) {
+                  final barcodes = capture.barcodes;
+                  for (final barcode in barcodes) {
+                    final raw = barcode.rawValue;
+                    if (raw != null && raw.trim().isNotEmpty && !controller.isScanning) {
+                      _handleScan(raw.trim());
+                      break;
+                    }
+                  }
+                },
+                errorBuilder: (context, error) {
+                  return Container(
+                    color: const Color(0xFF07111E),
+                    padding: const EdgeInsets.all(24),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.videocam_off_rounded, color: ThebesColors.gold, size: 44),
+                          const SizedBox(height: 12),
+                          Text(
+                            isArabic
+                                ? 'يرجى تفعيل إذن الكاميرا لمسح باركود الحضور'
+                                : 'Camera permission required for QR scan',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.cairo(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            isArabic
+                                ? 'أو يمكنك استخدام خيار "كتابة الرمز (PIN)" لتسجيل الحضور يدوياً'
+                                : 'Or switch to "Enter PIN" mode to register manually',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.cairo(color: Colors.grey, fontSize: 11),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
 
-          // Central target box
-          Container(
-            width: 200,
-            height: 200,
-            decoration: BoxDecoration(
-              color: Colors.white.withAlpha(8),
-              borderRadius: BorderRadius.circular(20),
+            // 2. Central target box framing
+            Container(
+              width: 200,
+              height: 200,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.white.withAlpha(30), width: 1),
+                borderRadius: BorderRadius.circular(20),
+              ),
             ),
-          ),
 
-          // 4 Golden Corners
-          Positioned(
-            top: 55,
-            left: (context.screenWidth > 640 ? 640 : context.screenWidth) / 2 - 110,
-            child: _buildCornerBracket(isTop: true, isLeft: true),
-          ),
-          Positioned(
-            top: 55,
-            right: (context.screenWidth > 640 ? 640 : context.screenWidth) / 2 - 110,
-            child: _buildCornerBracket(isTop: true, isLeft: false),
-          ),
-          Positioned(
-            bottom: 55,
-            left: (context.screenWidth > 640 ? 640 : context.screenWidth) / 2 - 110,
-            child: _buildCornerBracket(isTop: false, isLeft: true),
-          ),
-          Positioned(
-            bottom: 55,
-            right: (context.screenWidth > 640 ? 640 : context.screenWidth) / 2 - 110,
-            child: _buildCornerBracket(isTop: false, isLeft: false),
-          ),
+            // 3. 4 Golden Corner Brackets
+            Positioned(
+              top: 60,
+              left: (context.screenWidth > 640 ? 640 : context.screenWidth) / 2 - 110,
+              child: _buildCornerBracket(isTop: true, isLeft: true),
+            ),
+            Positioned(
+              top: 60,
+              right: (context.screenWidth > 640 ? 640 : context.screenWidth) / 2 - 110,
+              child: _buildCornerBracket(isTop: true, isLeft: false),
+            ),
+            Positioned(
+              bottom: 60,
+              left: (context.screenWidth > 640 ? 640 : context.screenWidth) / 2 - 110,
+              child: _buildCornerBracket(isTop: false, isLeft: true),
+            ),
+            Positioned(
+              bottom: 60,
+              right: (context.screenWidth > 640 ? 640 : context.screenWidth) / 2 - 110,
+              child: _buildCornerBracket(isTop: false, isLeft: false),
+            ),
 
-          // Laser Scanning Beam
-          AnimatedBuilder(
-            animation: _laserPositionAnimation,
-            builder: (context, child) {
-              return Positioned(
-                top: 60 + (190 * _laserPositionAnimation.value),
-                child: Container(
-                  width: 210,
-                  height: 3,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [
-                        Colors.transparent,
-                        Color(0xFFFFDF79),
-                        ThebesColors.gold,
-                        Color(0xFFFFDF79),
-                        Colors.transparent,
+            // 4. Laser Scanning Beam Animation
+            AnimatedBuilder(
+              animation: _laserPositionAnimation,
+              builder: (context, child) {
+                return Positioned(
+                  top: 65 + (190 * _laserPositionAnimation.value),
+                  child: Container(
+                    width: 210,
+                    height: 3,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [
+                          Colors.transparent,
+                          Color(0xFFFFDF79),
+                          ThebesColors.gold,
+                          Color(0xFFFFDF79),
+                          Colors.transparent,
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: ThebesColors.gold.withAlpha(220),
+                          blurRadius: 12,
+                          spreadRadius: 2,
+                        ),
                       ],
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: ThebesColors.gold.withAlpha(220),
-                        blurRadius: 12,
-                        spreadRadius: 2,
-                      ),
-                    ],
                   ),
-                ),
-              );
-            },
-          ),
+                );
+              },
+            ),
 
-          // Bottom Instruction overlay
-          Positioned(
-            bottom: 16,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.black.withAlpha(160),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.white.withAlpha(20)),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (controller.isScanning)
-                    const SizedBox(
-                      width: 14,
-                      height: 14,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: ThebesColors.gold),
-                    )
-                  else
-                    const Icon(Icons.center_focus_strong_rounded, color: ThebesColors.gold, size: 16),
-                  const SizedBox(width: 8),
-                  Text(
-                    controller.isScanning
-                        ? (isArabic ? 'جاري التحقق من الجلسة...' : 'Verifying Session...')
-                        : (isArabic ? 'وجه الكاميرا نحو كود الدكتور' : 'Aim at Doctor\'s Screen QR'),
-                    style: GoogleFonts.cairo(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
+            // 5. Bottom Instruction Overlay
+            Positioned(
+              bottom: 14,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+                decoration: BoxDecoration(
+                  color: Colors.black.withAlpha(190),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.white.withAlpha(20)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (controller.isScanning)
+                      const SizedBox(
+                        width: 14,
+                        height: 14,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: ThebesColors.gold),
+                      )
+                    else
+                      const Icon(Icons.center_focus_strong_rounded, color: ThebesColors.gold, size: 16),
+                    const SizedBox(width: 8),
+                    Text(
+                      controller.isScanning
+                          ? (isArabic ? 'جاري التحقق من الجلسة وتأكيد الحضور...' : 'Verifying Session...')
+                          : (isArabic ? 'وجه الكاميرا نحو كود الدكتور المعروض' : 'Aim at Doctor\'s Screen QR'),
+                      style: GoogleFonts.cairo(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -943,44 +998,6 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
           right: !isLeft ? const BorderSide(color: ThebesColors.gold, width: 3.5) : BorderSide.none,
         ),
       ),
-    );
-  }
-
-  Widget _buildQuickDemoChips(bool isArabic) {
-    final demos = [
-      {'title': isArabic ? '⚡ مسح ذكاء اصطناعي (CS301)' : '⚡ Scan AI (CS301)', 'code': 'THEBES-CS301-2026'},
-      {'title': isArabic ? '⚡ مسح قواعد بيانات (CS302)' : '⚡ Scan DB (CS302)', 'code': 'THEBES-CS302-2026'},
-      {'title': isArabic ? '⚡ مسح أمن شبكات (CS304)' : '⚡ Scan Sec (CS304)', 'code': 'THEBES-CS304-2026'},
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          isArabic ? 'تجربة سريعة لمحاكاة مسح كود الدكتور:' : 'Quick Demo to Simulate Doctor QR Scan:',
-          style: GoogleFonts.cairo(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.grey),
-        ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: demos.map((d) {
-            return ActionChip(
-              backgroundColor: ThebesColors.gold.withAlpha(25),
-              side: BorderSide(color: ThebesColors.gold.withAlpha(80)),
-              label: Text(
-                d['title']!,
-                style: GoogleFonts.cairo(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: ThebesColors.gold,
-                ),
-              ),
-              onPressed: () => _handleScan(d['code']!),
-            );
-          }).toList(),
-        ),
-      ],
     );
   }
 

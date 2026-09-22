@@ -66,5 +66,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>يحتاج تطبيق أكاديمية طيبة إلى إذن الكاميرا لمسح باركود QR الحضور الأكاديمي في المحاضرات.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>تطبيق أكاديمية طيبة لا يستخدم الميكروفون ولكن قد يتطلبه مشغل الكاميرا الداخلي.</string>
 </dict>
 </plist>
