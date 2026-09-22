@@ -52,64 +52,63 @@ class AdaptiveScaffold extends StatelessWidget {
         floatingActionButton: floatingActionButton,
         body: Row(
           children: [
-            // Cosmic Navigation Rail
-            Container(
-              width: 76,
-              decoration: BoxDecoration(
-                color: _surfaceBg,
-                border: Border(
-                  right: BorderSide(
-                    color: Colors.white.withAlpha(15),
-                    width: 1,
+            NavigationRail(
+              selectedIndex: currentIndex,
+              onDestinationSelected: onNavigationIndexChanged,
+              labelType: NavigationRailLabelType.all,
+              backgroundColor: _surfaceBg,
+              indicatorColor: _indigo.withAlpha(50),
+              selectedIconTheme: const IconThemeData(color: _neonCyan, size: 24),
+              unselectedIconTheme: const IconThemeData(color: Colors.white38, size: 22),
+              selectedLabelTextStyle: GoogleFonts.cairo(
+                color: _neonCyan,
+                fontWeight: FontWeight.w700,
+                fontSize: 11,
+              ),
+              unselectedLabelTextStyle: GoogleFonts.cairo(
+                color: Colors.white38,
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+              ),
+              leading: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: const LinearGradient(
+                      colors: [_indigo, _violet],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: _indigo.withAlpha(100),
+                        blurRadius: 14,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.account_balance_rounded,
+                    color: Color(0xFFFFD700),
+                    size: 22,
                   ),
                 ),
               ),
-              child: Column(
-                children: [
-                  const SizedBox(height: 20),
-                  // Logo
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: const LinearGradient(
-                        colors: [_indigo, _violet],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: _indigo.withAlpha(100),
-                          blurRadius: 14,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.account_balance_rounded,
-                      color: Color(0xFFFFD700),
-                      size: 22,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(destinations.length, (index) {
-                        final d = destinations[index];
-                        final isSelected = index == currentIndex;
-                        return _buildRailItem(
-                          icon: isSelected ? d.selectedIcon : d.icon,
-                          label: d.label,
-                          isSelected: isSelected,
-                          onTap: () => onNavigationIndexChanged(index),
-                        );
-                      }),
-                    ),
-                  ),
-                ],
-              ),
+              destinations: destinations.map((d) {
+                return NavigationRailDestination(
+                  icon: Icon(d.icon),
+                  selectedIcon: Icon(d.selectedIcon),
+                  label: Text(d.label),
+                );
+              }).toList(),
+            ),
+            VerticalDivider(
+              thickness: 1,
+              width: 1,
+              color: Colors.white.withAlpha(15),
             ),
             Expanded(child: body),
           ],
@@ -127,55 +126,6 @@ class AdaptiveScaffold extends StatelessWidget {
         currentIndex: currentIndex,
         destinations: destinations,
         onTap: onNavigationIndexChanged,
-      ),
-    );
-  }
-
-  Widget _buildRailItem({
-    required IconData icon,
-    required String label,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          width: 56,
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            color: isSelected ? _indigo.withAlpha(40) : Colors.transparent,
-            borderRadius: BorderRadius.circular(14),
-            border: isSelected
-                ? Border.all(color: _indigo.withAlpha(80), width: 1)
-                : null,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                icon,
-                color: isSelected ? _neonCyan : Colors.white38,
-                size: 22,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: GoogleFonts.cairo(
-                  fontSize: 9,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                  color: isSelected ? _neonCyan : Colors.white38,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
