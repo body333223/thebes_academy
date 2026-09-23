@@ -5,8 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:thebes_academy/core/localization/locale_provider.dart';
 import 'package:thebes_academy/core/responsive/responsive_helper.dart';
 import 'package:thebes_academy/core/theme/thebes_colors.dart';
+import 'package:flutter/services.dart';
 import 'package:thebes_academy/features/student/presentation/controllers/student_controller.dart';
-import 'package:thebes_academy/features/faculty/presentation/screens/faculty_dashboard.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 class QrAttendanceScreen extends StatefulWidget {
@@ -251,19 +251,11 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          isArabic ? 'تسجيل الحضور الأكاديمي' : 'Doctor QR & PIN Attendance',
+          isArabic ? 'تسجيل الحضور الأكاديمي' : 'Smart Attendance',
           style: GoogleFonts.cairo(fontWeight: FontWeight.w800, fontSize: 18),
         ),
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.school_rounded, color: ThebesColors.cobalt),
-            tooltip: isArabic ? 'لوحة الدكتور' : 'Faculty Dashboard',
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const FacultyDashboard()),
-            ),
-          ),
           IconButton(
             icon: Icon(_isFlashOn ? Icons.flash_on_rounded : Icons.flash_off_rounded),
             color: _isFlashOn ? ThebesColors.cobalt : Colors.grey,
@@ -445,9 +437,6 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
     bool isArabic,
     bool isDark,
   ) {
-    final activeCourse = controller.activeFacultySessionCourse;
-    final activePin = controller.activeFacultySessionCode;
-
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
@@ -493,8 +482,8 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
                     ),
                     Text(
                       isArabic
-                          ? 'اكتب الرمز الرقمي المعروض على شاشة الدكتور لتأكيد حضورك'
-                          : 'Type the session PIN shown on doctor\'s projector',
+                          ? 'اكتب الرمز الرقمي المعروض في القاعة لتأكيد حضورك'
+                          : 'Type the session PIN shown in class',
                       style: GoogleFonts.cairo(fontSize: 11.5, color: Colors.grey),
                     ),
                   ],
@@ -503,56 +492,6 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
             ],
           ),
           const SizedBox(height: 18),
-
-          // Live Active Session Hint Banner
-          if (controller.isFacultySessionActive)
-            Container(
-              margin: const EdgeInsets.only(bottom: 16),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: ThebesColors.emerald.withAlpha(25),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: ThebesColors.emerald.withAlpha(120)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.bolt_rounded, color: ThebesColors.emerald, size: 20),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      isArabic
-                          ? 'جلسة نشطة الآن: $activeCourse • كود التحضير: $activePin'
-                          : 'Active Now: $activeCourse • PIN: $activePin',
-                      style: GoogleFonts.cairo(
-                        color: ThebesColors.emerald,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        _manualCodeController.text = activePin;
-                      });
-                    },
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: Text(
-                      isArabic ? 'تعبئة الرمز' : 'Use PIN',
-                      style: GoogleFonts.cairo(
-                        color: ThebesColors.emerald,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 11.5,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
 
           // PIN Input Field with Large Clean Digits
           TextField(
@@ -584,10 +523,13 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
                   IconButton(
                     icon: const Icon(Icons.paste_rounded, color: ThebesColors.cobalt, size: 20),
                     tooltip: isArabic ? 'لصق' : 'Paste',
-                    onPressed: () {
-                      setState(() {
-                        _manualCodeController.text = activePin;
-                      });
+                    onPressed: () async {
+                      final data = await Clipboard.getData(Clipboard.kTextPlain);
+                      if (data?.text != null && data!.text!.isNotEmpty) {
+                        setState(() {
+                          _manualCodeController.text = data.text!.trim();
+                        });
+                      }
                     },
                   ),
                 ],
@@ -789,7 +731,7 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
                 Text(
                   isArabic
                       ? 'امسح الـ QR المعروض في قاعة المحاضرة لتثبيت حضورك فورياً'
-                      : 'Scan doctor\'s in-class QR to log attendance instantly',
+                      : 'Scan in-class QR to log attendance instantly',
                   style: GoogleFonts.cairo(
                     color: Colors.white.withAlpha(180),
                     fontSize: 11.5,
@@ -969,7 +911,7 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
                     Text(
                       controller.isScanning
                           ? (isArabic ? 'جاري التحقق من الجلسة وتأكيد الحضور...' : 'Verifying Session...')
-                          : (isArabic ? 'وجه الكاميرا نحو كود الدكتور المعروض' : 'Aim at Doctor\'s Screen QR'),
+                          : (isArabic ? 'وجه الكاميرا نحو رمز QR المعروض في القاعة' : 'Aim at Hall QR Code'),
                       style: GoogleFonts.cairo(
                         color: Colors.white,
                         fontSize: 12,

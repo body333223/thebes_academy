@@ -15,14 +15,22 @@ import 'services_screen.dart';
 import 'exam_schedule_screen.dart';
 import 'campus_guide_screen.dart';
 import 'package:thebes_academy/features/settings/presentation/screens/settings_screen.dart';
-import 'package:thebes_academy/features/faculty/presentation/screens/faculty_dashboard.dart';
+import 'package:thebes_academy/features/student/domain/entities/academic_entities.dart';
 
 /// Apple / iOS Human Interface Guidelines Inspired Student Dashboard
 /// Designed with generous whitespace, pristine cards, and refined typography.
-class HomeDashboardScreen extends StatelessWidget {
+class HomeDashboardScreen extends StatefulWidget {
   final Function(int)? onNavigateTab;
 
   const HomeDashboardScreen({super.key, this.onNavigateTab});
+
+  @override
+  State<HomeDashboardScreen> createState() => _HomeDashboardScreenState();
+}
+
+class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
+  bool _isAbsenceAlertDismissed = false;
+  int _selectedLectureIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +39,7 @@ class HomeDashboardScreen extends StatelessWidget {
     final isDark = locale.isDarkMode;
     final controller = context.watch<StudentController>();
     final student = controller.student;
-    final nextLecture = controller.nextLecture;
+    final consecutiveLectures = controller.todayConsecutiveLectures;
 
     return Scaffold(
       backgroundColor: isDark ? ThebesColors.darkBackground : const Color(0xFFF6F8FA),
@@ -55,15 +63,15 @@ class HomeDashboardScreen extends StatelessWidget {
                     const SizedBox(height: 12),
                   ],
 
-                  // 2. Absence Alert Pill (Apple-Style Urgent Banner)
-                  if (controller.totalAbsenceWarnings > 0) ...[
+                  // 2. Absence Alert Pill (Apple-Style Dismissible Banner)
+                  if (!_isAbsenceAlertDismissed && controller.totalAbsenceWarnings > 0) ...[
                     _buildAbsenceAlertPill(context, controller, isArabic, isDark),
                     const SizedBox(height: 16),
                   ],
 
-                  // 3. Featured Live Lecture Card (Apple Wallet / Music Player Style)
-                  if (nextLecture != null) ...[
-                    _buildLiveLectureCard(context, nextLecture, isArabic, isDark),
+                  // 3. Featured Consecutive Lectures Card (Apple Wallet / Music Player Style)
+                  if (consecutiveLectures.isNotEmpty) ...[
+                    _buildConsecutiveLecturesCard(context, consecutiveLectures, isArabic, isDark),
                     const SizedBox(height: 22),
                   ],
 
@@ -222,8 +230,8 @@ class HomeDashboardScreen extends StatelessWidget {
           context: context,
           icon: Icons.settings_outlined,
           onTap: () {
-            if (onNavigateTab != null) {
-              onNavigateTab!(4);
+            if (widget.onNavigateTab != null) {
+              widget.onNavigateTab!(4);
             } else {
               Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
             }
@@ -341,7 +349,7 @@ class HomeDashboardScreen extends StatelessWidget {
   }
 
   // =========================================================================
-  // 2. Absence Alert Pill
+  // 2. Absence Alert Pill (Apple-Style Subtle & Dismissible)
   // =========================================================================
   Widget _buildAbsenceAlertPill(
     BuildContext context,
@@ -351,66 +359,110 @@ class HomeDashboardScreen extends StatelessWidget {
   ) {
     final warningCount = controller.totalAbsenceWarnings;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF2C1014) : ThebesColors.catAlertBg,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: ThebesColors.catAlertText.withAlpha(90), width: 1),
-        boxShadow: const [
+        color: isDark ? const Color(0xFF2C1417) : const Color(0xFFFFF5F5),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? const Color(0xFF882029) : const Color(0xFFFECDD3),
+          width: 1,
+        ),
+        boxShadow: [
           BoxShadow(
-            color: Color(0x06EF4444),
+            color: Colors.red.withAlpha(isDark ? 30 : 12),
             blurRadius: 10,
-            offset: Offset(0, 4),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(7),
             decoration: BoxDecoration(
-              color: ThebesColors.catAlertText.withAlpha(25),
+              color: ThebesColors.orange.withAlpha(25),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.warning_amber_rounded, color: ThebesColors.catAlertText, size: 20),
+            child: const Icon(
+              Icons.warning_amber_rounded,
+              color: ThebesColors.orange,
+              size: 18,
+            ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  isArabic ? 'إنذار نسبة الغياب الأكاديمي' : 'Attendance Risk Alert',
+                  isArabic ? 'إنذار نسبة الغياب الأكاديمي' : 'Attendance Notice',
                   style: GoogleFonts.cairo(
-                    fontSize: 13,
+                    fontSize: 12.5,
                     fontWeight: FontWeight.w700,
-                    color: ThebesColors.catAlertText,
+                    color: isDark ? const Color(0xFFFFB4BA) : const Color(0xFF9F1239),
                   ),
                 ),
                 Text(
                   isArabic
                       ? 'يوجد $warningCount مقرر تجاوز أو قارب حد الـ 25% من الغياب.'
-                      : '$warningCount course(s) near or exceeding the 25% absence limit.',
+                      : '$warningCount course(s) near 25% absence limit.',
                   style: GoogleFonts.cairo(
                     fontSize: 11,
-                    color: ThebesColors.catAlertText.withAlpha(220),
+                    color: isDark ? const Color(0xFFFCA5A5) : const Color(0xFFBE123C),
                     fontWeight: FontWeight.w500,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           ),
-          TextButton(
-            onPressed: () => onNavigateTab != null ? onNavigateTab!(2) : null,
-            style: TextButton.styleFrom(
-              foregroundColor: ThebesColors.catAlertText,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          const SizedBox(width: 6),
+          // Review button
+          InkWell(
+            onTap: () {
+              if (widget.onNavigateTab != null) {
+                widget.onNavigateTab!(2);
+              } else {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const QrAttendanceScreen()));
+              }
+            },
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: isDark ? Colors.white.withAlpha(15) : const Color(0xFFFFE4E6),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                isArabic ? 'مراجعة' : 'Review',
+                style: GoogleFonts.cairo(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w700,
+                  color: isDark ? Colors.white : const Color(0xFF9F1239),
+                ),
+              ),
             ),
-            child: Text(
-              isArabic ? 'سجل الحضور' : 'Review',
-              style: GoogleFonts.cairo(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
+          ),
+          const SizedBox(width: 6),
+          // Dismiss (X) button
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _isAbsenceAlertDismissed = true;
+              });
+            },
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: isDark ? Colors.white.withAlpha(20) : Colors.black.withAlpha(10),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.close_rounded,
+                size: 16,
+                color: isDark ? Colors.white70 : const Color(0xFF9F1239),
               ),
             ),
           ),
@@ -420,20 +472,72 @@ class HomeDashboardScreen extends StatelessWidget {
   }
 
   // =========================================================================
-  // 3. Featured Live Lecture Card (Apple Music / Wallet Style)
+  // 3. Featured Consecutive Lectures Card with 1-Minute Gate
   // =========================================================================
-  Widget _buildLiveLectureCard(
+  bool _isLectureAttendanceUnlocked(CourseScheduleEntity lecture) {
+    try {
+      final clean = lecture.startTime.trim();
+      final isPM = clean.contains('م') || clean.toUpperCase().contains('PM');
+      final isAM = clean.contains('ص') || clean.toUpperCase().contains('AM');
+      final match = RegExp(r'(\d{1,2}):(\d{2})').firstMatch(clean);
+      if (match != null) {
+        int hour = int.parse(match.group(1)!);
+        final minute = int.parse(match.group(2)!);
+        if (isPM && hour < 12) hour += 12;
+        if (isAM && hour == 12) hour = 0;
+        final now = DateTime.now();
+        final lectureStart = DateTime(now.year, now.month, now.day, hour, minute);
+        // Unlocks strictly after 1 minute has elapsed from lecture start time:
+        final unlockTime = lectureStart.add(const Duration(minutes: 1));
+        return now.isAfter(unlockTime);
+      }
+    } catch (_) {}
+    return !lecture.isUpcoming;
+  }
+
+  String _getAttendanceUnlockTimeString(CourseScheduleEntity lecture, bool isArabic) {
+    try {
+      final clean = lecture.startTime.trim();
+      final isPM = clean.contains('م') || clean.toUpperCase().contains('PM');
+      final match = RegExp(r'(\d{1,2}):(\d{2})').firstMatch(clean);
+      if (match != null) {
+        int hour = int.parse(match.group(1)!);
+        int minute = int.parse(match.group(2)!);
+        minute += 1;
+        if (minute >= 60) {
+          hour += 1;
+          minute = 0;
+        }
+        final suffix = isPM ? (isArabic ? 'م' : 'PM') : (isArabic ? 'ص' : 'AM');
+        final hStr = hour.toString().padLeft(2, '0');
+        final mStr = minute.toString().padLeft(2, '0');
+        return '$hStr:$mStr $suffix';
+      }
+    } catch (_) {}
+    return isArabic ? 'بعد دقيقة من البدء' : '1 min after start';
+  }
+
+  Widget _buildConsecutiveLecturesCard(
     BuildContext context,
-    dynamic nextLecture,
+    List<CourseScheduleEntity> lectures,
     bool isArabic,
     bool isDark,
   ) {
+    if (lectures.isEmpty) return const SizedBox.shrink();
+    if (_selectedLectureIndex >= lectures.length) {
+      _selectedLectureIndex = 0;
+    }
+    final currentLecture = lectures[_selectedLectureIndex];
+    final totalLectures = lectures.length;
+    final isUnlocked = _isLectureAttendanceUnlocked(currentLecture);
+    final unlockTimeString = _getAttendanceUnlockTimeString(currentLecture, isArabic);
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: ThebesColors.primaryHeaderGradient,
-        borderRadius: BorderRadius.circular(22), // Apple large radius
+        borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
             color: ThebesColors.navy.withAlpha(45),
@@ -445,42 +549,89 @@ class HomeDashboardScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header Row: Status Badge & Pagination / Switcher & Time Badge
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: AlignmentDirectional.centerStart,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Live indicator badge
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: ThebesColors.orange.withAlpha(40),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: ThebesColors.orange.withAlpha(120)),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 7,
-                        height: 7,
-                        decoration: const BoxDecoration(
-                          color: ThebesColors.orange,
-                          shape: BoxShape.circle,
+                // Live or Consecutive Badge
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: (_selectedLectureIndex == 0 ? ThebesColors.orange : ThebesColors.cobalt).withAlpha(45),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: (_selectedLectureIndex == 0 ? ThebesColors.orange : ThebesColors.cobalt).withAlpha(140),
                         ),
                       ),
-                      const SizedBox(width: 6),
-                      Text(
-                        isArabic ? 'المحاضرة الحالية' : 'Live Now',
-                        style: GoogleFonts.cairo(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 7,
+                            height: 7,
+                            decoration: BoxDecoration(
+                              color: _selectedLectureIndex == 0 ? ThebesColors.orange : Colors.cyanAccent,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            _selectedLectureIndex == 0
+                                ? (isArabic ? 'المحاضرة الحالية' : 'Live Now')
+                                : (isArabic ? 'المحاضرة المتتالية' : 'Next Lecture'),
+                            style: GoogleFonts.cairo(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (totalLectures > 1) ...[
+                      const SizedBox(width: 8),
+                      // Consecutive Lecture Counter / Switcher
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withAlpha(20),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (_selectedLectureIndex > 0)
+                              GestureDetector(
+                                onTap: () => setState(() => _selectedLectureIndex--),
+                                child: const Icon(Icons.chevron_left_rounded, color: Colors.white, size: 16),
+                              ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 4),
+                              child: Text(
+                                '${_selectedLectureIndex + 1}/$totalLectures',
+                                style: GoogleFonts.cairo(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                            if (_selectedLectureIndex < totalLectures - 1)
+                              GestureDetector(
+                                onTap: () => setState(() => _selectedLectureIndex++),
+                                child: const Icon(Icons.chevron_right_rounded, color: Colors.white, size: 16),
+                              ),
+                          ],
                         ),
                       ),
                     ],
-                  ),
+                  ],
                 ),
                 const SizedBox(width: 12),
 
@@ -491,7 +642,7 @@ class HomeDashboardScreen extends StatelessWidget {
                     const Icon(Icons.access_time_rounded, size: 14, color: Color(0xFFE8EEFF)),
                     const SizedBox(width: 5),
                     Text(
-                      '${nextLecture.startTime} - ${nextLecture.endTime}',
+                      '${currentLecture.startTime} - ${currentLecture.endTime}',
                       style: GoogleFonts.cairo(
                         color: const Color(0xFFE8EEFF),
                         fontSize: 12,
@@ -507,7 +658,7 @@ class HomeDashboardScreen extends StatelessWidget {
 
           // Course title
           Text(
-            nextLecture.getLocalizedTitle(isArabic),
+            currentLecture.getLocalizedTitle(isArabic),
             style: GoogleFonts.cairo(
               color: Colors.white,
               fontSize: 18,
@@ -517,7 +668,7 @@ class HomeDashboardScreen extends StatelessWidget {
           ),
           const SizedBox(height: 6),
 
-          // Instructor & Room Wrap
+          // Instructor & Room & Type Wrap
           Wrap(
             spacing: 8,
             runSpacing: 6,
@@ -531,7 +682,7 @@ class HomeDashboardScreen extends StatelessWidget {
                   ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 160),
                     child: Text(
-                      nextLecture.getLocalizedInstructor(isArabic),
+                      currentLecture.getLocalizedInstructor(isArabic),
                       style: GoogleFonts.cairo(
                         color: Colors.white.withAlpha(200),
                         fontSize: 12,
@@ -557,7 +708,7 @@ class HomeDashboardScreen extends StatelessWidget {
                     ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 140),
                       child: Text(
-                        nextLecture.getLocalizedHall(isArabic),
+                        currentLecture.getLocalizedHall(isArabic),
                         style: GoogleFonts.cairo(
                           color: Colors.white,
                           fontSize: 11,
@@ -570,61 +721,165 @@ class HomeDashboardScreen extends StatelessWidget {
                   ],
                 ),
               ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                decoration: BoxDecoration(
+                  color: Colors.white.withAlpha(15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  currentLecture.type == LectureType.lab
+                      ? (isArabic ? 'سكشن عملي' : 'Lab')
+                      : (isArabic ? 'محاضرة نظري' : 'Lecture'),
+                  style: GoogleFonts.cairo(
+                    color: Colors.white.withAlpha(220),
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 18),
 
-          // One-tap Action Button
-          Container(
-            height: 48,
-            decoration: BoxDecoration(
-              gradient: ThebesColors.orangeCtaGradient,
-              borderRadius: BorderRadius.circular(14),
-              boxShadow: [
-                BoxShadow(
-                  color: ThebesColors.orange.withAlpha(90),
-                  blurRadius: 14,
-                  offset: const Offset(0, 4),
+          // Attendance Button with 1-Minute Gate:
+          // Unlocks after 1 minute has elapsed from lecture start time!
+          if (isUnlocked)
+            _buildUnlockedAttendanceButton(context, currentLecture, isArabic)
+          else
+            _buildLockedAttendanceButton(context, currentLecture, unlockTimeString, isArabic),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUnlockedAttendanceButton(
+    BuildContext context,
+    CourseScheduleEntity lecture,
+    bool isArabic,
+  ) {
+    return Container(
+      height: 48,
+      decoration: BoxDecoration(
+        gradient: ThebesColors.orangeCtaGradient,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: ThebesColors.orange.withAlpha(90),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(14),
+          onTap: () {
+            if (widget.onNavigateTab != null) {
+              widget.onNavigateTab!(2);
+            } else {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const QrAttendanceScreen()),
+              );
+            }
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.qr_code_scanner_rounded, size: 20, color: Colors.white),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  isArabic ? 'تسجيل الحضور الفوري (متاح الآن)' : 'Instant Check-In (Available Now)',
+                  style: GoogleFonts.cairo(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                    color: Colors.white,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ],
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(14),
-                onTap: () {
-                  if (onNavigateTab != null) {
-                    onNavigateTab!(2);
-                  } else {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const QrAttendanceScreen()),
-                    );
-                  }
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLockedAttendanceButton(
+    BuildContext context,
+    CourseScheduleEntity lecture,
+    String unlockTimeString,
+    bool isArabic,
+  ) {
+    return Container(
+      height: 48,
+      decoration: BoxDecoration(
+        color: Colors.white.withAlpha(20),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.white.withAlpha(40), width: 1),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(14),
+          onTap: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
                   children: [
-                    const Icon(Icons.qr_code_scanner_rounded, size: 20, color: Colors.white),
-                    const SizedBox(width: 8),
-                    Flexible(
+                    const Icon(Icons.lock_clock_rounded, color: Colors.white, size: 20),
+                    const SizedBox(width: 10),
+                    Expanded(
                       child: Text(
-                        isArabic ? 'تسجيل الحضور الفوري (QR / كود)' : 'Instant Check-In (QR / PIN)',
-                        style: GoogleFonts.cairo(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 13,
-                          color: Colors.white,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        isArabic
+                            ? 'تسجيل الحضور مغلق الآن • يفتح تلقائياً بعد مرور أول دقيقة من موعد المحاضرة ($unlockTimeString).'
+                            : 'Attendance locked • Opens 1 min after lecture start ($unlockTimeString).',
+                        style: GoogleFonts.cairo(fontSize: 12),
                       ),
                     ),
                   ],
                 ),
+                backgroundColor: ThebesColors.navy,
+                duration: const Duration(seconds: 4),
+                action: SnackBarAction(
+                  label: isArabic ? 'فتح تجريبي' : 'Dev Unlock',
+                  textColor: ThebesColors.orange,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const QrAttendanceScreen()),
+                    );
+                  },
+                ),
               ),
-            ),
+            );
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.lock_clock_rounded, size: 18, color: Color(0xFFFFD166)),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  isArabic
+                      ? 'يفتح تسجيل الحضور: $unlockTimeString (بعد دقيقة من البدء)'
+                      : 'Attendance opens: $unlockTimeString (1m after start)',
+                  style: GoogleFonts.cairo(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                    color: Colors.white.withAlpha(230),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -836,8 +1091,8 @@ class HomeDashboardScreen extends StatelessWidget {
         'bg': ThebesColors.orangePale,
         'accent': ThebesColors.orange,
         'action': () {
-          if (onNavigateTab != null) {
-            onNavigateTab!(2);
+          if (widget.onNavigateTab != null) {
+            widget.onNavigateTab!(2);
           } else {
             Navigator.push(context, MaterialPageRoute(builder: (_) => const QrAttendanceScreen()));
           }
@@ -849,8 +1104,8 @@ class HomeDashboardScreen extends StatelessWidget {
         'bg': ThebesColors.sky,
         'accent': ThebesColors.navy,
         'action': () {
-          if (onNavigateTab != null) {
-            onNavigateTab!(1);
+          if (widget.onNavigateTab != null) {
+            widget.onNavigateTab!(1);
           } else {
             Navigator.push(context, MaterialPageRoute(builder: (_) => const ScheduleScreen()));
           }
@@ -862,8 +1117,8 @@ class HomeDashboardScreen extends StatelessWidget {
         'bg': ThebesColors.catHealthBg,
         'accent': ThebesColors.catHealthText,
         'action': () {
-          if (onNavigateTab != null) {
-            onNavigateTab!(3);
+          if (widget.onNavigateTab != null) {
+            widget.onNavigateTab!(3);
           } else {
             Navigator.push(context, MaterialPageRoute(builder: (_) => const ServicesScreen()));
           }
@@ -891,11 +1146,17 @@ class HomeDashboardScreen extends StatelessWidget {
         'action': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ExamScheduleScreen())),
       },
       {
-        'title': isArabic ? 'لوحة الدكتور' : 'Faculty',
-        'icon': Icons.school_rounded,
-        'bg': ThebesColors.catLanguagesBg,
-        'accent': ThebesColors.catLanguagesText,
-        'action': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FacultyDashboard())),
+        'title': isArabic ? 'طلبات الطلاب' : 'Requests',
+        'icon': Icons.description_rounded,
+        'bg': const Color(0xFFEDE9FE),
+        'accent': const Color(0xFF7C3AED),
+        'action': () {
+          if (widget.onNavigateTab != null) {
+            widget.onNavigateTab!(3);
+          } else {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const ServicesScreen()));
+          }
+        },
       },
       {
         'title': isArabic ? 'دليل المقرات' : 'Campus Guide',
@@ -926,12 +1187,27 @@ class HomeDashboardScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            Text(
-              isArabic ? 'عرض الكل' : 'See all',
-              style: GoogleFonts.cairo(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: ThebesColors.orange,
+            // Functional "عرض الكل / See all" button
+            InkWell(
+              onTap: () => _showAllServicesSheet(context, isArabic, isDark),
+              borderRadius: BorderRadius.circular(10),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      isArabic ? 'عرض الكل' : 'See all',
+                      style: GoogleFonts.cairo(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                        color: ThebesColors.orange,
+                      ),
+                    ),
+                    const SizedBox(width: 3),
+                    const Icon(Icons.arrow_forward_ios_rounded, size: 11, color: ThebesColors.orange),
+                  ],
+                ),
               ),
             ),
           ],
@@ -1005,6 +1281,291 @@ class HomeDashboardScreen extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  // =========================================================================
+  // All Services Modal Sheet (Opened via "عرض الكل")
+  // =========================================================================
+  void _showAllServicesSheet(BuildContext context, bool isArabic, bool isDark) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        final allServices = [
+          {
+            'title': isArabic ? 'حضور المحاضرات (QR & PIN)' : 'Smart Attendance',
+            'desc': isArabic ? 'تسجيل الحضور بالكاميرا أو كود الجلسة' : 'Log attendance via QR or PIN',
+            'icon': Icons.qr_code_scanner_rounded,
+            'color': ThebesColors.orange,
+            'bg': ThebesColors.orangePale,
+            'action': () {
+              Navigator.pop(ctx);
+              if (widget.onNavigateTab != null) {
+                widget.onNavigateTab!(2);
+              } else {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const QrAttendanceScreen()));
+              }
+            },
+          },
+          {
+            'title': isArabic ? 'جدول المحاضرات والسكاشن' : 'Weekly Schedule',
+            'desc': isArabic ? 'مواعيد المحاضرات والقاعات والمعامل' : 'Lecture timings, halls & labs',
+            'icon': Icons.calendar_month_rounded,
+            'color': ThebesColors.navy,
+            'bg': ThebesColors.sky,
+            'action': () {
+              Navigator.pop(ctx);
+              if (widget.onNavigateTab != null) {
+                widget.onNavigateTab!(1);
+              } else {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const ScheduleScreen()));
+              }
+            },
+          },
+          {
+            'title': isArabic ? 'سداد المصروفات والرسوم' : 'E-Payment & Fees',
+            'desc': isArabic ? 'أقساط الرسوم الدراسية والدفع الإلكتروني' : 'Tuition fees & online payment',
+            'icon': Icons.payment_rounded,
+            'color': ThebesColors.catHealthText,
+            'bg': ThebesColors.catHealthBg,
+            'action': () {
+              Navigator.pop(ctx);
+              if (widget.onNavigateTab != null) {
+                widget.onNavigateTab!(3);
+              } else {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const ServicesScreen()));
+              }
+            },
+          },
+          {
+            'title': isArabic ? 'كارنيه الكلية الرقمي' : 'Digital Student ID',
+            'desc': isArabic ? 'بطاقة إلكترونية معتمدة بالباركود' : 'Verified ID card with barcode',
+            'icon': Icons.badge_rounded,
+            'color': ThebesColors.catMathText,
+            'bg': ThebesColors.catMathBg,
+            'action': () {
+              Navigator.pop(ctx);
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const DigitalIdScreen()));
+            },
+          },
+          {
+            'title': isArabic ? 'الدرجات والسجل التراكمي' : 'Grades & GPA',
+            'desc': isArabic ? 'نتائج المقررات ومعدل الـ GPA الفصلي' : 'Semester grades & GPA transcript',
+            'icon': Icons.assessment_rounded,
+            'color': ThebesColors.catBusinessText,
+            'bg': ThebesColors.catBusinessBg,
+            'action': () {
+              Navigator.pop(ctx);
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const GradesScreen()));
+            },
+          },
+          {
+            'title': isArabic ? 'جدول الامتحانات واللجان' : 'Exams & Seating',
+            'desc': isArabic ? 'مواعيد الاختبارات ورقم الجلوس والقاعة' : 'Exam schedule, seat & hall',
+            'icon': Icons.assignment_rounded,
+            'color': const Color(0xFF0284C7),
+            'bg': const Color(0xFFE0F2FE),
+            'action': () {
+              Navigator.pop(ctx);
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const ExamScheduleScreen()));
+            },
+          },
+          {
+            'title': isArabic ? 'دليل المقرات والمدرجات' : 'Campus Guide',
+            'desc': isArabic ? 'خريطة المباني والمعامل والمدرجات' : 'Campus buildings, labs & halls',
+            'icon': Icons.location_on_rounded,
+            'color': ThebesColors.catLanguagesText,
+            'bg': ThebesColors.catLanguagesBg,
+            'action': () {
+              Navigator.pop(ctx);
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const CampusGuideScreen()));
+            },
+          },
+          {
+            'title': isArabic ? 'الطلبات والخدمات الطلابية' : 'Student E-Requests',
+            'desc': isArabic ? 'إثبات قيد، بيان درجات، التماسات' : 'Enrollment proof, transcripts & appeals',
+            'icon': Icons.description_rounded,
+            'color': const Color(0xFF7C3AED),
+            'bg': const Color(0xFFEDE9FE),
+            'action': () {
+              Navigator.pop(ctx);
+              if (widget.onNavigateTab != null) {
+                widget.onNavigateTab!(3);
+              } else {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const ServicesScreen()));
+              }
+            },
+          },
+          {
+            'title': isArabic ? 'الإعلانات والأنشطة الأكاديمية' : 'Announcements',
+            'desc': isArabic ? 'تنبيهات شؤون الطلاب والأنشطة' : 'Student affairs news & events',
+            'icon': Icons.campaign_rounded,
+            'color': const Color(0xFF059669),
+            'bg': const Color(0xFFD1FAE5),
+            'action': () {
+              Navigator.pop(ctx);
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationsScreen()));
+            },
+          },
+          {
+            'title': isArabic ? 'إعدادات الحساب والمظهر' : 'Settings & Preferences',
+            'desc': isArabic ? 'اللغة، المظهر الداكن، الأمان' : 'Language, dark mode & security',
+            'icon': Icons.settings_rounded,
+            'color': ThebesColors.slateDark,
+            'bg': const Color(0xFFF1F5F9),
+            'action': () {
+              Navigator.pop(ctx);
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
+            },
+          },
+        ];
+
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.86,
+          ),
+          decoration: BoxDecoration(
+            color: isDark ? ThebesColors.darkCard : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x33000000),
+                blurRadius: 30,
+                offset: Offset(0, -6),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 12),
+              // Drag Handle
+              Container(
+                width: 44,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.white24 : Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              const SizedBox(height: 14),
+
+              // Header
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            isArabic ? 'كافة الخدمات الطلابية' : 'All Student Services',
+                            style: GoogleFonts.cairo(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: isDark ? Colors.white : ThebesColors.navy,
+                            ),
+                          ),
+                          Text(
+                            isArabic
+                                ? 'دليل متكامل لكافة بوابات وأدوات أكاديمية طيبة'
+                                : 'Complete directory of Thebes Academy tools',
+                            style: GoogleFonts.cairo(
+                              fontSize: 11.5,
+                              color: isDark ? ThebesColors.slateLight : ThebesColors.slate,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded),
+                      color: isDark ? Colors.white70 : ThebesColors.slate,
+                      onPressed: () => Navigator.pop(ctx),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(height: 18),
+
+              // Services List
+              Flexible(
+                child: ListView.separated(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
+                  itemCount: allServices.length,
+                  separatorBuilder: (_, index) => const SizedBox(height: 10),
+                  itemBuilder: (context, i) {
+                    final s = allServices[i];
+                    final color = s['color'] as Color;
+                    final bg = s['bg'] as Color;
+                    final action = s['action'] as VoidCallback;
+
+                    return Material(
+                      color: isDark ? ThebesColors.darkCardBorder.withAlpha(50) : const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(16),
+                      child: InkWell(
+                        onTap: action,
+                        borderRadius: BorderRadius.circular(16),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 44,
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  color: bg,
+                                  borderRadius: BorderRadius.circular(13),
+                                ),
+                                child: Icon(s['icon'] as IconData, color: color, size: 22),
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      s['title'] as String,
+                                      style: GoogleFonts.cairo(
+                                        fontSize: 13.5,
+                                        fontWeight: FontWeight.w700,
+                                        color: isDark ? Colors.white : ThebesColors.navy,
+                                      ),
+                                    ),
+                                    Text(
+                                      s['desc'] as String,
+                                      style: GoogleFonts.cairo(
+                                        fontSize: 11,
+                                        color: isDark ? ThebesColors.slateLight : ThebesColors.slate,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Icon(
+                                isArabic ? Icons.chevron_left_rounded : Icons.chevron_right_rounded,
+                                color: isDark ? Colors.white38 : ThebesColors.slateLight,
+                                size: 20,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 

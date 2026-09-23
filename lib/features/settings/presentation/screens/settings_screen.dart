@@ -4,7 +4,6 @@ import 'package:thebes_academy/core/theme/thebes_colors.dart';
 import 'package:thebes_academy/core/localization/locale_provider.dart';
 import 'package:thebes_academy/core/responsive/responsive_helper.dart';
 import 'package:thebes_academy/core/widgets/user_avatar_widget.dart';
-import 'package:thebes_academy/features/student/domain/entities/student_entity.dart';
 import 'package:thebes_academy/features/student/presentation/controllers/student_controller.dart';
 import 'package:thebes_academy/features/student/presentation/screens/digital_id_screen.dart';
 import 'package:thebes_academy/features/student/presentation/screens/campus_guide_screen.dart';
@@ -221,38 +220,6 @@ class SettingsScreen extends StatelessWidget {
                   value: isDark,
                   onChanged: (_) => locale.toggleTheme(),
                 ),
-              ),
-
-              // Switch Role (Student <-> Faculty)
-              ListTile(
-                leading: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: ThebesColors.opacity(ThebesColors.cyanAccent, 0.15),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.swap_horiz_rounded, color: ThebesColors.cyanAccent),
-                ),
-                title: Text(isArabic ? 'تبديل الدور (طالب / دكتور)' : 'Switch Role (Student / Faculty)'),
-                subtitle: Text(
-                  controller.isStudent
-                      ? (isArabic ? 'الحساب الحالي: طالب' : 'Current: Student')
-                      : (isArabic ? 'الحساب الحالي: دكتور' : 'Current: Faculty'),
-                ),
-                trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
-                onTap: () {
-                  controller.switchRole(controller.isStudent ? UserRole.faculty : UserRole.student);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        controller.isStudent
-                            ? (isArabic ? 'تم التبديل لبوابة الطالب' : 'Switched to Student')
-                            : (isArabic ? 'تم التبديل لبوابة الدكتور' : 'Switched to Faculty'),
-                      ),
-                      backgroundColor: ThebesColors.primary,
-                    ),
-                  );
-                },
               ),
 
               const Divider(height: 24),
