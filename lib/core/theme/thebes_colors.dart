@@ -47,27 +47,35 @@ class ThebesColors {
   static const Color info = Color(0xFF2563EB);
 
   // Surface & Background Colors
-  static const Color pageBg = Color(0xFFF8FAFC);
-  static const Color lightBackground = Color(0xFFF8FAFC);
+  static const Color pageBg = Color(0xFFF8FAFD);
+  static const Color lightBackground = Color(0xFFF8FAFD);
   static const Color lightSurface = Color(0xFFFFFFFF);
   static const Color lightCard = Color(0xFFFFFFFF);
   static const Color lightCardBorder = Color(0xFFE2E8F0);
-  static const Color lightTextPrimary = Color(0xFF1E293B);
+  static const Color lightTextPrimary = Color(0xFF0F172A);
   static const Color lightTextSecondary = Color(0xFF64748B);
   static const Color lightTextMuted = Color(0xFF94A3B8);
 
-  // Dark Mode Surfaces
-  static const Color darkBackground = Color(0xFF0A1128);
-  static const Color darkSurface = Color(0xFF0F1A3D);
-  static const Color darkCard = Color(0xFF15224F);
-  static const Color darkCardBorder = Color(0xFF223670);
+  // Dark Mode Surfaces - Luxury Midnight Obsidian & Polished Slate
+  static const Color darkBackground = Color(0xFF090D16);
+  static const Color darkSurface = Color(0xFF0F172A);
+  static const Color darkCard = Color(0xFF141D30);
+  static const Color darkCardBorder = Color(0xFF23334F);
+  static const Color elevatedDarkCard = Color(0xFF1B273F);
+  static const Color hairlineDark = Color(0xFF23334F);
   static const Color darkTextPrimary = Color(0xFFF8FAFC);
   static const Color darkTextSecondary = Color(0xFF94A3B8);
   static const Color darkTextMuted = Color(0xFF64748B);
 
   // Gradients
   static const LinearGradient primaryHeaderGradient = LinearGradient(
-    colors: [Color(0xFF0F1E36), Color(0xFF1E3A66)],
+    colors: [Color(0xFF0B192C), Color(0xFF1E3A5F)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient titaniumCardGradient = LinearGradient(
+    colors: [Color(0xFF0F1E36), Color(0xFF1A365D), Color(0xFF2563EB)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );

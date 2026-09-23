@@ -6,8 +6,10 @@ import 'package:thebes_academy/core/responsive/responsive_helper.dart';
 import 'package:thebes_academy/core/widgets/user_avatar_widget.dart';
 import 'package:thebes_academy/features/student/presentation/controllers/student_controller.dart';
 import 'package:thebes_academy/features/student/presentation/screens/digital_id_screen.dart';
+import 'package:thebes_academy/features/student/presentation/screens/profile_screen.dart';
 import 'package:thebes_academy/features/student/presentation/screens/campus_guide_screen.dart';
 import 'package:thebes_academy/features/auth/presentation/screens/login_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -30,56 +32,95 @@ class SettingsScreen extends StatelessWidget {
           child: ListView(
             padding: context.responsiveScreenPadding,
             children: [
-              // Profile Banner
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: isDark ? ThebesColors.darkCard : Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: isDark ? ThebesColors.darkCardBorder : ThebesColors.lightCardBorder,
-                  ),
+              // Profile Banner (Clickable -> Opens Full Student Profile)
+              InkWell(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ProfileScreen()),
                 ),
-                child: Row(
-                  children: [
-                    UserAvatarWidget(
-                      size: context.responsiveValue(mobile: 56.0, tablet: 64.0),
-                      initials: 'أ.ش',
+                borderRadius: BorderRadius.circular(22),
+                child: Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: isDark ? ThebesColors.darkCard : Colors.white,
+                    borderRadius: BorderRadius.circular(22),
+                    border: Border.all(
+                      color: isDark ? ThebesColors.hairlineDark : const Color(0xFFEAECF0),
                     ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            student.getLocalizedName(isArabic),
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : ThebesColors.primaryDark,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            student.getLocalizedInstitute(isArabic),
-                            style: const TextStyle(
-                              fontSize: 11,
-                              color: ThebesColors.gold,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'ID: ${student.academicId} • ${student.email}',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: isDark ? Colors.grey : ThebesColors.lightTextMuted,
-                            ),
-                          ),
-                        ],
+                    boxShadow: [
+                      BoxShadow(
+                        color: isDark ? Colors.black.withAlpha(40) : const Color(0x06101828),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: ThebesColors.orange, width: 2),
+                        ),
+                        child: UserAvatarWidget(
+                          size: context.responsiveValue(mobile: 54.0, tablet: 62.0),
+                          initials: isArabic ? 'ر.م' : 'R.A',
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              student.getLocalizedName(isArabic),
+                              style: GoogleFonts.almarai(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                color: isDark ? Colors.white : ThebesColors.navy,
+                                letterSpacing: -0.3,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              student.getLocalizedInstitute(isArabic),
+                              style: GoogleFonts.almarai(
+                                fontSize: 11.5,
+                                color: ThebesColors.orange,
+                                fontWeight: FontWeight.w700,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              'ID: ${student.academicId} • ${student.email}',
+                              style: GoogleFonts.almarai(
+                                fontSize: 11,
+                                color: isDark ? ThebesColors.slateLight : ThebesColors.slate,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: isDark ? ThebesColors.elevatedDarkCard : const Color(0xFFF1F5F9),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          isArabic ? Icons.chevron_left_rounded : Icons.chevron_right_rounded,
+                          size: 18,
+                          color: isDark ? Colors.white54 : ThebesColors.slate,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
 
@@ -187,38 +228,159 @@ class SettingsScreen extends StatelessWidget {
 
               const Divider(height: 24),
 
-              // Language Switch
-              ListTile(
-                leading: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: ThebesColors.opacity(ThebesColors.primary, 0.12),
-                    borderRadius: BorderRadius.circular(10),
+              // Modern Language Segmented Card
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 6),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: isDark ? ThebesColors.darkCard : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isDark ? ThebesColors.hairlineDark : const Color(0xFFEAECF0),
                   ),
-                  child: const Icon(Icons.translate_rounded, color: ThebesColors.primaryLight),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x04101828),
+                      blurRadius: 10,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
                 ),
-                title: Text(locale.tr('language')),
-                subtitle: Text(isArabic ? 'العربية (Arabic)' : 'English (الإنجليزية)'),
-                trailing: Switch(
-                  value: !isArabic,
-                  onChanged: (_) => locale.toggleLocale(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: ThebesColors.orangePale,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(Icons.translate_rounded, color: ThebesColors.orange, size: 20),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          locale.tr('language'),
+                          style: GoogleFonts.almarai(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: isDark ? Colors.white : ThebesColors.navy,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: isDark ? ThebesColors.elevatedDarkCard : const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: _buildSegmentButton(
+                              label: 'العربية (Arabic)',
+                              isSelected: isArabic,
+                              onTap: isArabic ? null : () => locale.toggleLocale(),
+                              isDark: isDark,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: _buildSegmentButton(
+                              label: 'English (الإنجليزية)',
+                              isSelected: !isArabic,
+                              onTap: !isArabic ? null : () => locale.toggleLocale(),
+                              isDark: isDark,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
-              // Dark Mode Toggle
-              ListTile(
-                leading: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.purple.withAlpha(30),
-                    borderRadius: BorderRadius.circular(10),
+              // Modern Dark Mode / Theme Segmented Card
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 6),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: isDark ? ThebesColors.darkCard : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isDark ? ThebesColors.hairlineDark : const Color(0xFFEAECF0),
                   ),
-                  child: const Icon(Icons.dark_mode_outlined, color: Colors.purple),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x04101828),
+                      blurRadius: 10,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
                 ),
-                title: Text(locale.tr('dark_mode')),
-                trailing: Switch(
-                  value: isDark,
-                  onChanged: (_) => locale.toggleTheme(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: ThebesColors.sky,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
+                            color: ThebesColors.navy,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          isArabic ? 'مظهر التطبيق (السمة)' : 'App Theme & Appearance',
+                          style: GoogleFonts.almarai(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: isDark ? Colors.white : ThebesColors.navy,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: isDark ? ThebesColors.elevatedDarkCard : const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: _buildSegmentButton(
+                              icon: Icons.light_mode_rounded,
+                              label: isArabic ? 'الوضع النهاري' : 'Light Mode',
+                              isSelected: !isDark,
+                              onTap: !isDark ? null : () => locale.toggleTheme(),
+                              isDark: isDark,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: _buildSegmentButton(
+                              icon: Icons.dark_mode_rounded,
+                              label: isArabic ? 'الوضع الليلي' : 'Dark Mode',
+                              isSelected: isDark,
+                              onTap: isDark ? null : () => locale.toggleTheme(),
+                              isDark: isDark,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
@@ -533,4 +695,65 @@ class SettingsScreen extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildSegmentButton({
+    IconData? icon,
+    required String label,
+    required bool isSelected,
+    required VoidCallback? onTap,
+    required bool isDark,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 8),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? (isDark ? ThebesColors.primaryHeaderGradient.colors.first : Colors.white)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: isDark ? Colors.black.withAlpha(50) : const Color(0x15000000),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (icon != null) ...[
+              Icon(
+                icon,
+                size: 16,
+                color: isSelected
+                    ? (isDark ? ThebesColors.orangeLight : ThebesColors.navy)
+                    : (isDark ? Colors.white54 : ThebesColors.slate),
+              ),
+              const SizedBox(width: 6),
+            ],
+            Flexible(
+              child: Text(
+                label,
+                style: GoogleFonts.almarai(
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                  color: isSelected
+                      ? (isDark ? Colors.white : ThebesColors.navy)
+                      : (isDark ? Colors.white54 : ThebesColors.slate),
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
+

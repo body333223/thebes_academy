@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'thebes_colors.dart';
+import 'package:thebes_academy/core/animations/page_transitions.dart';
 
 class ThebesTheme {
   static ThemeData get lightTheme => _buildTheebaTheme(Brightness.light);
@@ -17,7 +18,7 @@ class ThebesTheme {
     final textSecondary = isDark ? ThebesColors.darkTextSecondary : ThebesColors.lightTextSecondary;
 
     final baseTextTheme = isDark ? ThemeData.dark().textTheme : ThemeData.light().textTheme;
-    final textTheme = GoogleFonts.cairoTextTheme(baseTextTheme).apply(
+    final textTheme = GoogleFonts.almaraiTextTheme(baseTextTheme).apply(
       bodyColor: textPrimary,
       displayColor: textPrimary,
     );
@@ -27,6 +28,14 @@ class ThebesTheme {
       brightness: brightness,
       primaryColor: ThebesColors.navy,
       scaffoldBackgroundColor: bgColor,
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: SmoothPageTransitionBuilder(),
+          TargetPlatform.iOS: SmoothPageTransitionBuilder(),
+          TargetPlatform.windows: SmoothPageTransitionBuilder(),
+          TargetPlatform.macOS: SmoothPageTransitionBuilder(),
+        },
+      ),
       colorScheme: isDark
           ? ColorScheme.dark(
               primary: ThebesColors.cobalt,
@@ -55,7 +64,7 @@ class ThebesTheme {
         elevation: 0,
         centerTitle: true,
         surfaceTintColor: Colors.transparent,
-        titleTextStyle: GoogleFonts.cairo(
+        titleTextStyle: GoogleFonts.almarai(
           color: Colors.white,
           fontSize: 17,
           fontWeight: FontWeight.w700,
@@ -83,7 +92,7 @@ class ThebesTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
-          textStyle: GoogleFonts.cairo(
+          textStyle: GoogleFonts.almarai(
             fontSize: 14,
             fontWeight: FontWeight.w700,
           ),
@@ -97,7 +106,7 @@ class ThebesTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
-          textStyle: GoogleFonts.cairo(
+          textStyle: GoogleFonts.almarai(
             fontSize: 14,
             fontWeight: FontWeight.w700,
           ),
@@ -119,7 +128,7 @@ class ThebesTheme {
           borderRadius: BorderRadius.circular(14),
           borderSide: const BorderSide(color: ThebesColors.cobalt, width: 1.5),
         ),
-        hintStyle: GoogleFonts.cairo(
+        hintStyle: GoogleFonts.almarai(
           color: textSecondary,
           fontSize: 13,
         ),
@@ -139,13 +148,13 @@ class ThebesTheme {
         }),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return GoogleFonts.cairo(
+            return GoogleFonts.almarai(
               fontSize: 11,
               fontWeight: FontWeight.w700,
               color: ThebesColors.cobalt,
             );
           }
-          return GoogleFonts.cairo(
+          return GoogleFonts.almarai(
             fontSize: 10,
             fontWeight: FontWeight.w500,
             color: textSecondary,
@@ -161,22 +170,22 @@ class ThebesTheme {
         indicatorSize: TabBarIndicatorSize.label,
         labelColor: ThebesColors.cobalt,
         unselectedLabelColor: textSecondary,
-        labelStyle: GoogleFonts.cairo(
+        labelStyle: GoogleFonts.almarai(
           fontSize: 13,
           fontWeight: FontWeight.w700,
         ),
-        unselectedLabelStyle: GoogleFonts.cairo(fontSize: 13),
+        unselectedLabelStyle: GoogleFonts.almarai(fontSize: 13),
       ),
       chipTheme: ChipThemeData(
         backgroundColor: ThebesColors.sky,
-        labelStyle: GoogleFonts.cairo(color: ThebesColors.navy, fontSize: 12, fontWeight: FontWeight.w600),
+        labelStyle: GoogleFonts.almarai(color: ThebesColors.navy, fontSize: 12, fontWeight: FontWeight.w600),
         side: BorderSide.none,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
       ),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: ThebesColors.navyDark,
-        contentTextStyle: GoogleFonts.cairo(color: Colors.white, fontSize: 13),
+        contentTextStyle: GoogleFonts.almarai(color: Colors.white, fontSize: 13),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),

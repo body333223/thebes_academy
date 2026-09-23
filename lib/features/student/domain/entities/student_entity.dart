@@ -49,4 +49,7 @@ class StudentEntity {
   String getLocalizedInstitute(bool isArabic) => isArabic ? instituteAr : instituteEn;
   String getLocalizedDepartment(bool isArabic) => isArabic ? departmentAr : departmentEn;
   String getLocalizedAdvisor(bool isArabic) => isArabic ? academicAdvisorAr : academicAdvisorEn;
+
+  String get majorAr => departmentAr;
+  String get majorEn => departmentEn;
 }

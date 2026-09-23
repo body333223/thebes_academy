@@ -14,6 +14,7 @@ import 'grades_screen.dart';
 import 'services_screen.dart';
 import 'exam_schedule_screen.dart';
 import 'campus_guide_screen.dart';
+import 'profile_screen.dart';
 import 'package:thebes_academy/features/settings/presentation/screens/settings_screen.dart';
 import 'package:thebes_academy/features/student/domain/entities/academic_entities.dart';
 
@@ -69,22 +70,22 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     const SizedBox(height: 16),
                   ],
 
-                  // 3. Featured Consecutive Lectures Card (Apple Wallet / Music Player Style)
+                  // 3. Digital Student Pass (Chic Executive Card) - Placed above lectures banner
+                  _buildDigitalStudentPass(context, student, isArabic, isDark),
+                  const SizedBox(height: 18),
+
+                  // 4. Featured Consecutive Lectures Card (Apple Wallet / Music Player Style)
                   if (consecutiveLectures.isNotEmpty) ...[
                     _buildConsecutiveLecturesCard(context, consecutiveLectures, isArabic, isDark),
                     const SizedBox(height: 22),
                   ],
 
-                  // 4. Academic Vitals Grid (Apple Health Style 4-Card Grid)
+                  // 5. Academic Vitals Grid (Apple Health Style 4-Card Grid)
                   _buildAcademicVitals(context, controller, student, isArabic, isDark),
                   const SizedBox(height: 24),
 
-                  // 5. Quick Services (Delightful Squircle Dock)
+                  // 6. Quick Services (Delightful Squircle Dock)
                   _buildQuickServicesDock(context, isArabic, isDark),
-                  const SizedBox(height: 24),
-
-                  // 6. Digital Student Pass (Apple Wallet Style Pass)
-                  _buildDigitalStudentPass(context, student, isArabic, isDark),
                   const SizedBox(height: 24),
 
                   // 7. Campus Announcements (Apple News Style)
@@ -115,11 +116,11 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
 
     return Row(
       children: [
-        // Profile Avatar with subtle Apple squircle/ring
+        // Profile Avatar with subtle Apple squircle/ring -> Opens Full Student Profile
         GestureDetector(
           onTap: () => Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const DigitalIdScreen()),
+            MaterialPageRoute(builder: (_) => const ProfileScreen()),
           ),
           child: Stack(
             clipBehavior: Clip.none,
@@ -137,7 +138,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                   ],
                 ),
                 child: UserAvatarWidget(
-                  size: context.responsiveValue(mobile: 48.0, tablet: 56.0),
+                  size: context.responsiveValue(mobile: 46.0, tablet: 54.0),
                   initials: isArabic ? 'ر.م' : 'R.A',
                 ),
               ),
@@ -145,8 +146,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 bottom: 0,
                 right: 0,
                 child: Container(
-                  width: 13,
-                  height: 13,
+                  width: 12,
+                  height: 12,
                   decoration: BoxDecoration(
                     color: controller.isOnline ? ThebesColors.mint : Colors.grey,
                     shape: BoxShape.circle,
@@ -157,60 +158,71 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             ],
           ),
         ),
-        const SizedBox(width: 14),
+        const SizedBox(width: 12),
 
-        // Greeting and Department
+        // Greeting and Department (Tappable to Profile)
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Flexible(
-                    child: Text(
-                      isArabic ? 'أهلاً، ${student.nameAr.split(" ")[0]}' : 'Hi, ${student.nameEn.split(" ")[0]}',
-                      style: GoogleFonts.cairo(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
-                        color: nameColor,
-                        letterSpacing: -0.3,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: ThebesColors.mint.withAlpha(25),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      isArabic ? 'منتظم' : 'Active',
-                      style: GoogleFonts.cairo(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        color: ThebesColors.mint,
+          child: GestureDetector(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfileScreen()),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        isArabic ? 'أهلاً، ${student.nameAr.split(" ")[0]}' : 'Hi, ${student.nameEn.split(" ")[0]}',
+                        style: GoogleFonts.almarai(
+                          fontSize: 16.5,
+                          fontWeight: FontWeight.w700,
+                          color: nameColor,
+                          letterSpacing: -0.3,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 2),
-              Text(
-                '${student.getLocalizedDepartment(isArabic)} • ${isArabic ? "الفرقة ${student.academicYear}" : "Year ${student.academicYear}"}',
-                style: GoogleFonts.cairo(
-                  fontSize: 12,
-                  color: subtitleColor,
-                  fontWeight: FontWeight.w500,
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: ThebesColors.mint.withAlpha(25),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        isArabic ? 'منتظم' : 'Active',
+                        style: GoogleFonts.almarai(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: ThebesColors.mint,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+                const SizedBox(height: 2),
+                Text(
+                  '${student.getLocalizedDepartment(isArabic)} • ${isArabic ? "الفرقة ${student.academicYear}" : "Year ${student.academicYear}"}',
+                  style: GoogleFonts.almarai(
+                    fontSize: 11.5,
+                    color: subtitleColor,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
           ),
         ),
+        const SizedBox(width: 8),
+
+        // Modern Segmented Pill Controls Dock (Language & Dark Mode)
+        _buildModernControlsDock(context, locale, isDark),
+        const SizedBox(width: 8),
 
         // Notifications Button
         _buildCircularIconButton(
@@ -223,22 +235,79 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
           ),
           isDark: isDark,
         ),
-        const SizedBox(width: 8),
-
-        // Settings / Options
-        _buildCircularIconButton(
-          context: context,
-          icon: Icons.settings_outlined,
-          onTap: () {
-            if (widget.onNavigateTab != null) {
-              widget.onNavigateTab!(4);
-            } else {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
-            }
-          },
-          isDark: isDark,
-        ),
       ],
+    );
+  }
+
+  // Modern segmented pill dock for quick Language & Theme switching
+  Widget _buildModernControlsDock(BuildContext context, LocaleProvider locale, bool isDark) {
+    return Container(
+      height: 38,
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: isDark ? ThebesColors.elevatedDarkCard : Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: isDark ? ThebesColors.hairlineDark : const Color(0xFFE2E8F0),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: isDark ? Colors.black.withAlpha(40) : const Color(0x08000000),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Language Capsule Button
+          InkWell(
+            onTap: () => locale.toggleLocale(),
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: isDark ? Colors.white.withAlpha(12) : const Color(0xFFF1F5F9),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Text(
+                locale.isArabic ? 'EN' : 'عربي',
+                style: GoogleFonts.almarai(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w800,
+                  color: isDark ? ThebesColors.orangeLight : ThebesColors.navy,
+                ),
+              ),
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 3),
+            width: 1,
+            height: 14,
+            color: isDark ? ThebesColors.hairlineDark : const Color(0xFFE2E8F0),
+          ),
+          // Dark Mode Toggle Button with dynamic icon
+          InkWell(
+            onTap: () => locale.toggleTheme(),
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(
+                color: isDark ? ThebesColors.orange.withAlpha(25) : const Color(0xFFF1F5F9),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                size: 16,
+                color: isDark ? const Color(0xFFFFB74D) : ThebesColors.navy,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -325,7 +394,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
           Expanded(
             child: Text(
               isArabic ? 'العمل بدون اتصال • البيانات محفوظة محلياً' : 'Offline Mode • Data cached locally',
-              style: GoogleFonts.cairo(
+              style: GoogleFonts.almarai(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
                 color: const Color(0xFF92400E),
@@ -336,7 +405,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             onTap: () => controller.syncNow(),
             child: Text(
               isArabic ? 'تحديث' : 'Sync',
-              style: GoogleFonts.cairo(
+              style: GoogleFonts.almarai(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
                 color: ThebesColors.orange,
@@ -397,7 +466,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               children: [
                 Text(
                   isArabic ? 'إنذار نسبة الغياب الأكاديمي' : 'Attendance Notice',
-                  style: GoogleFonts.cairo(
+                  style: GoogleFonts.almarai(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w700,
                     color: isDark ? const Color(0xFFFFB4BA) : const Color(0xFF9F1239),
@@ -407,7 +476,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                   isArabic
                       ? 'يوجد $warningCount مقرر تجاوز أو قارب حد الـ 25% من الغياب.'
                       : '$warningCount course(s) near 25% absence limit.',
-                  style: GoogleFonts.cairo(
+                  style: GoogleFonts.almarai(
                     fontSize: 11,
                     color: isDark ? const Color(0xFFFCA5A5) : const Color(0xFFBE123C),
                     fontWeight: FontWeight.w500,
@@ -437,7 +506,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               ),
               child: Text(
                 isArabic ? 'مراجعة' : 'Review',
-                style: GoogleFonts.cairo(
+                style: GoogleFonts.almarai(
                   fontSize: 11.5,
                   fontWeight: FontWeight.w700,
                   color: isDark ? Colors.white : const Color(0xFF9F1239),
@@ -585,7 +654,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                             _selectedLectureIndex == 0
                                 ? (isArabic ? 'المحاضرة الحالية' : 'Live Now')
                                 : (isArabic ? 'المحاضرة المتتالية' : 'Next Lecture'),
-                            style: GoogleFonts.cairo(
+                            style: GoogleFonts.almarai(
                               color: Colors.white,
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
@@ -615,7 +684,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                               padding: const EdgeInsets.symmetric(horizontal: 4),
                               child: Text(
                                 '${_selectedLectureIndex + 1}/$totalLectures',
-                                style: GoogleFonts.cairo(
+                                style: GoogleFonts.almarai(
                                   color: Colors.white,
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700,
@@ -643,7 +712,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     const SizedBox(width: 5),
                     Text(
                       '${currentLecture.startTime} - ${currentLecture.endTime}',
-                      style: GoogleFonts.cairo(
+                      style: GoogleFonts.almarai(
                         color: const Color(0xFFE8EEFF),
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -659,7 +728,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
           // Course title
           Text(
             currentLecture.getLocalizedTitle(isArabic),
-            style: GoogleFonts.cairo(
+            style: GoogleFonts.almarai(
               color: Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -683,7 +752,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     constraints: const BoxConstraints(maxWidth: 160),
                     child: Text(
                       currentLecture.getLocalizedInstructor(isArabic),
-                      style: GoogleFonts.cairo(
+                      style: GoogleFonts.almarai(
                         color: Colors.white.withAlpha(200),
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
@@ -709,7 +778,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       constraints: const BoxConstraints(maxWidth: 140),
                       child: Text(
                         currentLecture.getLocalizedHall(isArabic),
-                        style: GoogleFonts.cairo(
+                        style: GoogleFonts.almarai(
                           color: Colors.white,
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
@@ -731,7 +800,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                   currentLecture.type == LectureType.lab
                       ? (isArabic ? 'سكشن عملي' : 'Lab')
                       : (isArabic ? 'محاضرة نظري' : 'Lecture'),
-                  style: GoogleFonts.cairo(
+                  style: GoogleFonts.almarai(
                     color: Colors.white.withAlpha(220),
                     fontSize: 10.5,
                     fontWeight: FontWeight.w600,
@@ -793,7 +862,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               Flexible(
                 child: Text(
                   isArabic ? 'تسجيل الحضور الفوري (متاح الآن)' : 'Instant Check-In (Available Now)',
-                  style: GoogleFonts.cairo(
+                  style: GoogleFonts.almarai(
                     fontWeight: FontWeight.w700,
                     fontSize: 13,
                     color: Colors.white,
@@ -838,7 +907,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                         isArabic
                             ? 'تسجيل الحضور مغلق الآن • يفتح تلقائياً بعد مرور أول دقيقة من موعد المحاضرة ($unlockTimeString).'
                             : 'Attendance locked • Opens 1 min after lecture start ($unlockTimeString).',
-                        style: GoogleFonts.cairo(fontSize: 12),
+                        style: GoogleFonts.almarai(fontSize: 12),
                       ),
                     ),
                   ],
@@ -868,7 +937,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                   isArabic
                       ? 'يفتح تسجيل الحضور: $unlockTimeString (بعد دقيقة من البدء)'
                       : 'Attendance opens: $unlockTimeString (1m after start)',
-                  style: GoogleFonts.cairo(
+                  style: GoogleFonts.almarai(
                     fontWeight: FontWeight.w600,
                     fontSize: 12,
                     color: Colors.white.withAlpha(230),
@@ -1023,7 +1092,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                   ),
                   child: Text(
                     statusBadge,
-                    style: GoogleFonts.cairo(
+                    style: GoogleFonts.almarai(
                       fontSize: 9.5,
                       fontWeight: FontWeight.w700,
                       color: statusColor,
@@ -1038,7 +1107,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
           const SizedBox(height: 12),
           Text(
             topLabel,
-            style: GoogleFonts.cairo(
+            style: GoogleFonts.almarai(
               fontSize: 11,
               fontWeight: FontWeight.w500,
               color: isDark ? ThebesColors.slateLight : ThebesColors.slate,
@@ -1056,7 +1125,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               children: [
                 Text(
                   mainValue,
-                  style: GoogleFonts.cairo(
+                  style: GoogleFonts.almarai(
                     fontSize: 19,
                     fontWeight: FontWeight.w700,
                     color: isDark ? Colors.white : ThebesColors.navy,
@@ -1066,7 +1135,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 if (subValue.isNotEmpty)
                   Text(
                     subValue,
-                    style: GoogleFonts.cairo(
+                    style: GoogleFonts.almarai(
                       fontSize: 10.5,
                       fontWeight: FontWeight.w500,
                       color: ThebesColors.slate,
@@ -1176,7 +1245,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             Flexible(
               child: Text(
                 isArabic ? 'الخدمات السريعة' : 'Quick Services',
-                style: GoogleFonts.cairo(
+                style: GoogleFonts.almarai(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: isDark ? Colors.white : ThebesColors.navy,
@@ -1198,7 +1267,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                   children: [
                     Text(
                       isArabic ? 'عرض الكل' : 'See all',
-                      style: GoogleFonts.cairo(
+                      style: GoogleFonts.almarai(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,
                         color: ThebesColors.orange,
@@ -1265,7 +1334,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       Text(
                         a['title'] as String,
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.cairo(
+                        style: GoogleFonts.almarai(
                           fontSize: 10.5,
                           fontWeight: FontWeight.w600,
                           color: isDark ? Colors.white70 : ThebesColors.slateDark,
@@ -1464,7 +1533,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                         children: [
                           Text(
                             isArabic ? 'كافة الخدمات الطلابية' : 'All Student Services',
-                            style: GoogleFonts.cairo(
+                            style: GoogleFonts.almarai(
                               fontSize: 18,
                               fontWeight: FontWeight.w800,
                               color: isDark ? Colors.white : ThebesColors.navy,
@@ -1474,7 +1543,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                             isArabic
                                 ? 'دليل متكامل لكافة بوابات وأدوات أكاديمية طيبة'
                                 : 'Complete directory of Thebes Academy tools',
-                            style: GoogleFonts.cairo(
+                            style: GoogleFonts.almarai(
                               fontSize: 11.5,
                               color: isDark ? ThebesColors.slateLight : ThebesColors.slate,
                             ),
@@ -1531,7 +1600,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                                   children: [
                                     Text(
                                       s['title'] as String,
-                                      style: GoogleFonts.cairo(
+                                      style: GoogleFonts.almarai(
                                         fontSize: 13.5,
                                         fontWeight: FontWeight.w700,
                                         color: isDark ? Colors.white : ThebesColors.navy,
@@ -1539,7 +1608,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                                     ),
                                     Text(
                                       s['desc'] as String,
-                                      style: GoogleFonts.cairo(
+                                      style: GoogleFonts.almarai(
                                         fontSize: 11,
                                         color: isDark ? ThebesColors.slateLight : ThebesColors.slate,
                                       ),
@@ -1570,7 +1639,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   }
 
   // =========================================================================
-  // 6. Digital Student Pass (Apple Wallet Style)
+  // 3. Digital Student Pass (Chic Executive Titanium Card)
   // =========================================================================
   Widget _buildDigitalStudentPass(
     BuildContext context,
@@ -1581,65 +1650,219 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => const DigitalIdScreen()),
+        MaterialPageRoute(builder: (_) => const ProfileScreen()),
       ),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          gradient: ThebesColors.primaryHeaderGradient,
-          borderRadius: BorderRadius.circular(20),
+          gradient: isDark ? ThebesColors.titaniumCardGradient : ThebesColors.primaryHeaderGradient,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(
+            color: isDark ? ThebesColors.hairlineDark : const Color(0xFF2E4682),
+            width: 1.2,
+          ),
           boxShadow: [
             BoxShadow(
-              color: ThebesColors.navy.withAlpha(40),
-              blurRadius: 18,
-              offset: const Offset(0, 6),
+              color: isDark ? Colors.black.withAlpha(90) : ThebesColors.navy.withAlpha(50),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: Colors.white.withAlpha(20),
-                shape: BoxShape.circle,
-                border: Border.all(color: ThebesColors.orangeLight, width: 1.5),
-              ),
-              child: const Icon(Icons.badge_rounded, color: Colors.white, size: 24),
+            // Top Bar: Academy Title & Contactless NFC Chip
+            Row(
+              children: [
+                Expanded(
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 22,
+                        height: 22,
+                        decoration: BoxDecoration(
+                          color: ThebesColors.orange.withAlpha(35),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Icon(Icons.school_rounded, color: ThebesColors.orangeLight, size: 13),
+                      ),
+                      const SizedBox(width: 7),
+                      Flexible(
+                        child: Text(
+                          isArabic ? 'أكاديمية طيبة المتكاملة للعلوم' : 'THEBES ACADEMY',
+                          style: GoogleFonts.almarai(
+                            color: Colors.white70,
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.3,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                      decoration: BoxDecoration(
+                        color: ThebesColors.mint.withAlpha(30),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: ThebesColors.mint.withAlpha(60), width: 0.8),
+                      ),
+                      child: Text(
+                        isArabic ? 'معتمدة' : 'Verified',
+                        style: GoogleFonts.almarai(
+                          color: ThebesColors.mint,
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    const Icon(Icons.contactless_rounded, color: Colors.white54, size: 17),
+                  ],
+                ),
+              ],
             ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            const SizedBox(height: 14),
+
+            // Middle: Avatar + Student Name + Department
+            Row(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: ThebesColors.orange, width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: ThebesColors.orange.withAlpha(40),
+                        blurRadius: 8,
+                      ),
+                    ],
+                  ),
+                  child: UserAvatarWidget(
+                    size: 46,
+                    initials: isArabic ? 'ر.م' : 'R.A',
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isArabic ? student.nameAr : student.nameEn,
+                        style: GoogleFonts.almarai(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.3,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        '${student.getLocalizedDepartment(isArabic)} • ${isArabic ? "الفرقة ${student.academicYear}" : "Year ${student.academicYear}"}',
+                        style: GoogleFonts.almarai(
+                          color: Colors.white70,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+
+            // Bottom Badges: Academic ID & Seat Number & View Full Profile CTA
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.black.withAlpha(isDark ? 40 : 25),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: Colors.white.withAlpha(isDark ? 15 : 25),
+                ),
+              ),
+              child: Row(
                 children: [
-                  Text(
-                    isArabic ? 'بطاقة الطالب الرقمية المعتمدة' : 'Digital Student Card (Pass)',
-                    style: GoogleFonts.cairo(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
+                  Expanded(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Row(
+                        children: [
+                          Text(
+                            isArabic ? 'كود القيد: ' : 'ID: ',
+                            style: GoogleFonts.almarai(
+                              color: Colors.white60,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Text(
+                            '${student.academicId}',
+                            style: GoogleFonts.almarai(
+                              color: ThebesColors.orangeLight,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            isArabic ? 'الجلوس: ' : 'Seat: ',
+                            style: GoogleFonts.almarai(
+                              color: Colors.white60,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Text(
+                            '${student.seatNumber}',
+                            style: GoogleFonts.almarai(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    isArabic
-                        ? 'كود القيد: ${student.academicId} • رقم الجلوس: ${student.seatNumber}'
-                        : 'ID: ${student.academicId} • Seat: ${student.seatNumber}',
-                    style: GoogleFonts.cairo(
-                      color: ThebesColors.orangeLight,
-                      fontSize: 11.5,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  const SizedBox(width: 8),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        isArabic ? 'الملف والبطاقة' : 'Full Profile',
+                        style: GoogleFonts.almarai(
+                          color: ThebesColors.orangeLight,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(width: 3),
+                      Icon(
+                        isArabic ? Icons.chevron_left_rounded : Icons.chevron_right_rounded,
+                        color: ThebesColors.orangeLight,
+                        size: 15,
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ),
-            const Icon(
-              Icons.chevron_right_rounded,
-              color: Colors.white70,
-              size: 22,
             ),
           ],
         ),
@@ -1664,7 +1887,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
       children: [
         Text(
           isArabic ? 'أحدث الإعلانات والتنبيهات' : 'Campus Announcements',
-          style: GoogleFonts.cairo(
+          style: GoogleFonts.almarai(
             fontSize: 16,
             fontWeight: FontWeight.w700,
             color: isDark ? Colors.white : ThebesColors.navy,
@@ -1714,7 +1937,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       children: [
                         Text(
                           item.getLocalizedTitle(isArabic),
-                          style: GoogleFonts.cairo(
+                          style: GoogleFonts.almarai(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
                             color: isDark ? Colors.white : ThebesColors.navy,
@@ -1723,7 +1946,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                         const SizedBox(height: 4),
                         Text(
                           item.getLocalizedContent(isArabic),
-                          style: GoogleFonts.cairo(
+                          style: GoogleFonts.almarai(
                             fontSize: 11.5,
                             color: isDark ? ThebesColors.slateLight : ThebesColors.slate,
                             height: 1.4,
@@ -1734,7 +1957,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                         const SizedBox(height: 6),
                         Text(
                           item.date,
-                          style: GoogleFonts.cairo(
+                          style: GoogleFonts.almarai(
                             fontSize: 10,
                             fontWeight: FontWeight.w500,
                             color: ThebesColors.slateLight,
