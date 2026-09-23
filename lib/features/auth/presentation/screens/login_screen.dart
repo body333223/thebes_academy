@@ -157,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               const SizedBox(height: 16),
               Text(
                 isArabic ? 'استعادة الحساب' : 'Account Recovery',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.cairo(
                   fontWeight: FontWeight.w700,
                   fontSize: 16,
                   color: ThebesColors.navy,
@@ -168,7 +168,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                 isArabic
                     ? 'يرجى مراجعة إدارة تكنولوجيا المعلومات في الأكاديمية أو الاتصال بالخط الساخن: 19572'
                     : 'Please visit the IT Academic Support Center or contact the student hotline: 19572',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.cairo(
                   fontSize: 12,
                   color: ThebesColors.slate,
                   height: 1.5,
@@ -186,7 +186,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                   ),
                   child: Text(
                     isArabic ? 'حسناً' : 'Close',
-                    style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600),
+                    style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -290,7 +290,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               // Title
               Text(
                 isArabic ? 'بوابة أكاديمية طيبة' : 'Theeba Academy Portal',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.cairo(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
@@ -302,7 +302,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               // Tagline
               Text(
                 isArabic ? 'تمكين قادة المستقبل' : 'Empowering Future Leaders',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.cairo(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                   color: const Color(0xFFE8EEFF).withAlpha(200),
@@ -339,7 +339,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
             children: [
               Text(
                 isArabic ? 'تسجيل الدخول' : 'Sign In',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.cairo(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: ThebesColors.navy,
@@ -350,7 +350,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                 isArabic
                     ? 'أدخل رقم القيد وكلمة المرور للمتابعة'
                     : 'Enter your student ID and password to continue',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.cairo(
                   fontSize: 11,
                   color: ThebesColors.slate,
                 ),
@@ -363,7 +363,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               TextField(
                 controller: _idController,
                 keyboardType: TextInputType.text,
-                style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500),
+                style: GoogleFonts.cairo(fontSize: 13, fontWeight: FontWeight.w500),
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.badge_outlined, color: ThebesColors.slate, size: 20),
                   hintText: isArabic ? 'مثال: S20210089' : 'e.g. S20210089',
@@ -392,7 +392,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               TextField(
                 controller: _passwordController,
                 obscureText: _obscurePassword,
-                style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500),
+                style: GoogleFonts.cairo(fontSize: 13, fontWeight: FontWeight.w500),
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.lock_outline_rounded, color: ThebesColors.slate, size: 20),
                   suffixIcon: IconButton(
@@ -433,7 +433,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                   ),
                   child: Text(
                     isArabic ? 'نسيت كلمة المرور؟' : 'Forgot Password?',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.cairo(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                       color: ThebesColors.orange,
@@ -474,7 +474,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                               children: [
                                 Text(
                                   isArabic ? 'تسجيل الدخول' : 'Sign In',
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.cairo(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w700,
                                     color: Colors.white,
@@ -499,7 +499,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: Text(
                         isArabic ? 'أو الدخول السريع' : 'Or Quick Access',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.cairo(
                           fontSize: 10,
                           fontWeight: FontWeight.w500,
                           color: ThebesColors.slate,
@@ -522,7 +522,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   Widget _buildFieldLabel(String label) {
     return Text(
       label,
-      style: GoogleFonts.poppins(
+      style: GoogleFonts.cairo(
         fontSize: 11,
         fontWeight: FontWeight.w600,
         color: ThebesColors.slateDark,
@@ -578,7 +578,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           : (isArabic
                               ? 'تسجيل الدخول بالبصمة / Face ID'
                               : 'Sign in with Biometrics / Face ID')),
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.cairo(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: contentColor,
@@ -604,7 +604,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               const SizedBox(width: 6),
               Text(
                 isArabic ? 'الدعم الفني والخط الساخن: 19572' : 'Academic Hotline & Support: 19572',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.cairo(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
                   color: ThebesColors.slate,
@@ -615,7 +615,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
           const SizedBox(height: 6),
           Text(
             'Theeba Academy Portal · v1.0',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.cairo(
               fontSize: 10,
               color: ThebesColors.slateLight,
             ),

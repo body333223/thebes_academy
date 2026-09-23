@@ -3,43 +3,48 @@ import 'package:flutter/material.dart';
 /// Theeba Academy Portal Design System Colors
 /// Single Source of Truth as specified in DESIGN_SPEC.md
 class ThebesColors {
-  // Primary Palette - Theeba Navy
-  static const Color navy = Color(0xFF1A2B5F);
-  static const Color primary = Color(0xFF1A2B5F);
-  static const Color primaryNavy = Color(0xFF1A2B5F);
-  static const Color navyDark = Color(0xFF0F1A3D);
-  static const Color primaryDark = Color(0xFF0F1A3D);
-  static const Color navyLight = Color(0xFF2A3F7F);
-  static const Color primaryLight = Color(0xFF2A3F7F);
+  // Primary Palette - Deep Academic Navy & Royal Cobalt
+  static const Color navy = Color(0xFF0F1E36);
+  static const Color primary = Color(0xFF0F1E36);
+  static const Color primaryNavy = Color(0xFF0F1E36);
+  static const Color navyDark = Color(0xFF08101E);
+  static const Color primaryDark = Color(0xFF08101E);
+  static const Color navyLight = Color(0xFF1E3A66);
+  static const Color primaryLight = Color(0xFF1E3A66);
 
-  // Accent Palette - Theeba Vibrant Orange
+  // Royal Cobalt - Primary Accent for Modern Academic EdTech
+  static const Color cobalt = Color(0xFF2563EB);
+  static const Color cobaltLight = Color(0xFF3B82F6);
+  static const Color cobaltPale = Color(0xFFEFF6FF);
+
+  // Accent Palette - Vibrant Amber / Coral for Badges & CTAs
   static const Color orange = Color(0xFFFF6B2B);
   static const Color accent = Color(0xFFFF6B2B);
   static const Color orangeLight = Color(0xFFFF8C55);
   static const Color orangePale = Color(0xFFFFF0EA);
 
   // Supporting & Category Tones
-  static const Color sky = Color(0xFFE8EEFF);
-  static const Color mint = Color(0xFF00C9A7);
+  static const Color sky = Color(0xFFEEF4FF);
+  static const Color mint = Color(0xFF10B981);
   static const Color slate = Color(0xFF64748B);
   static const Color slateLight = Color(0xFF94A3B8);
-  static const Color slateDark = Color(0xFF334155);
+  static const Color slateDark = Color(0xFF1E293B);
 
   // Legacy / Golden Accents for backward compatibility
   static const Color gold = Color(0xFFFF6B2B); // Mapped to primary vibrant accent
   static const Color goldLight = Color(0xFFFF8C55);
   static const Color goldDark = Color(0xFFE05315);
   static const Color goldMetallic = Color(0xFFFF8C55);
-  static const Color cyanAccent = Color(0xFF00C9A7);
-  static const Color accentBlue = Color(0xFF2A3F7F);
-  static const Color emerald = Color(0xFF00C9A7);
+  static const Color cyanAccent = Color(0xFF2563EB);
+  static const Color accentBlue = Color(0xFF2563EB);
+  static const Color emerald = Color(0xFF10B981);
   static const Color purpleAccent = Color(0xFF7C3AED);
 
   // Semantic Colors
-  static const Color success = Color(0xFF00C9A7);
+  static const Color success = Color(0xFF10B981);
   static const Color warning = Color(0xFFF59E0B);
   static const Color error = Color(0xFFEF4444);
-  static const Color info = Color(0xFF1A2B5F);
+  static const Color info = Color(0xFF2563EB);
 
   // Surface & Background Colors
   static const Color pageBg = Color(0xFFF8FAFC);
@@ -62,12 +67,18 @@ class ThebesColors {
 
   // Gradients
   static const LinearGradient primaryHeaderGradient = LinearGradient(
-    colors: [Color(0xFF1A2B5F), Color(0xFF2A3F7F)],
-    begin: Alignment(-0.8, -0.6),
-    end: Alignment(0.8, 0.6),
+    colors: [Color(0xFF0F1E36), Color(0xFF1E3A66)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
   );
 
   static const LinearGradient primaryGradient = primaryHeaderGradient;
+
+  static const LinearGradient cobaltGradient = LinearGradient(
+    colors: [Color(0xFF2563EB), Color(0xFF3B82F6)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
 
   static const LinearGradient orangeCtaGradient = LinearGradient(
     colors: [Color(0xFFFF6B2B), Color(0xFFFF8C55)],
@@ -75,22 +86,22 @@ class ThebesColors {
     end: Alignment.centerRight,
   );
 
-  static const LinearGradient goldGradient = orangeCtaGradient;
+  static const LinearGradient goldGradient = cobaltGradient;
 
   static const LinearGradient logoGradient = LinearGradient(
-    colors: [Color(0xFF1A2B5F), Color(0xFFFF6B2B)],
+    colors: [Color(0xFF0F1E36), Color(0xFF2563EB)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const LinearGradient splashGradient = LinearGradient(
-    colors: [Color(0xFF1A2B5F), Color(0xFF2A3F7F), Color(0xFF1A2B5F)],
-    begin: Alignment(-0.8, -0.6),
-    end: Alignment(0.8, 0.6),
+    colors: [Color(0xFF08101E), Color(0xFF0F1E36), Color(0xFF1E3A66)],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
   );
 
   static const LinearGradient royalCardGradient = LinearGradient(
-    colors: [Color(0xFF1A2B5F), Color(0xFF2A3F7F)],
+    colors: [Color(0xFF0F1E36), Color(0xFF1E3A66)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );

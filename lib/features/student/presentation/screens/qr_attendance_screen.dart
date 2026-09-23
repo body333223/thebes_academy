@@ -97,7 +97,7 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
                 ? const Color(0xFF0F1E33)
                 : Colors.white,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-            border: Border.all(color: ThebesColors.gold.withAlpha(80), width: 1.5),
+            border: Border.all(color: ThebesColors.cobalt.withAlpha(80), width: 1.5),
             boxShadow: [
               BoxShadow(
                 color: ThebesColors.primary.withAlpha(80),
@@ -146,7 +146,7 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
                 style: GoogleFonts.cairo(
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
-                  color: ThebesColors.gold,
+                  color: ThebesColors.cobalt,
                 ),
               ),
               const SizedBox(height: 8),
@@ -166,7 +166,7 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
                 decoration: BoxDecoration(
                   color: ThebesColors.primary.withAlpha(20),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: ThebesColors.gold.withAlpha(50)),
+                  border: Border.all(color: ThebesColors.cobalt.withAlpha(50)),
                 ),
                 child: Column(
                   children: [
@@ -201,7 +201,7 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: ThebesColors.gold,
+                    backgroundColor: ThebesColors.cobalt,
                     foregroundColor: ThebesColors.primaryDark,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -223,7 +223,7 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
   Widget _buildModalRow(IconData icon, String label, String value) {
     return Row(
       children: [
-        Icon(icon, size: 18, color: ThebesColors.gold),
+        Icon(icon, size: 18, color: ThebesColors.cobalt),
         const SizedBox(width: 8),
         Text(
           label,
@@ -257,7 +257,7 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.school_rounded, color: ThebesColors.gold),
+            icon: const Icon(Icons.school_rounded, color: ThebesColors.cobalt),
             tooltip: isArabic ? 'لوحة الدكتور' : 'Faculty Dashboard',
             onPressed: () => Navigator.push(
               context,
@@ -266,7 +266,7 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
           ),
           IconButton(
             icon: Icon(_isFlashOn ? Icons.flash_on_rounded : Icons.flash_off_rounded),
-            color: _isFlashOn ? ThebesColors.gold : Colors.grey,
+            color: _isFlashOn ? ThebesColors.cobalt : Colors.grey,
             tooltip: isArabic ? 'الكشاف' : 'Flashlight',
             onPressed: () {
               setState(() => _isFlashOn = !_isFlashOn);
@@ -299,11 +299,11 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
                   Center(
                     child: TextButton.icon(
                       onPressed: () => setState(() => _selectedMethodIndex = 1),
-                      icon: const Icon(Icons.pin_outlined, color: ThebesColors.gold, size: 18),
+                      icon: const Icon(Icons.pin_outlined, color: ThebesColors.cobalt, size: 18),
                       label: Text(
                         isArabic ? 'أو اضغط هنا لكتابة كود المحاضرة (PIN) مباشرة' : 'Or tap here to type Lecture PIN directly',
                         style: GoogleFonts.cairo(
-                          color: ThebesColors.gold,
+                          color: ThebesColors.cobalt,
                           fontWeight: FontWeight.w800,
                           fontSize: 13,
                         ),
@@ -317,11 +317,11 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
                   Center(
                     child: TextButton.icon(
                       onPressed: () => setState(() => _selectedMethodIndex = 0),
-                      icon: const Icon(Icons.qr_code_scanner_rounded, color: ThebesColors.gold, size: 18),
+                      icon: const Icon(Icons.qr_code_scanner_rounded, color: ThebesColors.cobalt, size: 18),
                       label: Text(
                         isArabic ? 'التبديل إلى مسح باركود الـ QR بالكاميرا' : 'Switch to Camera QR Scanner',
                         style: GoogleFonts.cairo(
-                          color: ThebesColors.gold,
+                          color: ThebesColors.cobalt,
                           fontWeight: FontWeight.w800,
                           fontSize: 13,
                         ),
@@ -365,10 +365,10 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 11),
                 decoration: BoxDecoration(
-                  color: _selectedMethodIndex == 0 ? ThebesColors.gold : Colors.transparent,
+                  color: _selectedMethodIndex == 0 ? ThebesColors.cobalt : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: _selectedMethodIndex == 0
-                      ? [BoxShadow(color: ThebesColors.gold.withAlpha(80), blurRadius: 10, offset: const Offset(0, 2))]
+                      ? [BoxShadow(color: ThebesColors.cobalt.withAlpha(80), blurRadius: 10, offset: const Offset(0, 2))]
                       : null,
                 ),
                 child: Row(
@@ -403,10 +403,10 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 11),
                 decoration: BoxDecoration(
-                  color: _selectedMethodIndex == 1 ? ThebesColors.gold : Colors.transparent,
+                  color: _selectedMethodIndex == 1 ? ThebesColors.cobalt : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: _selectedMethodIndex == 1
-                      ? [BoxShadow(color: ThebesColors.gold.withAlpha(80), blurRadius: 10, offset: const Offset(0, 2))]
+                      ? [BoxShadow(color: ThebesColors.cobalt.withAlpha(80), blurRadius: 10, offset: const Offset(0, 2))]
                       : null,
                 ),
                 child: Row(
@@ -454,7 +454,7 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
         color: isDark ? ThebesColors.darkCard : Colors.white,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: ThebesColors.gold.withAlpha(isDark ? 90 : 120),
+          color: ThebesColors.cobalt.withAlpha(isDark ? 90 : 120),
           width: 1.5,
         ),
         boxShadow: [
@@ -473,10 +473,10 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: ThebesColors.gold.withAlpha(30),
+                  color: ThebesColors.cobalt.withAlpha(30),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.pin_outlined, color: ThebesColors.gold, size: 24),
+                child: const Icon(Icons.pin_outlined, color: ThebesColors.cobalt, size: 24),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -572,7 +572,7 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
                 color: Colors.grey.withAlpha(120),
                 letterSpacing: 2,
               ),
-              prefixIcon: const Icon(Icons.numbers_rounded, color: ThebesColors.gold),
+              prefixIcon: const Icon(Icons.numbers_rounded, color: ThebesColors.cobalt),
               suffixIcon: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -582,7 +582,7 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
                       onPressed: () => setState(() => _manualCodeController.clear()),
                     ),
                   IconButton(
-                    icon: const Icon(Icons.paste_rounded, color: ThebesColors.gold, size: 20),
+                    icon: const Icon(Icons.paste_rounded, color: ThebesColors.cobalt, size: 20),
                     tooltip: isArabic ? 'لصق' : 'Paste',
                     onPressed: () {
                       setState(() {
@@ -596,15 +596,15 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
               fillColor: isDark ? const Color(0xFF0F1E33) : const Color(0xFFF8FAFC),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: ThebesColors.gold.withAlpha(80), width: 1.5),
+                borderSide: BorderSide(color: ThebesColors.cobalt.withAlpha(80), width: 1.5),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: ThebesColors.gold.withAlpha(90), width: 1.5),
+                borderSide: BorderSide(color: ThebesColors.cobalt.withAlpha(90), width: 1.5),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(color: ThebesColors.gold, width: 2),
+                borderSide: const BorderSide(color: ThebesColors.cobalt, width: 2),
               ),
             ),
           ),
@@ -629,10 +629,10 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
             height: 52,
             child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: ThebesColors.gold,
+                backgroundColor: ThebesColors.cobalt,
                 foregroundColor: ThebesColors.primaryDark,
                 elevation: 4,
-                shadowColor: ThebesColors.gold.withAlpha(120),
+                shadowColor: ThebesColors.cobalt.withAlpha(120),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
               onPressed: () {
@@ -676,15 +676,15 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
-          color: ThebesColors.gold.withAlpha(20),
+          color: ThebesColors.cobalt.withAlpha(20),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: ThebesColors.gold.withAlpha(80)),
+          border: Border.all(color: ThebesColors.cobalt.withAlpha(80)),
         ),
         child: Text(
           label,
           style: GoogleFonts.cairo(
             fontSize: 11,
-            color: ThebesColors.gold,
+            color: ThebesColors.cobalt,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -705,7 +705,7 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
       decoration: BoxDecoration(
         gradient: ThebesColors.royalCardGradient,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: ThebesColors.gold.withAlpha(90), width: 1.2),
+        border: Border.all(color: ThebesColors.cobalt.withAlpha(90), width: 1.2),
         boxShadow: [
           BoxShadow(
             color: ThebesColors.primary.withAlpha(60),
@@ -727,7 +727,7 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
                   value: overallRate / 100.0,
                   strokeWidth: 6,
                   backgroundColor: Colors.white.withAlpha(25),
-                  valueColor: const AlwaysStoppedAnimation<Color>(ThebesColors.gold),
+                  valueColor: const AlwaysStoppedAnimation<Color>(ThebesColors.cobalt),
                 ),
               ),
               Column(
@@ -814,10 +814,10 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
       decoration: BoxDecoration(
         color: const Color(0xFF07111E),
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: ThebesColors.gold.withAlpha(120), width: 1.5),
+        border: Border.all(color: ThebesColors.cobalt.withAlpha(120), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: ThebesColors.gold.withAlpha(35),
+            color: ThebesColors.cobalt.withAlpha(35),
             blurRadius: 24,
             spreadRadius: 1,
           ),
@@ -851,7 +851,7 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.videocam_off_rounded, color: ThebesColors.gold, size: 44),
+                          const Icon(Icons.videocam_off_rounded, color: ThebesColors.cobalt, size: 44),
                           const SizedBox(height: 12),
                           Text(
                             isArabic
@@ -926,14 +926,14 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
                         colors: [
                           Colors.transparent,
                           Color(0xFFFFDF79),
-                          ThebesColors.gold,
+                          ThebesColors.cobalt,
                           Color(0xFFFFDF79),
                           Colors.transparent,
                         ],
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: ThebesColors.gold.withAlpha(220),
+                          color: ThebesColors.cobalt.withAlpha(220),
                           blurRadius: 12,
                           spreadRadius: 2,
                         ),
@@ -961,10 +961,10 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
                       const SizedBox(
                         width: 14,
                         height: 14,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: ThebesColors.gold),
+                        child: CircularProgressIndicator(strokeWidth: 2, color: ThebesColors.cobalt),
                       )
                     else
-                      const Icon(Icons.center_focus_strong_rounded, color: ThebesColors.gold, size: 16),
+                      const Icon(Icons.center_focus_strong_rounded, color: ThebesColors.cobalt, size: 16),
                     const SizedBox(width: 8),
                     Text(
                       controller.isScanning
@@ -992,10 +992,10 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
       height: 26,
       decoration: BoxDecoration(
         border: Border(
-          top: isTop ? const BorderSide(color: ThebesColors.gold, width: 3.5) : BorderSide.none,
-          bottom: !isTop ? const BorderSide(color: ThebesColors.gold, width: 3.5) : BorderSide.none,
-          left: isLeft ? const BorderSide(color: ThebesColors.gold, width: 3.5) : BorderSide.none,
-          right: !isLeft ? const BorderSide(color: ThebesColors.gold, width: 3.5) : BorderSide.none,
+          top: isTop ? const BorderSide(color: ThebesColors.cobalt, width: 3.5) : BorderSide.none,
+          bottom: !isTop ? const BorderSide(color: ThebesColors.cobalt, width: 3.5) : BorderSide.none,
+          left: isLeft ? const BorderSide(color: ThebesColors.cobalt, width: 3.5) : BorderSide.none,
+          right: !isLeft ? const BorderSide(color: ThebesColors.cobalt, width: 3.5) : BorderSide.none,
         ),
       ),
     );
@@ -1059,7 +1059,7 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
                           ),
                           Text(
                             stat.courseCode,
-                            style: GoogleFonts.cairo(color: ThebesColors.gold, fontSize: 11, fontWeight: FontWeight.w700),
+                            style: GoogleFonts.cairo(color: ThebesColors.cobalt, fontSize: 11, fontWeight: FontWeight.w700),
                           ),
                         ],
                       ),
@@ -1228,7 +1228,7 @@ class _QrAttendanceScreenState extends State<QrAttendanceScreen> with SingleTick
                   ),
                   Text(
                     DateFormat('MM/dd hh:mm a').format(record.timestamp),
-                    style: GoogleFonts.cairo(fontSize: 11, fontWeight: FontWeight.w600, color: ThebesColors.gold),
+                    style: GoogleFonts.cairo(fontSize: 11, fontWeight: FontWeight.w600, color: ThebesColors.cobalt),
                   ),
                 ],
               ),

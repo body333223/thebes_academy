@@ -17,7 +17,7 @@ class ThebesTheme {
     final textSecondary = isDark ? ThebesColors.darkTextSecondary : ThebesColors.lightTextSecondary;
 
     final baseTextTheme = isDark ? ThemeData.dark().textTheme : ThemeData.light().textTheme;
-    final textTheme = GoogleFonts.poppinsTextTheme(baseTextTheme).apply(
+    final textTheme = GoogleFonts.cairoTextTheme(baseTextTheme).apply(
       bodyColor: textPrimary,
       displayColor: textPrimary,
     );
@@ -29,8 +29,8 @@ class ThebesTheme {
       scaffoldBackgroundColor: bgColor,
       colorScheme: isDark
           ? ColorScheme.dark(
-              primary: ThebesColors.orange,
-              secondary: ThebesColors.mint,
+              primary: ThebesColors.cobalt,
+              secondary: ThebesColors.orange,
               surface: surfaceColor,
               error: ThebesColors.error,
               onPrimary: Colors.white,
@@ -40,7 +40,7 @@ class ThebesTheme {
             )
           : ColorScheme.light(
               primary: ThebesColors.navy,
-              secondary: ThebesColors.orange,
+              secondary: ThebesColors.cobalt,
               surface: surfaceColor,
               error: ThebesColors.error,
               onPrimary: Colors.white,
@@ -55,9 +55,9 @@ class ThebesTheme {
         elevation: 0,
         centerTitle: true,
         surfaceTintColor: Colors.transparent,
-        titleTextStyle: GoogleFonts.poppins(
+        titleTextStyle: GoogleFonts.cairo(
           color: Colors.white,
-          fontSize: 16,
+          fontSize: 17,
           fontWeight: FontWeight.w700,
         ),
         iconTheme: const IconThemeData(color: Colors.white),
@@ -65,10 +65,9 @@ class ThebesTheme {
       ),
       cardTheme: CardThemeData(
         color: cardColor,
-        elevation: 1,
-        shadowColor: const Color(0x0A000000),
+        elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16), // rounded-2xl
+          borderRadius: BorderRadius.circular(18),
           side: BorderSide(
             color: borderColor,
             width: 1,
@@ -77,16 +76,16 @@ class ThebesTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: ThebesColors.orange,
+          backgroundColor: ThebesColors.cobalt,
           foregroundColor: Colors.white,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
-          textStyle: GoogleFonts.poppins(
+          textStyle: GoogleFonts.cairo(
             fontSize: 14,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
           ),
         ),
       ),
@@ -98,9 +97,9 @@ class ThebesTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
-          textStyle: GoogleFonts.poppins(
+          textStyle: GoogleFonts.cairo(
             fontSize: 14,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
           ),
         ),
       ),
@@ -118,9 +117,9 @@ class ThebesTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: ThebesColors.orange, width: 1.5),
+          borderSide: const BorderSide(color: ThebesColors.cobalt, width: 1.5),
         ),
-        hintStyle: GoogleFonts.poppins(
+        hintStyle: GoogleFonts.cairo(
           color: textSecondary,
           fontSize: 13,
         ),
@@ -131,22 +130,22 @@ class ThebesTheme {
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: surfaceColor,
-        indicatorColor: ThebesColors.orangePale,
+        indicatorColor: ThebesColors.cobaltPale,
         iconTheme: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return const IconThemeData(color: ThebesColors.orange, size: 24);
+            return const IconThemeData(color: ThebesColors.cobalt, size: 24);
           }
           return IconThemeData(color: textSecondary, size: 22);
         }),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return GoogleFonts.poppins(
+            return GoogleFonts.cairo(
               fontSize: 11,
               fontWeight: FontWeight.w700,
-              color: ThebesColors.orange,
+              color: ThebesColors.cobalt,
             );
           }
-          return GoogleFonts.poppins(
+          return GoogleFonts.cairo(
             fontSize: 10,
             fontWeight: FontWeight.w500,
             color: textSecondary,
@@ -158,26 +157,26 @@ class ThebesTheme {
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
       ),
       tabBarTheme: TabBarThemeData(
-        indicatorColor: ThebesColors.orange,
+        indicatorColor: ThebesColors.cobalt,
         indicatorSize: TabBarIndicatorSize.label,
-        labelColor: ThebesColors.orange,
+        labelColor: ThebesColors.cobalt,
         unselectedLabelColor: textSecondary,
-        labelStyle: GoogleFonts.poppins(
-          fontSize: 12,
+        labelStyle: GoogleFonts.cairo(
+          fontSize: 13,
           fontWeight: FontWeight.w700,
         ),
-        unselectedLabelStyle: GoogleFonts.poppins(fontSize: 12),
+        unselectedLabelStyle: GoogleFonts.cairo(fontSize: 13),
       ),
       chipTheme: ChipThemeData(
         backgroundColor: ThebesColors.sky,
-        labelStyle: GoogleFonts.poppins(color: ThebesColors.navy, fontSize: 12, fontWeight: FontWeight.w600),
+        labelStyle: GoogleFonts.cairo(color: ThebesColors.navy, fontSize: 12, fontWeight: FontWeight.w600),
         side: BorderSide.none,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
       ),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: ThebesColors.navyDark,
-        contentTextStyle: GoogleFonts.poppins(color: Colors.white, fontSize: 13),
+        contentTextStyle: GoogleFonts.cairo(color: Colors.white, fontSize: 13),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),

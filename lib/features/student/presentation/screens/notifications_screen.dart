@@ -37,10 +37,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           if (controller.unreadNotificationsCount > 0)
             TextButton.icon(
               onPressed: () => controller.markAllNotificationsAsRead(),
-              icon: const Icon(Icons.done_all_rounded, size: 18, color: ThebesColors.gold),
+              icon: const Icon(Icons.done_all_rounded, size: 18, color: ThebesColors.cobalt),
               label: Text(
                 isArabic ? 'تحديد كـ مقروء' : 'Mark all read',
-                style: GoogleFonts.cairo(color: ThebesColors.gold, fontSize: 12, fontWeight: FontWeight.bold),
+                style: GoogleFonts.cairo(color: ThebesColors.cobalt, fontSize: 12, fontWeight: FontWeight.bold),
               ),
             ),
         ],
@@ -134,7 +134,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected
-                ? ThebesColors.gold
+                ? ThebesColors.cobalt
                 : (isDark ? ThebesColors.darkCardBorder : Colors.grey.shade300),
           ),
         ),
@@ -145,7 +145,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               Icon(
                 icon,
                 size: 16,
-                color: isSelected ? ThebesColors.gold : (isDark ? Colors.white70 : Colors.black54),
+                color: isSelected ? ThebesColors.cobalt : (isDark ? Colors.white70 : Colors.black54),
               ),
               const SizedBox(width: 6),
             ],
@@ -178,7 +178,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         typeIcon = Icons.warning_amber_rounded;
         break;
       case NotificationType.lectureReminder:
-        typeColor = ThebesColors.gold;
+        typeColor = ThebesColors.cobalt;
         typeIcon = Icons.access_time_rounded;
         break;
       case NotificationType.gradeAlert:

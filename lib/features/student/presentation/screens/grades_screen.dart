@@ -26,11 +26,15 @@ class _GradesScreenState extends State<GradesScreen> {
     final isTabletOrDesktop = context.isTablet || context.isDesktop;
 
     return Scaffold(
+      backgroundColor: isDark ? ThebesColors.darkBackground : const Color(0xFFF6F8FA),
       appBar: AppBar(
-        title: Text(locale.tr('academic_results')),
+        title: Text(
+          locale.tr('academic_results'),
+          style: GoogleFonts.cairo(fontWeight: FontWeight.w700, fontSize: 17),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.calculate_outlined, color: ThebesColors.gold),
+            icon: const Icon(Icons.calculate_outlined, color: Colors.white),
             onPressed: () => _showGpaCalculator(context, locale, student.gpa, student.completedHours),
             tooltip: 'GPA Simulator',
           ),
@@ -40,142 +44,49 @@ class _GradesScreenState extends State<GradesScreen> {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1140),
           child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
             padding: context.responsiveScreenPadding,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 1. GPA Hero Gauge Card
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    gradient: ThebesColors.primaryGradient,
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: ThebesColors.gold, width: 1.5),
-                    boxShadow: [
-                      BoxShadow(
-                        color: ThebesColors.opacity(ThebesColors.primaryDark, 0.35),
-                        blurRadius: 14,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                locale.tr('cumulative_gpa'),
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 13,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.baseline,
-                                textBaseline: TextBaseline.alphabetic,
-                                children: [
-                                  Text(
-                                    student.gpa.toStringAsFixed(2),
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: context.responsiveValue(mobile: 30.0, tablet: 36.0),
-                                      fontWeight: FontWeight.w900,
-                                    ),
-                                  ),
-                                  const Text(
-                                    ' / 4.00',
-                                    style: TextStyle(
-                                      color: ThebesColors.gold,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: ThebesColors.opacity(ThebesColors.gold, 0.2),
-                              border: Border.all(color: ThebesColors.gold, width: 2),
-                            ),
-                            child: const Icon(
-                              Icons.military_tech_rounded,
-                              color: ThebesColors.gold,
-                              size: 38,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Divider(color: Colors.white.withAlpha(40), height: 1),
-                      const SizedBox(height: 14),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _buildGpaMetric(
-                            isArabic ? 'التقدير العام' : 'Standing',
-                            isArabic ? 'امتياز (A)' : 'Excellent (A)',
-                            ThebesColors.gold,
-                          ),
-                          _buildGpaMetric(
-                            isArabic ? 'الساعات المنجزة' : 'Credit Hours',
-                            '${student.completedHours} / ${student.totalRequiredHours}',
-                            Colors.white,
-                          ),
-                          _buildGpaMetric(
-                            locale.tr('honors_status'),
-                            isArabic ? 'مستحق' : 'Honors',
-                            ThebesColors.success,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+                // 1. Modern Academic GPA Hero Card
+                _buildGpaHeroCard(context, student, isArabic, isDark, locale),
+                const SizedBox(height: 24),
 
-                const SizedBox(height: 20),
-
-                // Semester Header
+                // 2. Semester Selector & Course List Header
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      isArabic ? 'مقررات الفصل الأخير (ربيع 2026)' : 'Last Term Courses (Spring 2026)',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : ThebesColors.primaryDark,
+                      isArabic ? 'سجل درجات الفصل الدراسي' : 'Term Academic Record',
+                      style: GoogleFonts.cairo(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: isDark ? Colors.white : ThebesColors.navy,
+                        letterSpacing: -0.3,
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: ThebesColors.opacity(ThebesColors.primary, 0.1),
-                        borderRadius: BorderRadius.circular(8),
+                        color: ThebesColors.cobaltPale,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: ThebesColors.cobalt.withAlpha(50)),
                       ),
                       child: Text(
-                        isArabic ? '${grades.length} مواد معتمدة' : '${grades.length} Courses',
-                        style: const TextStyle(
-                          color: ThebesColors.gold,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
+                        isArabic ? '${grades.length} مقررات' : '${grades.length} Courses',
+                        style: GoogleFonts.cairo(
+                          color: ThebesColors.cobalt,
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
                   ],
                 ),
+                const SizedBox(height: 14),
 
-                const SizedBox(height: 12),
-
-                // Responsive Grades Grid or Column
+                // 3. Responsive Course Grades Grid or List
                 if (isTabletOrDesktop)
                   GridView.builder(
                     shrinkWrap: true,
@@ -184,7 +95,7 @@ class _GradesScreenState extends State<GradesScreen> {
                       crossAxisCount: 2,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
-                      childAspectRatio: 2.2,
+                      childAspectRatio: 2.1,
                     ),
                     itemCount: grades.length,
                     itemBuilder: (context, index) {
@@ -194,29 +105,130 @@ class _GradesScreenState extends State<GradesScreen> {
                 else
                   ...grades.map((g) => _buildGradeCard(g, isArabic, isDark)),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
 
-                // GPA Simulator Button
-                OutlinedButton.icon(
-                  onPressed: () => _showGpaCalculator(context, locale, student.gpa, student.completedHours),
-                  icon: const Icon(Icons.calculate_rounded, color: ThebesColors.gold),
-                  label: Text(
-                    isArabic ? 'حاسبة المعدل التراكمي المتوقع (GPA Simulator)' : 'Simulate Next Semester GPA',
-                    style: TextStyle(
-                      color: isDark ? Colors.white : ThebesColors.primaryDark,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                    side: const BorderSide(color: ThebesColors.gold, width: 1.5),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  ),
-                ),
+                // 4. GPA Simulator Action Banner
+                _buildSimulatorBanner(context, locale, student, isArabic, isDark),
+                const SizedBox(height: 30),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildGpaHeroCard(
+    BuildContext context,
+    dynamic student,
+    bool isArabic,
+    bool isDark,
+    LocaleProvider locale,
+  ) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(22),
+      decoration: BoxDecoration(
+        gradient: ThebesColors.primaryHeaderGradient,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: Colors.white.withAlpha(25), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: ThebesColors.navy.withAlpha(45),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    locale.tr('cumulative_gpa'),
+                    style: GoogleFonts.cairo(
+                      color: const Color(0xFFE2E8F0),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      Text(
+                        student.gpa.toStringAsFixed(2),
+                        style: GoogleFonts.cairo(
+                          color: Colors.white,
+                          fontSize: context.responsiveValue(mobile: 34.0, tablet: 40.0),
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        ' / 4.00',
+                        style: GoogleFonts.cairo(
+                          color: ThebesColors.orangeLight,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withAlpha(20),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.white.withAlpha(30)),
+                ),
+                child: const Icon(
+                  Icons.workspace_premium_rounded,
+                  color: ThebesColors.orangeLight,
+                  size: 34,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.white.withAlpha(16),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildGpaMetric(
+                  isArabic ? 'التقدير العام' : 'Standing',
+                  isArabic ? 'امتياز (A)' : 'Excellent (A)',
+                  ThebesColors.mint,
+                ),
+                Container(width: 1, height: 26, color: Colors.white.withAlpha(30)),
+                _buildGpaMetric(
+                  isArabic ? 'الساعات المنجزة' : 'Credit Hours',
+                  '${student.completedHours} / ${student.totalRequiredHours}',
+                  Colors.white,
+                ),
+                Container(width: 1, height: 26, color: Colors.white.withAlpha(30)),
+                _buildGpaMetric(
+                  locale.tr('honors_status'),
+                  isArabic ? 'مرتبة الشرف' : 'Honors',
+                  ThebesColors.orangeLight,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -227,18 +239,19 @@ class _GradesScreenState extends State<GradesScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            color: Colors.white60,
+          style: GoogleFonts.cairo(
+            color: const Color(0xFFCBD5E1),
             fontSize: 11,
+            fontWeight: FontWeight.w500,
           ),
         ),
         const SizedBox(height: 2),
         Text(
           value,
-          style: TextStyle(
+          style: GoogleFonts.cairo(
             color: color,
-            fontSize: 12.5,
-            fontWeight: FontWeight.bold,
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
           ),
         ),
       ],
@@ -246,393 +259,378 @@ class _GradesScreenState extends State<GradesScreen> {
   }
 
   Widget _buildGradeCard(GradeEntity grade, bool isArabic, bool isDark) {
+    Color badgeBg;
+    Color badgeText;
+
+    if (grade.gradeLetter.startsWith('A')) {
+      badgeBg = ThebesColors.mint.withAlpha(25);
+      badgeText = ThebesColors.mint;
+    } else if (grade.gradeLetter.startsWith('B')) {
+      badgeBg = ThebesColors.cobaltPale;
+      badgeText = ThebesColors.cobalt;
+    } else if (grade.gradeLetter.startsWith('C')) {
+      badgeBg = const Color(0xFFFEF3C7);
+      badgeText = const Color(0xFFD97706);
+    } else {
+      badgeBg = const Color(0xFFFFE4E4);
+      badgeText = ThebesColors.error;
+    }
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isDark ? ThebesColors.darkCard : Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: isDark ? ThebesColors.darkCardBorder : ThebesColors.lightCardBorder,
+          width: 1,
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      grade.courseCode,
-                      style: const TextStyle(
-                        color: ThebesColors.gold,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      grade.getLocalizedCourse(isArabic),
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : ThebesColors.primaryDark,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: ThebesColors.primary,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: ThebesColors.gold),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      grade.gradeLetter,
-                      style: const TextStyle(
-                        color: ThebesColors.gold,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 16,
-                      ),
-                    ),
-                    Text(
-                      '${grade.points} pts',
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 10,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x060F1A3D),
+            blurRadius: 12,
+            offset: Offset(0, 4),
           ),
-          const SizedBox(height: 12),
-          Divider(color: Colors.grey.withAlpha(50), height: 1),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildScoreColumn(isArabic ? 'أعمال سنة' : 'Work', '${grade.courseworkScore.toInt()}/20', isDark),
-              _buildScoreColumn(isArabic ? 'ميدتيرم' : 'Midterm', '${grade.midtermScore.toInt()}/20', isDark),
-              _buildScoreColumn(isArabic ? 'عملي' : 'Lab', '${grade.practicalScore.toInt()}/10', isDark),
-              _buildScoreColumn(isArabic ? 'فاينال' : 'Final', '${grade.finalExamScore.toInt()}/50', isDark),
-              _buildScoreColumn(isArabic ? 'المجموع' : 'Total', '${grade.totalScore.toInt()}/100', isDark, isTotal: true),
-            ],
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: ThebesColors.sky,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        grade.courseCode,
+                        style: GoogleFonts.cairo(
+                          color: ThebesColors.navy,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${grade.creditHours} ${isArabic ? "ساعات معتمدة" : "Credit Hours"}',
+                      style: GoogleFonts.cairo(
+                        color: ThebesColors.slate,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  grade.getLocalizedCourse(isArabic),
+                  style: GoogleFonts.cairo(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: isDark ? Colors.white : ThebesColors.navy,
+                    letterSpacing: -0.2,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  '${isArabic ? "الدرجة الكلية:" : "Score:"} ${grade.totalScore.toInt()}/100 • ${grade.points} ${isArabic ? "نقاط" : "pts"}',
+                  style: GoogleFonts.cairo(
+                    fontSize: 11.5,
+                    color: isDark ? ThebesColors.slateLight : ThebesColors.slate,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: badgeBg,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Center(
+              child: Text(
+                grade.gradeLetter,
+                style: GoogleFonts.cairo(
+                  color: badgeText,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 17,
+                ),
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildScoreColumn(String label, String score, bool isDark, {bool isTotal = false}) {
-    return Column(
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 10,
-            color: isDark ? Colors.grey : ThebesColors.lightTextMuted,
+  Widget _buildSimulatorBanner(
+    BuildContext context,
+    LocaleProvider locale,
+    dynamic student,
+    bool isArabic,
+    bool isDark,
+  ) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: isDark ? ThebesColors.darkSurface : ThebesColors.sky,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: ThebesColors.cobalt.withAlpha(40)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: ThebesColors.cobalt,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(Icons.auto_graph_rounded, color: Colors.white, size: 22),
           ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          score,
-          style: TextStyle(
-            fontSize: 11.5,
-            fontWeight: FontWeight.bold,
-            color: isTotal
-                ? ThebesColors.gold
-                : (isDark ? Colors.white70 : ThebesColors.lightTextPrimary),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isArabic ? 'مخطط ومحاكي المعدل التراكمي' : 'GPA Simulator & Planner',
+                  style: GoogleFonts.cairo(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13.5,
+                    color: isDark ? Colors.white : ThebesColors.navy,
+                  ),
+                ),
+                Text(
+                  isArabic
+                      ? 'احسب تقديراتك المتوقعة للفصول القادمة'
+                      : 'Simulate your expected GPA for upcoming terms',
+                  style: GoogleFonts.cairo(
+                    fontSize: 11,
+                    color: isDark ? ThebesColors.slateLight : ThebesColors.slate,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+          ElevatedButton(
+            onPressed: () => _showGpaCalculator(context, locale, student.gpa, student.completedHours),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ThebesColors.cobalt,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            child: Text(
+              isArabic ? 'تجربة' : 'Simulate',
+              style: GoogleFonts.cairo(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  void _showGpaCalculator(BuildContext context, LocaleProvider locale, double currentGpa, int completedHours) {
-    final controller = context.read<StudentController>();
+  void _showGpaCalculator(
+    BuildContext context,
+    LocaleProvider locale,
+    double currentGpa,
+    int completedHours,
+  ) {
     final isArabic = locale.isArabic;
     final isDark = locale.isDarkMode;
+    final controller = context.read<StudentController>();
     final courses = controller.grades;
 
-    // Default expected grade letter map for each course
-    final Map<String, String> expectedLetters = {
-      for (var c in courses) c.courseCode: c.gradeLetter.isEmpty ? 'A' : c.gradeLetter,
+    final gradePointsMap = {
+      'A+': 4.0,
+      'A': 3.7,
+      'B+': 3.3,
+      'B': 3.0,
+      'C+': 2.7,
+      'C': 2.4,
+      'D+': 2.2,
+      'D': 2.0,
+      'F': 0.0,
     };
+    final gradeOptions = gradePointsMap.keys.toList();
+
+    final expectedLetters = <String, String>{};
+    for (final c in courses) {
+      expectedLetters[c.courseCode] = 'A';
+    }
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => StatefulBuilder(
-        builder: (context, setModalState) {
-          final simulatedGpa = controller.calculateSimulatedGpa(expectedLetters);
+        builder: (ctx, setModalState) {
+          int termHours = 0;
+          double termQualityPoints = 0.0;
+          for (final c in courses) {
+            final letter = expectedLetters[c.courseCode] ?? 'A';
+            final pts = gradePointsMap[letter] ?? 3.7;
+            termHours += c.creditHours;
+            termQualityPoints += pts * c.creditHours;
+          }
+
+          final priorQualityPoints = currentGpa * completedHours;
+          final totalHours = completedHours + termHours;
+          final simulatedGpa = totalHours > 0
+              ? (priorQualityPoints + termQualityPoints) / totalHours
+              : currentGpa;
           final delta = simulatedGpa - currentGpa;
           final isPositive = delta >= 0;
 
-          String standingText;
-          Color standingColor;
-          if (simulatedGpa >= 3.7) {
-            standingText = isArabic ? 'امتياز مع مرتبة الشرف 🏆' : 'Excellent with Honors 🏆';
-            standingColor = ThebesColors.gold;
-          } else if (simulatedGpa >= 3.4) {
-            standingText = isArabic ? 'جيد جداً مرتفع 🌟' : 'Very Good High 🌟';
-            standingColor = ThebesColors.emerald;
-          } else if (simulatedGpa >= 3.0) {
-            standingText = isArabic ? 'جيد جداً 🎖️' : 'Very Good 🎖️';
-            standingColor = ThebesColors.accentBlue;
-          } else if (simulatedGpa >= 2.4) {
-            standingText = isArabic ? 'جيد 👍' : 'Good 👍';
-            standingColor = Colors.orange;
-          } else {
-            standingText = isArabic ? 'إنذار أكاديمي محتمل ⚠️' : 'Academic Warning Risk ⚠️';
-            standingColor = ThebesColors.error;
-          }
-
-          const gradeOptions = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'D', 'F'];
-
           return Container(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.85,
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            height: MediaQuery.of(ctx).size.height * 0.75,
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF0F172A) : Colors.white,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-              border: Border.all(
-                color: isDark ? ThebesColors.darkCardBorder : ThebesColors.gold.withAlpha(80),
-                width: 1.5,
-              ),
+              color: isDark ? ThebesColors.darkCard : Colors.white,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             ),
+            padding: const EdgeInsets.all(20),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Center(
                   child: Container(
-                    width: 44,
-                    height: 5,
+                    width: 38,
+                    height: 4,
                     decoration: BoxDecoration(
                       color: Colors.grey.shade400,
-                      borderRadius: BorderRadius.circular(3),
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: ThebesColors.gold.withAlpha(30),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(Icons.calculate_rounded, color: ThebesColors.gold, size: 24),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
+                const SizedBox(height: 14),
+                Text(
+                  isArabic ? 'محاكي ومخطط المعدل التراكمي' : 'GPA Simulator & Planner',
+                  style: GoogleFonts.cairo(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: isDark ? Colors.white : ThebesColors.navy,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    gradient: ThebesColors.primaryHeaderGradient,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            isArabic ? 'محاكي ومخطط المعدل التراكمي' : 'GPA Simulator & Planner',
-                            style: GoogleFonts.cairo(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w900,
-                              color: isDark ? Colors.white : ThebesColors.primaryNavy,
-                            ),
+                            isArabic ? 'المعدل الحالي' : 'Current',
+                            style: GoogleFonts.cairo(fontSize: 11, color: Colors.white70),
                           ),
                           Text(
-                            isArabic
-                                ? 'حدد التقدير المتوقع لكل مادة لمعرفة تأثيره الفوري'
-                                : 'Select expected grades to simulate your cumulative GPA',
-                            style: GoogleFonts.cairo(fontSize: 11, color: Colors.grey),
+                            currentGpa.toStringAsFixed(2),
+                            style: GoogleFonts.cairo(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.white),
                           ),
                         ],
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-
-                // Hero Result Card
-                Container(
-                  padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    gradient: ThebesColors.primaryGradient,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: ThebesColors.gold, width: 1.5),
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      const Icon(Icons.arrow_forward_rounded, color: Colors.white70, size: 20),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                isArabic ? 'المعدل الحالي' : 'Current GPA',
-                                style: GoogleFonts.cairo(fontSize: 12, color: Colors.white70),
-                              ),
-                              Text(
-                                currentGpa.toStringAsFixed(2),
-                                style: GoogleFonts.cairo(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
-                              ),
-                            ],
+                          Text(
+                            isArabic ? 'المعدل المتوقع' : 'Simulated',
+                            style: GoogleFonts.cairo(fontSize: 11, color: ThebesColors.orangeLight),
                           ),
-                          const Icon(Icons.arrow_forward_rounded, color: ThebesColors.gold, size: 24),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
+                          Row(
                             children: [
                               Text(
-                                isArabic ? 'المعدل المتوقع الجديد' : 'Simulated GPA',
-                                style: GoogleFonts.cairo(fontSize: 12, color: ThebesColors.gold),
+                                simulatedGpa.toStringAsFixed(2),
+                                style: GoogleFonts.cairo(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white,
+                                ),
                               ),
-                              Row(
-                                children: [
-                                  Text(
-                                    simulatedGpa.toStringAsFixed(2),
-                                    style: GoogleFonts.cairo(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.w900,
-                                      color: ThebesColors.gold,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: isPositive ? ThebesColors.emerald : ThebesColors.error,
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: Text(
-                                      '${isPositive ? '+' : ''}${delta.toStringAsFixed(2)}',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: isPositive ? ThebesColors.mint : ThebesColors.error,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  '${isPositive ? '+' : ''}${delta.toStringAsFixed(2)}',
+                                  style: GoogleFonts.cairo(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700),
+                                ),
                               ),
                             ],
                           ),
                         ],
-                      ),
-                      const SizedBox(height: 12),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withAlpha(25),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          standingText,
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.cairo(
-                            color: standingColor,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 12,
-                          ),
-                        ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
-
-                // Courses List Header
-                Text(
-                  isArabic ? 'تقديرات المواد المتوقعة للفصل الحالي:' : 'Expected Course Grades for Current Term:',
-                  style: GoogleFonts.cairo(fontSize: 13, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-
-                // Courses List
+                const SizedBox(height: 14),
                 Expanded(
                   child: ListView.builder(
                     itemCount: courses.length,
                     itemBuilder: (context, index) {
-                      final course = courses[index];
-                      final currentSelected = expectedLetters[course.courseCode] ?? 'A';
+                      final c = courses[index];
+                      final currentSelected = expectedLetters[c.courseCode] ?? 'A';
 
                       return Container(
-                        margin: const EdgeInsets.only(bottom: 10),
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
-                          color: isDark ? ThebesColors.darkCard : Colors.grey.shade50,
-                          borderRadius: BorderRadius.circular(14),
+                          color: isDark ? ThebesColors.darkSurface : ThebesColors.pageBg,
+                          borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: isDark ? ThebesColors.darkCardBorder : Colors.grey.shade300,
+                            color: isDark ? ThebesColors.darkCardBorder : ThebesColors.lightCardBorder,
                           ),
                         ),
                         child: Row(
                           children: [
                             Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    course.getLocalizedCourse(isArabic),
-                                    style: GoogleFonts.cairo(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                      color: isDark ? Colors.white : ThebesColors.primaryNavy,
-                                    ),
-                                  ),
-                                  Text(
-                                    '${course.courseCode} • ${course.creditHours} ${isArabic ? "ساعات" : "Credit Hrs"}',
-                                    style: GoogleFonts.cairo(fontSize: 11, color: Colors.grey),
-                                  ),
-                                ],
+                              child: Text(
+                                c.getLocalizedCourse(isArabic),
+                                style: GoogleFonts.cairo(
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: isDark ? Colors.white : ThebesColors.navy,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            // Grade Selector Dropdown
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: ThebesColors.gold.withAlpha(30),
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: ThebesColors.gold.withAlpha(120)),
-                              ),
-                              child: DropdownButtonHideUnderline(
-                                child: DropdownButton<String>(
-                                  value: currentSelected,
-                                  dropdownColor: isDark ? ThebesColors.darkCard : Colors.white,
-                                  style: GoogleFonts.cairo(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: ThebesColors.gold,
-                                  ),
-                                  items: gradeOptions.map((g) {
-                                    return DropdownMenuItem(
-                                      value: g,
-                                      child: Text(g),
-                                    );
-                                  }).toList(),
-                                  onChanged: (newVal) {
-                                    if (newVal != null) {
-                                      setModalState(() {
-                                        expectedLetters[course.courseCode] = newVal;
-                                      });
-                                    }
-                                  },
+                            DropdownButtonHideUnderline(
+                              child: DropdownButton<String>(
+                                value: currentSelected,
+                                dropdownColor: isDark ? ThebesColors.darkCard : Colors.white,
+                                style: GoogleFonts.cairo(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: ThebesColors.cobalt,
                                 ),
+                                items: gradeOptions.map((g) => DropdownMenuItem(value: g, child: Text(g))).toList(),
+                                onChanged: (newVal) {
+                                  if (newVal != null) {
+                                    setModalState(() => expectedLetters[c.courseCode] = newVal);
+                                  }
+                                },
                               ),
                             ),
                           ],
@@ -641,18 +639,16 @@ class _GradesScreenState extends State<GradesScreen> {
                     },
                   ),
                 ),
-                const SizedBox(height: 12),
                 ElevatedButton(
                   onPressed: () => Navigator.pop(ctx),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: ThebesColors.gold,
-                    foregroundColor: ThebesColors.primaryNavy,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    backgroundColor: ThebesColors.cobalt,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   child: Text(
-                    isArabic ? 'اعتماد المحاكاة وإغلاق' : 'Save & Close',
-                    style: GoogleFonts.cairo(fontWeight: FontWeight.bold, fontSize: 14),
+                    isArabic ? 'إغلاق' : 'Close',
+                    style: GoogleFonts.cairo(fontWeight: FontWeight.w700, fontSize: 13, color: Colors.white),
                   ),
                 ),
               ],

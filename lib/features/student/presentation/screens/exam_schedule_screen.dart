@@ -25,7 +25,7 @@ class ExamScheduleScreen extends StatelessWidget {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.info_outline_rounded, color: ThebesColors.gold),
+            icon: const Icon(Icons.info_outline_rounded, color: ThebesColors.cobalt),
             tooltip: isArabic ? 'تعليمات الامتحانات' : 'Exam Rules',
             onPressed: () => _showExamRegulationsDialog(context, isArabic, isDark),
           ),
@@ -58,14 +58,14 @@ class ExamScheduleScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                       decoration: BoxDecoration(
-                        color: ThebesColors.gold.withAlpha(30),
+                        color: ThebesColors.cobalt.withAlpha(30),
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: ThebesColors.gold.withAlpha(90)),
+                        border: Border.all(color: ThebesColors.cobalt.withAlpha(90)),
                       ),
                       child: Text(
                         '${exams.length} ${isArabic ? "امتحانات" : "Exams"}',
                         style: GoogleFonts.cairo(
-                          color: ThebesColors.gold,
+                          color: ThebesColors.cobalt,
                           fontSize: 12,
                           fontWeight: FontWeight.w800,
                         ),
@@ -117,7 +117,7 @@ class ExamScheduleScreen extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: ThebesColors.royalCardGradient,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: ThebesColors.gold.withAlpha(120), width: 1.5),
+        border: Border.all(color: ThebesColors.cobalt.withAlpha(120), width: 1.5),
         boxShadow: [
           BoxShadow(
             color: ThebesColors.primary.withAlpha(90),
@@ -135,14 +135,14 @@ class ExamScheduleScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: ThebesColors.gold.withAlpha(35),
+                  color: ThebesColors.cobalt.withAlpha(35),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: ThebesColors.gold),
+                  border: Border.all(color: ThebesColors.cobalt),
                 ),
                 child: Text(
                   isArabic ? 'بطاقة رقم الجلوس المعتمدة' : 'Official Seating Card',
                   style: GoogleFonts.cairo(
-                    color: ThebesColors.gold,
+                    color: ThebesColors.cobalt,
                     fontSize: 11.5,
                     fontWeight: FontWeight.w800,
                   ),
@@ -186,9 +186,9 @@ class ExamScheduleScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white.withAlpha(15),
                   shape: BoxShape.circle,
-                  border: Border.all(color: ThebesColors.gold.withAlpha(100)),
+                  border: Border.all(color: ThebesColors.cobalt.withAlpha(100)),
                 ),
-                child: const Icon(Icons.event_seat_rounded, color: ThebesColors.gold, size: 30),
+                child: const Icon(Icons.event_seat_rounded, color: ThebesColors.cobalt, size: 30),
               ),
             ],
           ),
@@ -200,7 +200,7 @@ class ExamScheduleScreen extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.meeting_room_rounded, color: ThebesColors.gold, size: 16),
+                  const Icon(Icons.meeting_room_rounded, color: ThebesColors.cobalt, size: 16),
                   const SizedBox(width: 6),
                   Text(
                     isArabic ? 'اللجنة: صالة 1 (مبنى الهندسة)' : 'Committee: Hall 1 (Eng)',
@@ -252,14 +252,14 @@ class ExamScheduleScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: ThebesColors.gold.withAlpha(25),
+                  color: ThebesColors.cobalt.withAlpha(25),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: ThebesColors.gold.withAlpha(80)),
+                  border: Border.all(color: ThebesColors.cobalt.withAlpha(80)),
                 ),
                 child: Text(
                   exam.courseCode,
                   style: GoogleFonts.spaceMono(
-                    color: ThebesColors.gold,
+                    color: ThebesColors.cobalt,
                     fontWeight: FontWeight.w900,
                     fontSize: 12,
                   ),
@@ -267,12 +267,12 @@ class ExamScheduleScreen extends StatelessWidget {
               ),
               Row(
                 children: [
-                  const Icon(Icons.calendar_month_rounded, size: 15, color: ThebesColors.gold),
+                  const Icon(Icons.calendar_month_rounded, size: 15, color: ThebesColors.cobalt),
                   const SizedBox(width: 5),
                   Text(
                     exam.date,
                     style: GoogleFonts.cairo(
-                      color: ThebesColors.gold,
+                      color: ThebesColors.cobalt,
                       fontSize: 12.5,
                       fontWeight: FontWeight.bold,
                     ),
@@ -339,11 +339,11 @@ class ExamScheduleScreen extends StatelessWidget {
                     );
                   },
                   style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: ThebesColors.gold.withAlpha(120)),
+                    side: BorderSide(color: ThebesColors.cobalt.withAlpha(120)),
                     padding: const EdgeInsets.symmetric(vertical: 9),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  icon: const Icon(Icons.notification_add_rounded, size: 17, color: ThebesColors.gold),
+                  icon: const Icon(Icons.notification_add_rounded, size: 17, color: ThebesColors.cobalt),
                   label: Text(
                     isArabic ? 'إضافة للتقويم وتذكيري' : 'Add to Calendar',
                     style: GoogleFonts.cairo(
@@ -374,7 +374,7 @@ class ExamScheduleScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.gavel_rounded, color: ThebesColors.gold, size: 20),
+              const Icon(Icons.gavel_rounded, color: ThebesColors.cobalt, size: 20),
               const SizedBox(width: 8),
               Text(
                 isArabic ? 'ضوابط وتعليمات اللجان الامتحانية' : 'Exam Rules & Instructions',
@@ -410,7 +410,7 @@ class ExamScheduleScreen extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
         title: Row(
           children: [
-            const Icon(Icons.rule_rounded, color: ThebesColors.gold),
+            const Icon(Icons.rule_rounded, color: ThebesColors.cobalt),
             const SizedBox(width: 8),
             Text(
               isArabic ? 'اللائحة الامتحانية' : 'Exam Regulations',
@@ -433,7 +433,7 @@ class ExamScheduleScreen extends StatelessWidget {
         actions: [
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: ThebesColors.gold,
+              backgroundColor: ThebesColors.cobalt,
               foregroundColor: ThebesColors.primaryDark,
             ),
             onPressed: () => Navigator.pop(ctx),

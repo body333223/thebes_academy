@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:thebes_academy/core/theme/thebes_colors.dart';
 import 'package:thebes_academy/core/widgets/thebes_logo.dart';
@@ -24,11 +25,11 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     super.initState();
     _animController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1400),
+      duration: const Duration(milliseconds: 1200),
     );
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _animController, curve: Curves.easeOutBack),
+    _scaleAnimation = Tween<double>(begin: 0.85, end: 1.0).animate(
+      CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic),
     );
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -37,7 +38,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     _animController.forward();
 
-    _navTimer = Timer(const Duration(milliseconds: 2500), () {
+    _navTimer = Timer(const Duration(milliseconds: 2400), () {
       if (mounted) {
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
@@ -46,7 +47,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               opacity: animation,
               child: child,
             ),
-            transitionDuration: const Duration(milliseconds: 500),
+            transitionDuration: const Duration(milliseconds: 400),
           ),
         );
       }
@@ -63,55 +64,52 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     final locale = context.watch<LocaleProvider>();
-    final isDark = locale.isDarkMode;
+    final isArabic = locale.isArabic;
 
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-          gradient: isDark
-              ? const LinearGradient(
-                  colors: [ThebesColors.darkBackground, ThebesColors.primaryDark],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                )
-              : const LinearGradient(
-                  colors: [ThebesColors.primaryDark, ThebesColors.primary],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-        ),
-        child: SafeArea(
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Positioned(
-                top: -80,
-                right: -80,
-                child: Container(
-                  width: 240,
-                  height: 240,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: ThebesColors.opacity(ThebesColors.gold, 0.08),
-                  ),
+      backgroundColor: const Color(0xFF08101E),
+      body: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Background ambient gradient glow
+          Positioned(
+            top: -120,
+            right: -120,
+            child: Container(
+              width: 340,
+              height: 340,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    ThebesColors.cobalt.withAlpha(50),
+                    Colors.transparent,
+                  ],
                 ),
               ),
-              Positioned(
-                bottom: -100,
-                left: -60,
-                child: Container(
-                  width: 280,
-                  height: 280,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: ThebesColors.opacity(ThebesColors.cyanAccent, 0.06),
-                  ),
+            ),
+          ),
+          Positioned(
+            bottom: -100,
+            left: -100,
+            child: Container(
+              width: 320,
+              height: 320,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    ThebesColors.orange.withAlpha(30),
+                    Colors.transparent,
+                  ],
                 ),
               ),
+            ),
+          ),
 
-              ScaleTransition(
+          SafeArea(
+            child: Center(
+              child: ScaleTransition(
                 scale: _scaleAnimation,
                 child: FadeTransition(
                   opacity: _fadeAnimation,
@@ -123,24 +121,25 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                         showText: true,
                         textColor: Colors.white,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 20),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
                         decoration: BoxDecoration(
-                          color: Colors.white.withAlpha(20),
-                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.white.withAlpha(16),
+                          borderRadius: BorderRadius.circular(24),
                           border: Border.all(
-                            color: ThebesColors.opacity(ThebesColors.gold, 0.4),
+                            color: Colors.white.withAlpha(25),
+                            width: 1,
                           ),
                         ),
                         child: Text(
-                          locale.isArabic
-                              ? 'البوابة الأكاديمية والخدمات الطلابية الذكية'
+                          isArabic
+                              ? 'بوابة الطالب الأكاديمية الذكية'
                               : 'Smart Academic & Student Portal',
-                          style: TextStyle(
-                            color: Colors.white.withAlpha(220),
+                          style: GoogleFonts.cairo(
+                            color: const Color(0xFFE2E8F0),
                             fontSize: 13,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
@@ -148,34 +147,35 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   ),
                 ),
               ),
-
-              Positioned(
-                bottom: 32,
-                child: Column(
-                  children: [
-                    const SizedBox(
-                      width: 26,
-                      height: 26,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        valueColor: AlwaysStoppedAnimation<Color>(ThebesColors.gold),
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    Text(
-                      'v2.4.0 • Thebes Higher Institutes (Cairo / Maadi)',
-                      style: TextStyle(
-                        color: Colors.white.withAlpha(130),
-                        fontSize: 11,
-                        letterSpacing: 0.8,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
+
+          Positioned(
+            bottom: 36,
+            child: Column(
+              children: [
+                SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    valueColor: const AlwaysStoppedAnimation<Color>(ThebesColors.cobaltLight),
+                    backgroundColor: Colors.white.withAlpha(20),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  'Thebes Higher Institutes • المعاهد العليا بطيبة',
+                  style: GoogleFonts.cairo(
+                    color: Colors.white54,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

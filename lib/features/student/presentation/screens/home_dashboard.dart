@@ -17,6 +17,8 @@ import 'campus_guide_screen.dart';
 import 'package:thebes_academy/features/settings/presentation/screens/settings_screen.dart';
 import 'package:thebes_academy/features/faculty/presentation/screens/faculty_dashboard.dart';
 
+/// Apple / iOS Human Interface Guidelines Inspired Student Dashboard
+/// Designed with generous whitespace, pristine cards, and refined typography.
 class HomeDashboardScreen extends StatelessWidget {
   final Function(int)? onNavigateTab;
 
@@ -32,49 +34,54 @@ class HomeDashboardScreen extends StatelessWidget {
     final nextLecture = controller.nextLecture;
 
     return Scaffold(
+      backgroundColor: isDark ? ThebesColors.darkBackground : const Color(0xFFF6F8FA),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1140),
             child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
               padding: context.responsiveScreenPadding,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 1. Top Luxury Header
+                  // 1. Apple-Style Header Bar
                   _buildHeader(context, locale, controller, student, isArabic, isDark),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 16),
 
-                  // Offline & Sync Status Banner
-                  _buildOfflineSyncBanner(context, controller, isArabic, isDark),
-
-                  // Absence Risk Banner (If any course has warnings)
-                  if (controller.totalAbsenceWarnings > 0) ...[
-                    _buildAbsenceAlertBanner(context, controller, isArabic, isDark),
-                    const SizedBox(height: 14),
+                  // Offline status notice if offline
+                  if (!controller.isOnline) ...[
+                    _buildOfflineNotice(context, controller, isArabic, isDark),
+                    const SizedBox(height: 12),
                   ],
 
-                  const SizedBox(height: 6),
+                  // 2. Absence Alert Pill (Apple-Style Urgent Banner)
+                  if (controller.totalAbsenceWarnings > 0) ...[
+                    _buildAbsenceAlertPill(context, controller, isArabic, isDark),
+                    const SizedBox(height: 16),
+                  ],
 
-                  // 2. Next Lecture & QR Attendance Live Hero Banner
-                  _buildLiveLectureHero(context, nextLecture, isArabic, isDark),
-                  const SizedBox(height: 22),
+                  // 3. Featured Live Lecture Card (Apple Wallet / Music Player Style)
+                  if (nextLecture != null) ...[
+                    _buildLiveLectureCard(context, nextLecture, isArabic, isDark),
+                    const SizedBox(height: 22),
+                  ],
 
-                  // 3. Academic Vitals 4-Stat Row
-                  _buildAcademicStatsGrid(context, controller, student, isArabic, isDark),
+                  // 4. Academic Vitals Grid (Apple Health Style 4-Card Grid)
+                  _buildAcademicVitals(context, controller, student, isArabic, isDark),
                   const SizedBox(height: 24),
 
-                  // 4. Quick Action Floating Dock
-                  _buildQuickActionDock(context, isArabic, isDark),
-                  const SizedBox(height: 26),
+                  // 5. Quick Services (Delightful Squircle Dock)
+                  _buildQuickServicesDock(context, isArabic, isDark),
+                  const SizedBox(height: 24),
 
-                  // 5. Digital ID Smart Card Preview
-                  _buildDigitalIdPreview(context, student, isArabic, isDark),
-                  const SizedBox(height: 26),
+                  // 6. Digital Student Pass (Apple Wallet Style Pass)
+                  _buildDigitalStudentPass(context, student, isArabic, isDark),
+                  const SizedBox(height: 24),
 
-                  // 6. Latest Campus Announcements
+                  // 7. Campus Announcements (Apple News Style)
                   _buildAnnouncementsSection(context, controller, isArabic, isDark),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 36),
                 ],
               ),
             ),
@@ -84,6 +91,9 @@ class HomeDashboardScreen extends StatelessWidget {
     );
   }
 
+  // =========================================================================
+  // 1. Header Bar
+  // =========================================================================
   Widget _buildHeader(
     BuildContext context,
     LocaleProvider locale,
@@ -97,33 +107,35 @@ class HomeDashboardScreen extends StatelessWidget {
 
     return Row(
       children: [
+        // Profile Avatar with subtle Apple squircle/ring
         GestureDetector(
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const DigitalIdScreen()),
           ),
           child: Stack(
+            clipBehavior: Clip.none,
             children: [
               Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: ThebesColors.orange, width: 2.2),
+                  border: Border.all(color: ThebesColors.orange, width: 2),
                   boxShadow: [
                     BoxShadow(
-                      color: ThebesColors.orange.withAlpha(40),
+                      color: ThebesColors.orange.withAlpha(30),
                       blurRadius: 10,
                       offset: const Offset(0, 3),
                     ),
                   ],
                 ),
                 child: UserAvatarWidget(
-                  size: context.responsiveValue(mobile: 50.0, tablet: 58.0),
+                  size: context.responsiveValue(mobile: 48.0, tablet: 56.0),
                   initials: isArabic ? 'ر.م' : 'R.A',
                 ),
               ),
               Positioned(
-                bottom: 2,
-                right: 2,
+                bottom: 0,
+                right: 0,
                 child: Container(
                   width: 13,
                   height: 13,
@@ -138,45 +150,50 @@ class HomeDashboardScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 14),
+
+        // Greeting and Department
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Wrap(
-                crossAxisAlignment: WrapCrossAlignment.center,
-                spacing: 6,
-                runSpacing: 2,
+              Row(
                 children: [
-                  Text(
-                    isArabic ? 'أهلاً بك، ${student.nameAr.split(" ")[0]}' : 'Welcome, ${student.nameEn.split(" ")[0]}',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: nameColor,
+                  Flexible(
+                    child: Text(
+                      isArabic ? 'أهلاً، ${student.nameAr.split(" ")[0]}' : 'Hi, ${student.nameEn.split(" ")[0]}',
+                      style: GoogleFonts.cairo(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                        color: nameColor,
+                        letterSpacing: -0.3,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  const SizedBox(width: 6),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                     decoration: BoxDecoration(
-                      color: ThebesColors.mint.withAlpha(30),
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: ThebesColors.mint.withAlpha(120)),
+                      color: ThebesColors.mint.withAlpha(25),
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      isArabic ? 'طالب منتظم' : 'Active',
-                      style: GoogleFonts.poppins(
-                        color: ThebesColors.mint,
-                        fontSize: 9.5,
+                      isArabic ? 'منتظم' : 'Active',
+                      style: GoogleFonts.cairo(
+                        fontSize: 10,
                         fontWeight: FontWeight.w700,
+                        color: ThebesColors.mint,
                       ),
                     ),
                   ),
                 ],
               ),
+              const SizedBox(height: 2),
               Text(
                 '${student.getLocalizedDepartment(isArabic)} • ${isArabic ? "الفرقة ${student.academicYear}" : "Year ${student.academicYear}"}',
-                style: GoogleFonts.poppins(
-                  fontSize: 11.5,
+                style: GoogleFonts.cairo(
+                  fontSize: 12,
                   color: subtitleColor,
                   fontWeight: FontWeight.w500,
                 ),
@@ -186,143 +203,88 @@ class HomeDashboardScreen extends StatelessWidget {
             ],
           ),
         ),
-        // Notifications Button with Unread Badge
-        IconButton(
-          onPressed: () => Navigator.push(
+
+        // Notifications Button
+        _buildCircularIconButton(
+          context: context,
+          icon: Icons.notifications_outlined,
+          badgeCount: controller.unreadNotificationsCount,
+          onTap: () => Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const NotificationsScreen()),
           ),
-          icon: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: isDark ? ThebesColors.darkCard : ThebesColors.orangePale,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.notifications_outlined, color: ThebesColors.orange, size: 20),
-              ),
-              if (controller.unreadNotificationsCount > 0)
-                Positioned(
-                  top: -2,
-                  right: -2,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: ThebesColors.orange,
-                      shape: BoxShape.circle,
-                    ),
-                    constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
-                    child: Text(
-                      '${controller.unreadNotificationsCount}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-            ],
-          ),
+          isDark: isDark,
         ),
-        // Doctor / Faculty Dashboard Switch Button
-        IconButton(
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const FacultyDashboard()),
-          ),
-          icon: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: isDark ? ThebesColors.darkCard : ThebesColors.sky,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.school_rounded, color: ThebesColors.navy, size: 20),
-          ),
-          tooltip: isArabic ? 'لوحة التحكم الأكاديمي' : 'Faculty Dashboard',
-        ),
-        // Settings / Profile Button
-        IconButton(
-          onPressed: () {
+        const SizedBox(width: 8),
+
+        // Settings / Options
+        _buildCircularIconButton(
+          context: context,
+          icon: Icons.settings_outlined,
+          onTap: () {
             if (onNavigateTab != null) {
               onNavigateTab!(4);
             } else {
               Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
             }
           },
-          icon: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: isDark ? ThebesColors.darkCard : ThebesColors.sky,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.settings_outlined, color: ThebesColors.navy, size: 20),
-          ),
+          isDark: isDark,
         ),
       ],
     );
   }
 
-  Widget _buildOfflineSyncBanner(
-    BuildContext context,
-    StudentController controller,
-    bool isArabic,
-    bool isDark,
-  ) {
-    if (controller.isOnline && !controller.isSyncing) return const SizedBox.shrink();
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: !controller.isOnline
-            ? (isDark ? const Color(0xFF332015) : const Color(0xFFFFF3E0))
-            : (isDark ? const Color(0xFF102538) : const Color(0xFFE3F2FD)),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: !controller.isOnline ? ThebesColors.warning : ThebesColors.accentBlue,
-        ),
-      ),
-      child: Row(
+  Widget _buildCircularIconButton({
+    required BuildContext context,
+    required IconData icon,
+    required VoidCallback onTap,
+    int badgeCount = 0,
+    required bool isDark,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Stack(
+        clipBehavior: Clip.none,
         children: [
-          Icon(
-            !controller.isOnline ? Icons.cloud_off_rounded : Icons.sync_rounded,
-            size: 20,
-            color: !controller.isOnline ? ThebesColors.warning : ThebesColors.accentBlue,
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              !controller.isOnline
-                  ? (isArabic
-                      ? 'أنت تعمل بدون اتصال • البيانات محفوظة محلياً'
-                      : 'Offline Mode • Data cached locally')
-                  : (isArabic ? 'جاري مزامنة أحدث البيانات الجامعية...' : 'Syncing latest university data...'),
-              style: GoogleFonts.cairo(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : Colors.black87,
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: isDark ? ThebesColors.darkCard : Colors.white,
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: isDark ? ThebesColors.darkCardBorder : const Color(0xFFE5E7EB),
+                width: 1,
               ),
-            ),
-          ),
-          if (!controller.isSyncing)
-            GestureDetector(
-              onTap: () => controller.syncNow(),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: ThebesColors.gold,
-                  borderRadius: BorderRadius.circular(8),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x06000000),
+                  blurRadius: 8,
+                  offset: Offset(0, 2),
                 ),
-                child: Text(
-                  isArabic ? 'تحديث الآن' : 'Sync Now',
-                  style: GoogleFonts.cairo(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: ThebesColors.primaryNavy,
+              ],
+            ),
+            child: Icon(icon, size: 20, color: isDark ? Colors.white70 : ThebesColors.navy),
+          ),
+          if (badgeCount > 0)
+            Positioned(
+              top: -2,
+              right: -2,
+              child: Container(
+                width: 16,
+                height: 16,
+                decoration: const BoxDecoration(
+                  color: ThebesColors.orange,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    '$badgeCount',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 9,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ),
               ),
@@ -332,27 +294,73 @@ class HomeDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAbsenceAlertBanner(
+  // =========================================================================
+  // Offline Notice
+  // =========================================================================
+  Widget _buildOfflineNotice(
+    BuildContext context,
+    StudentController controller,
+    bool isArabic,
+    bool isDark,
+  ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFFBEB),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFFDE68A)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.cloud_off_rounded, color: Color(0xFFD97706), size: 18),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              isArabic ? 'العمل بدون اتصال • البيانات محفوظة محلياً' : 'Offline Mode • Data cached locally',
+              style: GoogleFonts.cairo(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF92400E),
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () => controller.syncNow(),
+            child: Text(
+              isArabic ? 'تحديث' : 'Sync',
+              style: GoogleFonts.cairo(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: ThebesColors.orange,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // =========================================================================
+  // 2. Absence Alert Pill
+  // =========================================================================
+  Widget _buildAbsenceAlertPill(
     BuildContext context,
     StudentController controller,
     bool isArabic,
     bool isDark,
   ) {
     final warningCount = controller.totalAbsenceWarnings;
-    final alertBg = isDark ? const Color(0xFF2C1014) : ThebesColors.catAlertBg;
-    final alertText = isDark ? const Color(0xFFFF8B94) : ThebesColors.catAlertText;
-
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
       decoration: BoxDecoration(
-        color: alertBg,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: alertText.withAlpha(isDark ? 80 : 120), width: 1.2),
+        color: isDark ? const Color(0xFF2C1014) : ThebesColors.catAlertBg,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: ThebesColors.catAlertText.withAlpha(90), width: 1),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x0A000000),
+            color: Color(0x06EF4444),
             blurRadius: 10,
-            offset: Offset(0, 3),
+            offset: Offset(0, 4),
           ),
         ],
       ),
@@ -361,10 +369,10 @@ class HomeDashboardScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: alertText.withAlpha(25),
-              borderRadius: BorderRadius.circular(10),
+              color: ThebesColors.catAlertText.withAlpha(25),
+              shape: BoxShape.circle,
             ),
-            child: Icon(Icons.warning_amber_rounded, color: alertText, size: 20),
+            child: const Icon(Icons.warning_amber_rounded, color: ThebesColors.catAlertText, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -372,20 +380,21 @@ class HomeDashboardScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isArabic ? 'إنذار نسبة الغياب الأكاديمي' : 'Academic Attendance Alert',
-                  style: GoogleFonts.poppins(
+                  isArabic ? 'إنذار نسبة الغياب الأكاديمي' : 'Attendance Risk Alert',
+                  style: GoogleFonts.cairo(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
-                    color: alertText,
+                    color: ThebesColors.catAlertText,
                   ),
                 ),
                 Text(
                   isArabic
-                      ? 'يوجد $warningCount مقرر يتطلب متابعة نسبة الغياب لتفادي تخطي نسبة 25%.'
-                      : '$warningCount course(s) require attendance monitoring to stay within the 25% limit.',
-                  style: GoogleFonts.poppins(
+                      ? 'يوجد $warningCount مقرر تجاوز أو قارب حد الـ 25% من الغياب.'
+                      : '$warningCount course(s) near or exceeding the 25% absence limit.',
+                  style: GoogleFonts.cairo(
                     fontSize: 11,
-                    color: alertText.withAlpha(220),
+                    color: ThebesColors.catAlertText.withAlpha(220),
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
@@ -394,12 +403,12 @@ class HomeDashboardScreen extends StatelessWidget {
           TextButton(
             onPressed: () => onNavigateTab != null ? onNavigateTab!(2) : null,
             style: TextButton.styleFrom(
-              foregroundColor: alertText,
+              foregroundColor: ThebesColors.catAlertText,
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             ),
             child: Text(
-              isArabic ? 'التفاصيل' : 'Details',
-              style: GoogleFonts.poppins(
+              isArabic ? 'سجل الحضور' : 'Review',
+              style: GoogleFonts.cairo(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
               ),
@@ -410,25 +419,25 @@ class HomeDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLiveLectureHero(
+  // =========================================================================
+  // 3. Featured Live Lecture Card (Apple Music / Wallet Style)
+  // =========================================================================
+  Widget _buildLiveLectureCard(
     BuildContext context,
     dynamic nextLecture,
     bool isArabic,
     bool isDark,
   ) {
-    if (nextLecture == null) return const SizedBox.shrink();
-
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: ThebesColors.primaryHeaderGradient,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withAlpha(25), width: 1),
+        borderRadius: BorderRadius.circular(22), // Apple large radius
         boxShadow: [
           BoxShadow(
-            color: ThebesColors.navy.withAlpha(50),
-            blurRadius: 18,
+            color: ThebesColors.navy.withAlpha(45),
+            blurRadius: 20,
             offset: const Offset(0, 8),
           ),
         ],
@@ -436,114 +445,144 @@ class HomeDashboardScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 8,
-            runSpacing: 6,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: ThebesColors.orange.withAlpha(40),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: ThebesColors.orange.withAlpha(120)),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: ThebesColors.orange,
-                        shape: BoxShape.circle,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: AlignmentDirectional.centerStart,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Live indicator badge
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: ThebesColors.orange.withAlpha(40),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: ThebesColors.orange.withAlpha(120)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 7,
+                        height: 7,
+                        decoration: const BoxDecoration(
+                          color: ThebesColors.orange,
+                          shape: BoxShape.circle,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 6),
-                    Flexible(
-                      child: Text(
-                        isArabic ? 'المحاضرة الحالية' : 'Live Lecture',
-                        style: GoogleFonts.poppins(
+                      const SizedBox(width: 6),
+                      Text(
+                        isArabic ? 'المحاضرة الحالية' : 'Live Now',
+                        style: GoogleFonts.cairo(
                           color: Colors.white,
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
                         ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+
+                // Time badge
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.access_time_rounded, size: 14, color: Color(0xFFE8EEFF)),
+                    const SizedBox(width: 5),
+                    Text(
+                      '${nextLecture.startTime} - ${nextLecture.endTime}',
+                      style: GoogleFonts.cairo(
+                        color: const Color(0xFFE8EEFF),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Course title
+          Text(
+            nextLecture.getLocalizedTitle(isArabic),
+            style: GoogleFonts.cairo(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.3,
+            ),
+          ),
+          const SizedBox(height: 6),
+
+          // Instructor & Room Wrap
+          Wrap(
+            spacing: 8,
+            runSpacing: 6,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.person_pin_rounded, size: 16, color: Colors.white.withAlpha(180)),
+                  const SizedBox(width: 6),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 160),
+                    child: Text(
+                      nextLecture.getLocalizedInstructor(isArabic),
+                      style: GoogleFonts.cairo(
+                        color: Colors.white.withAlpha(200),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: Colors.white.withAlpha(20),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.meeting_room_rounded, size: 14, color: ThebesColors.orangeLight),
+                    const SizedBox(width: 4),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 140),
+                      child: Text(
+                        nextLecture.getLocalizedHall(isArabic),
+                        style: GoogleFonts.cairo(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
                 ),
               ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.access_time_rounded, size: 14, color: Color(0xFFE8EEFF)),
-                  const SizedBox(width: 5),
-                  Text(
-                    '${nextLecture.startTime} - ${nextLecture.endTime}',
-                    style: GoogleFonts.poppins(
-                      color: const Color(0xFFE8EEFF),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
             ],
           ),
-          const SizedBox(height: 14),
-          Text(
-            nextLecture.getLocalizedTitle(isArabic),
-            style: GoogleFonts.poppins(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              Icon(Icons.person_pin_rounded, size: 16, color: Colors.white.withAlpha(180)),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  nextLecture.getLocalizedInstructor(isArabic),
-                  style: GoogleFonts.poppins(
-                    color: Colors.white.withAlpha(200),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(width: 12),
-              const Icon(Icons.meeting_room_rounded, size: 16, color: ThebesColors.orangeLight),
-              const SizedBox(width: 4),
-              Flexible(
-                child: Text(
-                  nextLecture.getLocalizedHall(isArabic),
-                  style: GoogleFonts.poppins(
-                    color: ThebesColors.orangeLight,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          // Direct Action Button to Scan QR Code
+          const SizedBox(height: 18),
+
+          // One-tap Action Button
           Container(
-            width: double.infinity,
-            height: 46,
+            height: 48,
             decoration: BoxDecoration(
               gradient: ThebesColors.orangeCtaGradient,
               borderRadius: BorderRadius.circular(14),
               boxShadow: [
                 BoxShadow(
-                  color: ThebesColors.orange.withAlpha(100),
+                  color: ThebesColors.orange.withAlpha(90),
                   blurRadius: 14,
                   offset: const Offset(0, 4),
                 ),
@@ -555,7 +594,7 @@ class HomeDashboardScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(14),
                 onTap: () {
                   if (onNavigateTab != null) {
-                    onNavigateTab!(2); // Navigate to QR Attendance tab
+                    onNavigateTab!(2);
                   } else {
                     Navigator.push(
                       context,
@@ -570,8 +609,8 @@ class HomeDashboardScreen extends StatelessWidget {
                     const SizedBox(width: 8),
                     Flexible(
                       child: Text(
-                        isArabic ? 'سجل حضورك الآن (كود PIN أو باركود QR)' : 'Register Attendance (PIN / QR)',
-                        style: GoogleFonts.poppins(
+                        isArabic ? 'تسجيل الحضور الفوري (QR / كود)' : 'Instant Check-In (QR / PIN)',
+                        style: GoogleFonts.cairo(
                           fontWeight: FontWeight.w700,
                           fontSize: 13,
                           color: Colors.white,
@@ -590,7 +629,10 @@ class HomeDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAcademicStatsGrid(
+  // =========================================================================
+  // 4. Academic Vitals Grid (Apple Health Style 4 Cards)
+  // =========================================================================
+  Widget _buildAcademicVitals(
     BuildContext context,
     StudentController controller,
     dynamic student,
@@ -600,395 +642,70 @@ class HomeDashboardScreen extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isWide = constraints.maxWidth > 580;
-        final itemWidth = isWide ? (constraints.maxWidth - 36) / 4 : (constraints.maxWidth - 12) / 2;
+        final cardWidth = isWide ? (constraints.maxWidth - 36) / 4 : (constraints.maxWidth - 12) / 2;
 
         return Wrap(
           spacing: 12,
           runSpacing: 12,
           children: [
-            // 1. Cumulative GPA with Radial Progress Ring
-            Container(
-              width: itemWidth,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-              decoration: BoxDecoration(
-                color: isDark ? ThebesColors.darkCard : Colors.white,
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(
-                  color: isDark ? ThebesColors.darkCardBorder : ThebesColors.lightCardBorder,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withAlpha(isDark ? 30 : 10),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: ThebesColors.gold.withAlpha(25),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(Icons.star_rounded, color: ThebesColors.gold, size: 18),
-                      ),
-                      // Radial Progress Ring
-                      SizedBox(
-                        width: 30,
-                        height: 30,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            CircularProgressIndicator(
-                              value: (student.gpa / 4.0).clamp(0.0, 1.0),
-                              strokeWidth: 3,
-                              backgroundColor: ThebesColors.gold.withAlpha(40),
-                              valueColor: const AlwaysStoppedAnimation<Color>(ThebesColors.gold),
-                            ),
-                            Text(
-                              '${((student.gpa / 4.0) * 100).toInt()}%',
-                              style: GoogleFonts.cairo(
-                                fontSize: 8,
-                                fontWeight: FontWeight.w900,
-                                color: ThebesColors.gold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerLeft,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      textBaseline: TextBaseline.alphabetic,
-                      children: [
-                        Text(
-                          student.gpa.toStringAsFixed(2),
-                          style: GoogleFonts.cairo(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w900,
-                            color: isDark ? Colors.white : ThebesColors.primary,
-                          ),
-                        ),
-                        const SizedBox(width: 3),
-                        Text(
-                          '/ 4.00',
-                          style: GoogleFonts.cairo(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Text(
-                    isArabic ? 'المعدل التراكمي' : 'Cumulative GPA',
-                    style: GoogleFonts.cairo(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    isArabic ? 'ممتاز مع مرتبة الشرف' : 'Excellent Honors',
-                    style: GoogleFonts.cairo(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      color: ThebesColors.gold,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
+            // 1. GPA Card
+            _buildVitalCard(
+              width: cardWidth,
+              isDark: isDark,
+              icon: Icons.auto_awesome_rounded,
+              iconBg: ThebesColors.orangePale,
+              iconColor: ThebesColors.orange,
+              topLabel: isArabic ? 'المعدل التراكمي' : 'Cumulative GPA',
+              mainValue: student.gpa.toStringAsFixed(2),
+              subValue: '/ 4.00',
+              statusBadge: isArabic ? 'مرتبة الشرف' : "Dean's List",
+              statusColor: ThebesColors.orange,
             ),
 
-            // 2. Attendance Rate with Circular Progress Ring
-            Container(
-              width: itemWidth,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-              decoration: BoxDecoration(
-                color: isDark ? ThebesColors.darkCard : Colors.white,
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(
-                  color: isDark ? ThebesColors.darkCardBorder : ThebesColors.lightCardBorder,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withAlpha(isDark ? 30 : 10),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: ThebesColors.emerald.withAlpha(25),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(Icons.verified_rounded, color: ThebesColors.emerald, size: 18),
-                      ),
-                      SizedBox(
-                        width: 30,
-                        height: 30,
-                        child: CircularProgressIndicator(
-                          value: (student.attendanceRate / 100.0).clamp(0.0, 1.0),
-                          strokeWidth: 3,
-                          backgroundColor: ThebesColors.emerald.withAlpha(40),
-                          valueColor: const AlwaysStoppedAnimation<Color>(ThebesColors.emerald),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      '${student.attendanceRate}%',
-                      style: GoogleFonts.cairo(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                        color: isDark ? Colors.white : ThebesColors.primary,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    isArabic ? 'نسبة الحضور' : 'Attendance Rate',
-                    style: GoogleFonts.cairo(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    isArabic ? 'سجل حضور مثالي' : 'Good Standing',
-                    style: GoogleFonts.cairo(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      color: ThebesColors.emerald,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
+            // 2. Attendance Card
+            _buildVitalCard(
+              width: cardWidth,
+              isDark: isDark,
+              icon: Icons.fact_check_rounded,
+              iconBg: ThebesColors.catHealthBg,
+              iconColor: ThebesColors.catHealthText,
+              topLabel: isArabic ? 'نسبة الحضور' : 'Attendance Rate',
+              mainValue: '${student.attendanceRate}%',
+              subValue: '',
+              statusBadge: isArabic ? 'منتظم' : 'Optimal',
+              statusColor: ThebesColors.mint,
             ),
 
-            // 3. Completed Hours with Linear Progress
-            Container(
-              width: itemWidth,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-              decoration: BoxDecoration(
-                color: isDark ? ThebesColors.darkCard : Colors.white,
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(
-                  color: isDark ? ThebesColors.darkCardBorder : ThebesColors.lightCardBorder,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withAlpha(isDark ? 30 : 10),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: ThebesColors.cyanAccent.withAlpha(25),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(Icons.school_rounded, color: ThebesColors.cyanAccent, size: 18),
-                      ),
-                      Flexible(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                          decoration: BoxDecoration(
-                            color: ThebesColors.cyanAccent.withAlpha(25),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            '${((student.completedHours / student.totalRequiredHours) * 100).toInt()}%',
-                            style: GoogleFonts.cairo(
-                              fontSize: 9.5,
-                              fontWeight: FontWeight.bold,
-                              color: ThebesColors.cyanAccent,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      '${student.completedHours} / ${student.totalRequiredHours}',
-                      style: GoogleFonts.cairo(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
-                        color: isDark ? Colors.white : ThebesColors.primary,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: LinearProgressIndicator(
-                      value: (student.completedHours / student.totalRequiredHours).clamp(0.0, 1.0),
-                      minHeight: 4,
-                      backgroundColor: isDark ? Colors.white12 : Colors.grey.withAlpha(50),
-                      valueColor: const AlwaysStoppedAnimation<Color>(ThebesColors.cyanAccent),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    isArabic ? 'ساعة معتمدة منجزة' : 'Completed Hours',
-                    style: GoogleFonts.cairo(
-                      fontSize: 10.5,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
+            // 3. Completed Hours Card
+            _buildVitalCard(
+              width: cardWidth,
+              isDark: isDark,
+              icon: Icons.school_rounded,
+              iconBg: ThebesColors.sky,
+              iconColor: ThebesColors.navy,
+              topLabel: isArabic ? 'الساعات المنجزة' : 'Earned Credits',
+              mainValue: '${student.completedHours}',
+              subValue: '/ ${student.totalRequiredHours} hr',
+              statusBadge: '${((student.completedHours / student.totalRequiredHours) * 100).toInt()}%',
+              statusColor: ThebesColors.navy,
             ),
 
-            // 4. Tuition Fees Card
-            Container(
-              width: itemWidth,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-              decoration: BoxDecoration(
-                color: isDark ? ThebesColors.darkCard : Colors.white,
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(
-                  color: isDark ? ThebesColors.darkCardBorder : ThebesColors.lightCardBorder,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withAlpha(isDark ? 30 : 10),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: (controller.remainingTuition == 0 ? ThebesColors.emerald : ThebesColors.warning)
-                              .withAlpha(25),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          Icons.account_balance_wallet_rounded,
-                          color: controller.remainingTuition == 0 ? ThebesColors.emerald : ThebesColors.warning,
-                          size: 18,
-                        ),
-                      ),
-                      Flexible(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                          decoration: BoxDecoration(
-                            color: (controller.remainingTuition == 0 ? ThebesColors.emerald : ThebesColors.warning)
-                                .withAlpha(20),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            controller.remainingTuition == 0
-                                ? (isArabic ? 'خالصة' : 'Clear')
-                                : (isArabic ? 'قسط ثان' : 'Due'),
-                            style: GoogleFonts.cairo(
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                              color: controller.remainingTuition == 0 ? ThebesColors.emerald : ThebesColors.warning,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      controller.remainingTuition == 0
-                          ? (isArabic ? 'مسددة بالكامل' : 'Fully Paid')
-                          : '${controller.remainingTuition.toInt()} ج.م',
-                      style: GoogleFonts.cairo(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
-                        color: isDark ? Colors.white : ThebesColors.primary,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  Text(
-                    isArabic ? 'المصروفات الدراسية' : 'Tuition Fees',
-                    style: GoogleFonts.cairo(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    controller.remainingTuition == 0
-                        ? (isArabic ? 'لا توجد مستحقات' : 'Zero balance')
-                        : (isArabic ? 'متبقي القسط الثاني' : 'Pending payment'),
-                    style: GoogleFonts.cairo(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                      color: controller.remainingTuition == 0 ? ThebesColors.emerald : ThebesColors.warning,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
+            // 4. Tuition Status Card
+            _buildVitalCard(
+              width: cardWidth,
+              isDark: isDark,
+              icon: Icons.account_balance_wallet_rounded,
+              iconBg: controller.remainingTuition == 0 ? ThebesColors.catHealthBg : ThebesColors.orangePale,
+              iconColor: controller.remainingTuition == 0 ? ThebesColors.catHealthText : ThebesColors.orange,
+              topLabel: isArabic ? 'المصروفات' : 'Tuition Fees',
+              mainValue: controller.remainingTuition == 0
+                  ? (isArabic ? 'مسددة' : 'Paid')
+                  : '${controller.remainingTuition.toInt()}',
+              subValue: controller.remainingTuition == 0 ? '' : ' ج.م',
+              statusBadge: controller.remainingTuition == 0
+                  ? (isArabic ? 'خالصة' : 'Clear')
+                  : (isArabic ? 'قسط ثان' : 'Due'),
+              statusColor: controller.remainingTuition == 0 ? ThebesColors.mint : ThebesColors.orange,
             ),
           ],
         );
@@ -996,7 +713,122 @@ class HomeDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildQuickActionDock(BuildContext context, bool isArabic, bool isDark) {
+  Widget _buildVitalCard({
+    required double width,
+    required bool isDark,
+    required IconData icon,
+    required Color iconBg,
+    required Color iconColor,
+    required String topLabel,
+    required String mainValue,
+    required String subValue,
+    required String statusBadge,
+    required Color statusColor,
+  }) {
+    return Container(
+      width: width,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+      decoration: BoxDecoration(
+        color: isDark ? ThebesColors.darkCard : Colors.white,
+        borderRadius: BorderRadius.circular(18), // Apple squircle
+        border: Border.all(
+          color: isDark ? ThebesColors.darkCardBorder : const Color(0xFFEAECF0),
+          width: 1,
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x06101828),
+            blurRadius: 14,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: iconBg,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, size: 16, color: iconColor),
+              ),
+              const SizedBox(width: 4),
+              Flexible(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: statusColor.withAlpha(20),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    statusBadge,
+                    style: GoogleFonts.cairo(
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w700,
+                      color: statusColor,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            topLabel,
+            style: GoogleFonts.cairo(
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+              color: isDark ? ThebesColors.slateLight : ThebesColors.slate,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 2),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: AlignmentDirectional.centerStart,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(
+                  mainValue,
+                  style: GoogleFonts.cairo(
+                    fontSize: 19,
+                    fontWeight: FontWeight.w700,
+                    color: isDark ? Colors.white : ThebesColors.navy,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                if (subValue.isNotEmpty)
+                  Text(
+                    subValue,
+                    style: GoogleFonts.cairo(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w500,
+                      color: ThebesColors.slate,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // =========================================================================
+  // 5. Quick Services Dock (Apple Squircle Grid)
+  // =========================================================================
+  Widget _buildQuickServicesDock(BuildContext context, bool isArabic, bool isDark) {
     final actions = [
       {
         'title': isArabic ? 'حضور QR' : 'QR Attendance',
@@ -1025,13 +857,6 @@ class HomeDashboardScreen extends StatelessWidget {
         },
       },
       {
-        'title': isArabic ? 'كارنيه الكلية' : 'Digital ID',
-        'icon': Icons.badge_rounded,
-        'bg': ThebesColors.catMathBg,
-        'accent': ThebesColors.catMathText,
-        'action': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DigitalIdScreen())),
-      },
-      {
         'title': isArabic ? 'سداد المصروفات' : 'E-Payment',
         'icon': Icons.payment_rounded,
         'bg': ThebesColors.catHealthBg,
@@ -1043,6 +868,13 @@ class HomeDashboardScreen extends StatelessWidget {
             Navigator.push(context, MaterialPageRoute(builder: (_) => const ServicesScreen()));
           }
         },
+      },
+      {
+        'title': isArabic ? 'كارنيه الكلية' : 'Digital ID',
+        'icon': Icons.badge_rounded,
+        'bg': ThebesColors.catMathBg,
+        'accent': ThebesColors.catMathText,
+        'action': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DigitalIdScreen())),
       },
       {
         'title': isArabic ? 'الدرجات والنتائج' : 'Grades & GPA',
@@ -1077,19 +909,39 @@ class HomeDashboardScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          isArabic ? 'الخدمات السريعة' : 'Quick Services',
-          style: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-            color: isDark ? Colors.white : ThebesColors.navy,
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Flexible(
+              child: Text(
+                isArabic ? 'الخدمات السريعة' : 'Quick Services',
+                style: GoogleFonts.cairo(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: isDark ? Colors.white : ThebesColors.navy,
+                  letterSpacing: -0.3,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              isArabic ? 'عرض الكل' : 'See all',
+              style: GoogleFonts.cairo(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: ThebesColors.orange,
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 12),
         SizedBox(
-          height: 96,
+          height: 98,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
             itemCount: actions.length,
             separatorBuilder: (_, index) => const SizedBox(width: 12),
             itemBuilder: (context, i) {
@@ -1099,20 +951,20 @@ class HomeDashboardScreen extends StatelessWidget {
 
               return InkWell(
                 onTap: a['action'] as VoidCallback,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(18),
                 child: Container(
                   width: 90,
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                   decoration: BoxDecoration(
                     color: isDark ? ThebesColors.darkCard : Colors.white,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(18),
                     border: Border.all(
-                      color: isDark ? ThebesColors.darkCardBorder : ThebesColors.lightCardBorder,
+                      color: isDark ? ThebesColors.darkCardBorder : const Color(0xFFEAECF0),
                     ),
                     boxShadow: const [
                       BoxShadow(
-                        color: Color(0x08000000),
-                        blurRadius: 8,
+                        color: Color(0x04101828),
+                        blurRadius: 10,
                         offset: Offset(0, 3),
                       ),
                     ],
@@ -1121,26 +973,26 @@ class HomeDashboardScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        width: 40,
-                        height: 40,
+                        width: 42,
+                        height: 42,
                         decoration: BoxDecoration(
                           color: tileBg,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(13),
                         ),
                         child: Icon(
                           a['icon'] as IconData,
                           color: accentColor,
-                          size: 20,
+                          size: 21,
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 7),
                       Text(
                         a['title'] as String,
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.cairo(
                           fontSize: 10.5,
                           fontWeight: FontWeight.w600,
-                          color: isDark ? Colors.white : ThebesColors.slateDark,
+                          color: isDark ? Colors.white70 : ThebesColors.slateDark,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -1156,7 +1008,10 @@ class HomeDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDigitalIdPreview(
+  // =========================================================================
+  // 6. Digital Student Pass (Apple Wallet Style)
+  // =========================================================================
+  Widget _buildDigitalStudentPass(
     BuildContext context,
     dynamic student,
     bool isArabic,
@@ -1172,11 +1027,10 @@ class HomeDashboardScreen extends StatelessWidget {
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           gradient: ThebesColors.primaryHeaderGradient,
-          borderRadius: BorderRadius.circular(20), // rounded-2xl
-          border: Border.all(color: Colors.white.withAlpha(20)),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: ThebesColors.navy.withAlpha(50),
+              color: ThebesColors.navy.withAlpha(40),
               blurRadius: 18,
               offset: const Offset(0, 6),
             ),
@@ -1185,14 +1039,14 @@ class HomeDashboardScreen extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              width: 50,
-              height: 50,
+              width: 48,
+              height: 48,
               decoration: BoxDecoration(
-                color: Colors.white.withAlpha(25),
+                color: Colors.white.withAlpha(20),
                 shape: BoxShape.circle,
                 border: Border.all(color: ThebesColors.orangeLight, width: 1.5),
               ),
-              child: const Icon(Icons.badge_rounded, color: Colors.white, size: 26),
+              child: const Icon(Icons.badge_rounded, color: Colors.white, size: 24),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -1200,8 +1054,8 @@ class HomeDashboardScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isArabic ? 'بطاقة الطالب الرقمية الموحدة' : 'Digital Student Smart Card',
-                    style: GoogleFonts.poppins(
+                    isArabic ? 'بطاقة الطالب الرقمية المعتمدة' : 'Digital Student Card (Pass)',
+                    style: GoogleFonts.cairo(
                       color: Colors.white,
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -1210,9 +1064,9 @@ class HomeDashboardScreen extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     isArabic
-                        ? 'كود الطالب: ${student.academicId} • رقم الجلوس: ${student.seatNumber}'
+                        ? 'كود القيد: ${student.academicId} • رقم الجلوس: ${student.seatNumber}'
                         : 'ID: ${student.academicId} • Seat: ${student.seatNumber}',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.cairo(
                       color: ThebesColors.orangeLight,
                       fontSize: 11.5,
                       fontWeight: FontWeight.w600,
@@ -1221,10 +1075,10 @@ class HomeDashboardScreen extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(
-              isArabic ? Icons.arrow_back_ios_new_rounded : Icons.arrow_forward_ios_rounded,
+            const Icon(
+              Icons.chevron_right_rounded,
               color: Colors.white70,
-              size: 15,
+              size: 22,
             ),
           ],
         ),
@@ -1232,6 +1086,9 @@ class HomeDashboardScreen extends StatelessWidget {
     );
   }
 
+  // =========================================================================
+  // 7. Latest Campus Announcements (Apple News Style)
+  // =========================================================================
   Widget _buildAnnouncementsSection(
     BuildContext context,
     StudentController controller,
@@ -1239,120 +1096,97 @@ class HomeDashboardScreen extends StatelessWidget {
     bool isDark,
   ) {
     final announcements = controller.announcements;
+    if (announcements.isEmpty) return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Text(
-                isArabic ? 'إعلانات وأخبار الأكاديمية' : 'Academy Announcements',
-                style: GoogleFonts.cairo(fontSize: 17, fontWeight: FontWeight.w800),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              isArabic ? 'عرض الأرشيف' : 'Archive',
-              style: GoogleFonts.cairo(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                color: ThebesColors.gold,
-              ),
-            ),
-          ],
+        Text(
+          isArabic ? 'أحدث الإعلانات والتنبيهات' : 'Campus Announcements',
+          style: GoogleFonts.cairo(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: isDark ? Colors.white : ThebesColors.navy,
+            letterSpacing: -0.3,
+          ),
         ),
         const SizedBox(height: 12),
-        ...announcements.map((ann) {
-          return Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: isDark ? ThebesColors.darkCard : Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: ann.isImportant
-                    ? ThebesColors.gold.withAlpha(120)
-                    : (isDark ? ThebesColors.darkCardBorder : ThebesColors.lightCardBorder),
+        ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: announcements.take(3).length,
+          separatorBuilder: (_, index) => const SizedBox(height: 10),
+          itemBuilder: (context, index) {
+            final item = announcements[index];
+            return Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: isDark ? ThebesColors.darkCard : Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: isDark ? ThebesColors.darkCardBorder : const Color(0xFFEAECF0),
+                ),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x04101828),
+                    blurRadius: 10,
+                    offset: Offset(0, 3),
+                  ),
+                ],
               ),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: ann.isImportant
-                        ? ThebesColors.gold.withAlpha(30)
-                        : ThebesColors.primary.withAlpha(20),
-                    borderRadius: BorderRadius.circular(10),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: ThebesColors.sky,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.campaign_outlined, size: 20, color: ThebesColors.navy),
                   ),
-                  child: Icon(
-                    ann.isImportant ? Icons.campaign_rounded : Icons.article_rounded,
-                    color: ann.isImportant ? ThebesColors.gold : ThebesColors.info,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Flexible(
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: ThebesColors.primary.withAlpha(15),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                ann.getLocalizedCategory(isArabic),
-                                style: GoogleFonts.cairo(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                  color: ThebesColors.gold,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.getLocalizedTitle(isArabic),
+                          style: GoogleFonts.cairo(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: isDark ? Colors.white : ThebesColors.navy,
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            ann.date,
-                            style: GoogleFonts.cairo(fontSize: 11, color: Colors.grey),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          item.getLocalizedContent(isArabic),
+                          style: GoogleFonts.cairo(
+                            fontSize: 11.5,
+                            color: isDark ? ThebesColors.slateLight : ThebesColors.slate,
+                            height: 1.4,
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        ann.getLocalizedTitle(isArabic),
-                        style: GoogleFonts.cairo(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        ann.getLocalizedContent(isArabic),
-                        style: GoogleFonts.cairo(
-                          fontSize: 12,
-                          color: Colors.grey,
-                          height: 1.5,
+                        const SizedBox(height: 6),
+                        Text(
+                          item.date,
+                          style: GoogleFonts.cairo(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                            color: ThebesColors.slateLight,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-          );
-        }),
+                ],
+              ),
+            );
+          },
+        ),
       ],
     );
   }

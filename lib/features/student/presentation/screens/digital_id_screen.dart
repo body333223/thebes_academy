@@ -53,13 +53,17 @@ class _DigitalIdScreenState extends State<DigitalIdScreen> {
     final qrPayload = 'THEBES://GATE_ACCESS/${student.academicId}/TIME_${DateTime.now().minute}';
 
     return Scaffold(
+      backgroundColor: isDark ? ThebesColors.darkBackground : const Color(0xFFF6F8FA),
       appBar: AppBar(
-        title: Text(locale.tr('id_card_title')),
+        title: Text(
+          locale.tr('id_card_title'),
+          style: GoogleFonts.cairo(fontWeight: FontWeight.w700, fontSize: 17),
+        ),
         actions: [
           IconButton(
             icon: Icon(
-              _showQrEnlarged ? Icons.credit_card_rounded : Icons.qr_code_scanner_rounded,
-              color: ThebesColors.gold,
+              _showQrEnlarged ? Icons.credit_card_rounded : Icons.qr_code_2_rounded,
+              color: Colors.white,
             ),
             onPressed: () => setState(() => _showQrEnlarged = !_showQrEnlarged),
             tooltip: 'Toggle QR View',
@@ -68,26 +72,27 @@ class _DigitalIdScreenState extends State<DigitalIdScreen> {
       ),
       body: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 520),
+          constraints: const BoxConstraints(maxWidth: 500),
           child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
             padding: context.responsiveScreenPadding,
             child: Column(
               children: [
-                // Live Security Bar Banner
+                // 1. Live Verification Status Bar
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
                   decoration: BoxDecoration(
-                    color: ThebesColors.opacity(ThebesColors.success, 0.12),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: ThebesColors.opacity(ThebesColors.success, 0.4)),
+                    color: ThebesColors.mint.withAlpha(20),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: ThebesColors.mint.withAlpha(60)),
                   ),
                   child: Row(
                     children: [
                       Container(
-                        width: 10,
-                        height: 10,
+                        width: 9,
+                        height: 9,
                         decoration: const BoxDecoration(
-                          color: ThebesColors.success,
+                          color: ThebesColors.mint,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -95,81 +100,70 @@ class _DigitalIdScreenState extends State<DigitalIdScreen> {
                       Expanded(
                         child: Text(
                           '${locale.tr('live_verification')} • $_currentTime',
-                          style: const TextStyle(
-                            color: ThebesColors.success,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
+                          style: GoogleFonts.cairo(
+                            color: ThebesColors.mint,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12.5,
                           ),
                         ),
                       ),
-                      const Icon(Icons.verified_user_rounded, color: ThebesColors.success, size: 18),
+                      const Icon(Icons.verified_rounded, color: ThebesColors.mint, size: 20),
                     ],
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 18),
 
-                // THE OFFICIAL DIGITAL ID CARD
+                // 2. THE OFFICIAL SMART CAMPUS CARD (Apple Wallet / Titanium Pass Style)
                 Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF0C2340), Color(0xFF16375E), Color(0xFF09182A)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+                    gradient: ThebesColors.primaryHeaderGradient,
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                      color: ThebesColors.gold,
-                      width: 2,
-                    ),
+                    border: Border.all(color: Colors.white.withAlpha(30), width: 1.2),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withAlpha(90),
-                        blurRadius: 20,
+                        color: ThebesColors.navy.withAlpha(60),
+                        blurRadius: 24,
                         offset: const Offset(0, 10),
-                      ),
-                      BoxShadow(
-                        color: ThebesColors.opacity(ThebesColors.gold, 0.2),
-                        blurRadius: 10,
-                        offset: const Offset(0, 0),
                       ),
                     ],
                   ),
                   child: Stack(
                     children: [
+                      // Background Watermark Emblem
                       Positioned(
-                        right: -40,
-                        bottom: -40,
+                        right: -30,
+                        bottom: -30,
                         child: Opacity(
-                          opacity: 0.05,
+                          opacity: 0.04,
                           child: const Icon(
                             Icons.school,
-                            size: 260,
+                            size: 240,
                             color: Colors.white,
                           ),
                         ),
                       ),
+
                       Padding(
                         padding: const EdgeInsets.all(22),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Card Header: Academy Crest + Names
+                            // Card Header: Squircle Academy Crest & Session
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Container(
-                                  padding: const EdgeInsets.all(8),
+                                  width: 44,
+                                  height: 44,
                                   decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.white.withAlpha(25),
-                                    border: Border.all(color: ThebesColors.gold, width: 1.5),
+                                    color: Colors.white.withAlpha(20),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: Colors.white.withAlpha(30)),
                                   ),
-                                  child: const Icon(
-                                    Icons.school_rounded,
-                                    color: ThebesColors.gold,
-                                    size: 24,
+                                  child: const Center(
+                                    child: Icon(Icons.school_rounded, color: Colors.white, size: 24),
                                   ),
                                 ),
                                 const SizedBox(width: 12),
@@ -179,153 +173,119 @@ class _DigitalIdScreenState extends State<DigitalIdScreen> {
                                     children: [
                                       Text(
                                         isArabic ? 'أكاديمية طـيبة المتكاملة' : 'THEBES ACADEMY',
-                                        style: const TextStyle(
+                                        style: GoogleFonts.cairo(
                                           color: Colors.white,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          letterSpacing: 0.5,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w800,
+                                          letterSpacing: -0.3,
                                         ),
                                       ),
                                       Text(
                                         student.getLocalizedInstitute(isArabic),
-                                        style: TextStyle(
-                                          color: ThebesColors.opacity(ThebesColors.gold, 0.95),
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w600,
+                                        style: GoogleFonts.cairo(
+                                          color: const Color(0xFFCBD5E1),
+                                          fontSize: 11.5,
+                                          fontWeight: FontWeight.w500,
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: ThebesColors.opacity(ThebesColors.gold, 0.2),
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                      color: ThebesColors.opacity(ThebesColors.gold, 0.5),
-                                    ),
+                                    color: Colors.white.withAlpha(18),
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
-                                  child: const Text(
-                                    '2026/2027',
-                                    style: TextStyle(
-                                      color: ThebesColors.gold,
+                                  child: Text(
+                                    '2026 / 2027',
+                                    style: GoogleFonts.cairo(
+                                      color: Colors.white,
                                       fontSize: 11,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w700,
                                     ),
                                   ),
                                 ),
                               ],
                             ),
 
-                            const SizedBox(height: 18),
-                            Divider(color: ThebesColors.opacity(ThebesColors.gold, 0.3), height: 1),
-                            const SizedBox(height: 18),
+                            const SizedBox(height: 16),
+                            Divider(color: Colors.white.withAlpha(25), height: 1),
+                            const SizedBox(height: 16),
 
-                            // Main Body: Student Photo + Info Or Enlarged QR
+                            // Main Card Content (Photo + Student Details OR Enlarged QR)
                             if (!_showQrEnlarged)
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Column(
                                     children: [
-                                      // Smart Campus Contactless Chip
+                                      // Smart Contactless Chip
                                       Container(
-                                        width: 44,
-                                        height: 32,
+                                        width: 40,
+                                        height: 28,
                                         margin: const EdgeInsets.only(bottom: 8),
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(6),
                                           gradient: const LinearGradient(
-                                            colors: [Color(0xFFE5C07B), Color(0xFFD4AF37), Color(0xFFB38F24)],
+                                            colors: [Color(0xFFCBD5E1), Color(0xFF94A3B8)],
                                           ),
-                                          border: Border.all(color: const Color(0xFF7A6014), width: 0.8),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withAlpha(50),
-                                              blurRadius: 4,
-                                              offset: const Offset(0, 2),
-                                            ),
-                                          ],
+                                          border: Border.all(color: Colors.white.withAlpha(60)),
                                         ),
                                         child: const Center(
-                                          child: Icon(Icons.nfc_rounded, size: 18, color: Color(0xFF0C2340)),
+                                          child: Icon(Icons.contactless_rounded, size: 18, color: ThebesColors.navy),
                                         ),
                                       ),
+                                      // Student Photo Box
                                       Container(
-                                        width: 86,
-                                        height: 98,
+                                        width: 84,
+                                        height: 94,
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(12),
-                                          border: Border.all(color: ThebesColors.gold, width: 2),
-                                          gradient: ThebesColors.cardGradient,
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withAlpha(70),
-                                              blurRadius: 8,
-                                            ),
-                                          ],
+                                          borderRadius: BorderRadius.circular(14),
+                                          border: Border.all(color: Colors.white.withAlpha(40), width: 1.5),
+                                          color: Colors.white.withAlpha(15),
                                         ),
                                         child: const Center(
-                                          child: Icon(
-                                            Icons.person_rounded,
-                                            size: 54,
-                                            color: ThebesColors.gold,
-                                          ),
+                                          child: Icon(Icons.person_rounded, size: 52, color: Colors.white70),
                                         ),
                                       ),
-                                      const SizedBox(height: 8),
+                                      const SizedBox(height: 6),
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                         decoration: BoxDecoration(
-                                          color: Colors.white.withAlpha(30),
+                                          color: ThebesColors.mint.withAlpha(30),
                                           borderRadius: BorderRadius.circular(6),
                                         ),
                                         child: Text(
-                                          isArabic ? 'طالب منتظم' : 'Regular',
-                                          style: const TextStyle(
-                                            color: Colors.white70,
+                                          isArabic ? 'طالب مقيد' : 'Enrolled',
+                                          style: GoogleFonts.cairo(
+                                            color: ThebesColors.mint,
                                             fontSize: 10,
-                                            fontWeight: FontWeight.bold,
+                                            fontWeight: FontWeight.w700,
                                           ),
                                         ),
                                       ),
                                     ],
                                   ),
-
                                   const SizedBox(width: 16),
-
-                                  // Student Academic Data
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           student.getLocalizedName(isArabic),
-                                          style: const TextStyle(
+                                          style: GoogleFonts.cairo(
                                             color: Colors.white,
                                             fontSize: 15,
-                                            fontWeight: FontWeight.bold,
+                                            fontWeight: FontWeight.w800,
+                                            letterSpacing: -0.3,
                                           ),
                                         ),
-                                        const SizedBox(height: 6),
-                                        _buildIdRow(
-                                          locale.tr('academic_id'),
-                                          student.academicId,
-                                          highlight: true,
-                                        ),
-                                        _buildIdRow(
-                                          locale.tr('major'),
-                                          student.getLocalizedDepartment(isArabic),
-                                        ),
-                                        _buildIdRow(
-                                          locale.tr('academic_year'),
-                                          isArabic ? 'الفرقة الثالثة' : '3rd Year',
-                                        ),
-                                        _buildIdRow(
-                                          locale.tr('seat_no'),
-                                          student.seatNumber,
-                                        ),
+                                        const SizedBox(height: 8),
+                                        _buildIdField(locale.tr('academic_id'), student.academicId, highlight: true),
+                                        _buildIdField(locale.tr('major'), student.getLocalizedDepartment(isArabic)),
+                                        _buildIdField(locale.tr('academic_year'), isArabic ? 'الفرقة الثالثة' : '3rd Year'),
+                                        _buildIdField(locale.tr('seat_no'), student.seatNumber),
                                       ],
                                     ),
                                   ),
@@ -336,42 +296,43 @@ class _DigitalIdScreenState extends State<DigitalIdScreen> {
                                 child: Column(
                                   children: [
                                     Container(
-                                      padding: const EdgeInsets.all(12),
+                                      padding: const EdgeInsets.all(14),
                                       decoration: BoxDecoration(
                                         color: Colors.white,
-                                        borderRadius: BorderRadius.circular(16),
+                                        borderRadius: BorderRadius.circular(18),
                                       ),
                                       child: QrImageView(
                                         data: qrPayload,
                                         version: QrVersions.auto,
-                                        size: 180.0,
+                                        size: 170.0,
                                         eyeStyle: const QrEyeStyle(
                                           eyeShape: QrEyeShape.square,
-                                          color: ThebesColors.primaryDark,
+                                          color: ThebesColors.navy,
                                         ),
                                         dataModuleStyle: const QrDataModuleStyle(
                                           dataModuleShape: QrDataModuleShape.square,
-                                          color: ThebesColors.primaryDark,
+                                          color: ThebesColors.navy,
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(height: 8),
+                                    const SizedBox(height: 10),
                                     Text(
                                       student.getLocalizedName(isArabic),
-                                      style: const TextStyle(
+                                      style: GoogleFonts.cairo(
                                         color: Colors.white,
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 14,
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
 
-                            const SizedBox(height: 18),
-                            Divider(color: ThebesColors.opacity(ThebesColors.gold, 0.3), height: 1),
+                            const SizedBox(height: 16),
+                            Divider(color: Colors.white.withAlpha(25), height: 1),
                             const SizedBox(height: 14),
 
-                            // Card Footer: Dynamic Mini QR / Gate Pass Barcode
+                            // Card Footer: Validity & Mini QR
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -380,44 +341,41 @@ class _DigitalIdScreenState extends State<DigitalIdScreen> {
                                   children: [
                                     Text(
                                       locale.tr('valid_through'),
-                                      style: TextStyle(
-                                        color: Colors.white.withAlpha(150),
+                                      style: GoogleFonts.cairo(
+                                        color: Colors.white54,
                                         fontSize: 10,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
-                                    const SizedBox(height: 2),
-                                    const Text(
+                                    Text(
                                       '31 / 08 / 2027',
-                                      style: TextStyle(
-                                        color: ThebesColors.gold,
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 1,
+                                      style: GoogleFonts.cairo(
+                                        color: Colors.white,
+                                        fontSize: 12.5,
+                                        fontWeight: FontWeight.w700,
                                       ),
                                     ),
                                   ],
                                 ),
-
                                 GestureDetector(
                                   onTap: () => setState(() => _showQrEnlarged = !_showQrEnlarged),
                                   child: Container(
-                                    padding: const EdgeInsets.all(6),
+                                    padding: const EdgeInsets.all(5),
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(color: ThebesColors.gold, width: 1.5),
                                     ),
                                     child: QrImageView(
                                       data: qrPayload,
                                       version: QrVersions.auto,
-                                      size: 44.0,
+                                      size: 40.0,
                                       eyeStyle: const QrEyeStyle(
                                         eyeShape: QrEyeShape.square,
-                                        color: ThebesColors.primary,
+                                        color: ThebesColors.navy,
                                       ),
                                       dataModuleStyle: const QrDataModuleStyle(
                                         dataModuleShape: QrDataModuleShape.square,
-                                        color: ThebesColors.primary,
+                                        color: ThebesColors.navy,
                                       ),
                                     ),
                                   ),
@@ -433,7 +391,7 @@ class _DigitalIdScreenState extends State<DigitalIdScreen> {
 
                 const SizedBox(height: 20),
 
-                // Digital ID Action Dock (Export Card & Offline Pass)
+                // 3. Action Buttons
                 Row(
                   children: [
                     Expanded(
@@ -442,14 +400,13 @@ class _DigitalIdScreenState extends State<DigitalIdScreen> {
                         icon: const Icon(Icons.share_rounded, size: 18),
                         label: Text(
                           isArabic ? 'تصدير الكارنيه' : 'Export ID',
-                          style: GoogleFonts.cairo(fontWeight: FontWeight.bold, fontSize: 13),
+                          style: GoogleFonts.cairo(fontWeight: FontWeight.w700, fontSize: 13),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: ThebesColors.gold,
-                          foregroundColor: ThebesColors.primaryNavy,
+                          backgroundColor: ThebesColors.cobalt,
+                          foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                          elevation: 2,
                         ),
                       ),
                     ),
@@ -457,17 +414,17 @@ class _DigitalIdScreenState extends State<DigitalIdScreen> {
                     Expanded(
                       child: OutlinedButton.icon(
                         onPressed: () => _showOfflinePassDialog(context, student, isArabic, isDark),
-                        icon: const Icon(Icons.offline_bolt_rounded, size: 18, color: ThebesColors.gold),
+                        icon: const Icon(Icons.qr_code_rounded, size: 18, color: ThebesColors.navy),
                         label: Text(
                           isArabic ? 'تصريح البوابات' : 'Gate Pass',
                           style: GoogleFonts.cairo(
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w700,
                             fontSize: 13,
-                            color: isDark ? Colors.white : ThebesColors.primaryNavy,
+                            color: isDark ? Colors.white : ThebesColors.navy,
                           ),
                         ),
                         style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: ThebesColors.gold, width: 1.5),
+                          side: BorderSide(color: isDark ? ThebesColors.darkCardBorder : ThebesColors.lightCardBorder, width: 1.5),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
@@ -478,7 +435,7 @@ class _DigitalIdScreenState extends State<DigitalIdScreen> {
 
                 const SizedBox(height: 18),
 
-                // Instructions Pill
+                // Hint banner
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -490,14 +447,14 @@ class _DigitalIdScreenState extends State<DigitalIdScreen> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.info_outline_rounded, color: ThebesColors.gold, size: 22),
+                      const Icon(Icons.info_outline_rounded, color: ThebesColors.cobalt, size: 20),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
                           locale.tr('scan_qr_hint'),
-                          style: TextStyle(
+                          style: GoogleFonts.cairo(
                             fontSize: 12,
-                            color: isDark ? Colors.white70 : ThebesColors.lightTextSecondary,
+                            color: isDark ? Colors.white70 : ThebesColors.slate,
                             height: 1.4,
                           ),
                         ),
@@ -513,154 +470,61 @@ class _DigitalIdScreenState extends State<DigitalIdScreen> {
     );
   }
 
+  Widget _buildIdField(String label, String value, {bool highlight = false}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 5),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.cairo(
+              color: Colors.white60,
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          Text(
+            value,
+            style: GoogleFonts.cairo(
+              color: highlight ? ThebesColors.orangeLight : Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showExportDialog(BuildContext context, dynamic student, bool isArabic, bool isDark) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF0D1B2A) : Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-          side: const BorderSide(color: ThebesColors.gold, width: 1.5),
-        ),
+        backgroundColor: isDark ? ThebesColors.darkCard : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
-            const Icon(Icons.verified_rounded, color: ThebesColors.gold, size: 24),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                isArabic ? 'البطاقة الرقمية الرسمية المعتمدة' : 'Official Verified Digital ID',
-                style: GoogleFonts.cairo(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : ThebesColors.primaryNavy,
-                ),
-              ),
+            const Icon(Icons.verified_rounded, color: ThebesColors.cobalt, size: 22),
+            const SizedBox(width: 8),
+            Text(
+              isArabic ? 'بطاقة الطالب الرقمية' : 'Digital ID Card',
+              style: GoogleFonts.cairo(fontSize: 16, fontWeight: FontWeight.w700),
             ),
           ],
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Stamp Card Preview
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                gradient: ThebesColors.royalCardGradient,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: ThebesColors.gold),
-              ),
-              child: Stack(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        isArabic ? 'أكاديمية طيبة المتكاملة للعلوم' : 'THEBES ACADEMY HIGHER INSTITUTES',
-                        style: GoogleFonts.cairo(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: ThebesColors.gold,
-                        ),
-                      ),
-                      const Divider(color: Colors.white24, height: 12),
-                      Text(
-                        isArabic ? student.nameAr : student.nameEn,
-                        style: GoogleFonts.cairo(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      Text(
-                        'ID: ${student.academicId} • Seat: ${student.seatNumber}',
-                        style: const TextStyle(fontSize: 11, color: Colors.white70),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        student.getLocalizedDepartment(isArabic),
-                        style: GoogleFonts.cairo(fontSize: 11, color: Colors.white60),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                  // Golden Official Stamp
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: Transform.rotate(
-                      angle: -0.2,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: ThebesColors.gold, width: 2),
-                          borderRadius: BorderRadius.circular(8),
-                          color: ThebesColors.gold.withAlpha(40),
-                        ),
-                        child: Text(
-                          isArabic ? 'معتمد رسمياً ★' : 'OFFICIAL PASS ★',
-                          style: GoogleFonts.cairo(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w900,
-                            color: ThebesColors.gold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              isArabic
-                  ? 'هذه البطاقة معتمدة رسمياً ومزودة بختم الأكاديمية الأمني للعام الأكاديمي الحالي.'
-                  : 'This verified credential is authenticated by Thebes Academy for the current academic year.',
-              style: GoogleFonts.cairo(fontSize: 12, color: Colors.grey, height: 1.4),
-              textAlign: TextAlign.center,
-            ),
-          ],
+        content: Text(
+          isArabic
+              ? 'تم التحقق من بياناتك الأكاديمية بنجاح. يمكنك استخدام هذا الكارنيه الرقمي عبر البوابات الإلكترونية والمعامل.'
+              : 'Academic credentials verified. Use this digital pass for automated campus turnstiles and library access.',
+          style: GoogleFonts.cairo(fontSize: 12.5, color: isDark ? Colors.white70 : ThebesColors.slate, height: 1.4),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(
-              isArabic ? 'إغلاق' : 'Close',
-              style: GoogleFonts.cairo(color: Colors.grey),
-            ),
-          ),
-          ElevatedButton.icon(
-            onPressed: () {
-              Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  backgroundColor: ThebesColors.primaryNavy,
-                  content: Row(
-                    children: [
-                      const Icon(Icons.check_circle_rounded, color: ThebesColors.emerald),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          isArabic
-                              ? 'تم حفظ بطاقة الطالب المعتمدة بنجاح على جهازك!'
-                              : 'Official ID card saved successfully to your device!',
-                          style: GoogleFonts.cairo(color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-            icon: const Icon(Icons.download_done_rounded, size: 18),
-            label: Text(
-              isArabic ? 'حفظ الكارنيه' : 'Save ID',
-              style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: ThebesColors.gold,
-              foregroundColor: ThebesColors.primaryNavy,
-            ),
+            child: Text(isArabic ? 'تم' : 'Done', style: GoogleFonts.cairo(fontWeight: FontWeight.w700, color: ThebesColors.cobalt)),
           ),
         ],
       ),
@@ -668,150 +532,48 @@ class _DigitalIdScreenState extends State<DigitalIdScreen> {
   }
 
   void _showOfflinePassDialog(BuildContext context, dynamic student, bool isArabic, bool isDark) {
-    final offlineToken = 'THEBES-OFFLINE-GATE-PASS-${student.academicId}-${DateTime.now().day}${DateTime.now().month}';
-
-    showModalBottomSheet(
+    final qrPayload = 'THEBES://OFFLINE_GATE/${student.academicId}/PASS';
+    showDialog(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF0F172A) : Colors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-          border: Border.all(color: ThebesColors.gold, width: 1.5),
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? ThebesColors.darkCard : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Center(
+          child: Text(
+            isArabic ? 'تصريح الدخول السريع' : 'Fast Campus Gate Pass',
+            style: GoogleFonts.cairo(fontSize: 16, fontWeight: FontWeight.w700),
+          ),
         ),
-        child: Column(
+        content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Center(
-              child: Container(
-                width: 44,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade400,
-                  borderRadius: BorderRadius.circular(3),
-                ),
-              ),
-            ),
-            const SizedBox(height: 18),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.bolt_rounded, color: ThebesColors.emerald, size: 24),
-                const SizedBox(width: 8),
-                Text(
-                  isArabic ? 'تصريح البوابات السريع (دون إنترنت)' : 'Offline Contactless Gate Pass',
-                  style: GoogleFonts.cairo(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              isArabic
-                  ? 'وجه هذا الرمز المباشر إلى قارئ بوابات الدخول بمقرات الأكاديمية (المعادي / سقارة)'
-                  : 'Point this offline pass at Thebes Academy entrance turnstiles',
-              style: GoogleFonts.cairo(fontSize: 12, color: Colors.grey),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 20),
-            // High-Contrast Gate QR Code
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: ThebesColors.gold, width: 2),
-                boxShadow: [
-                  BoxShadow(
-                    color: ThebesColors.gold.withAlpha(50),
-                    blurRadius: 16,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                borderRadius: BorderRadius.circular(16),
               ),
               child: QrImageView(
-                data: offlineToken,
+                data: qrPayload,
                 version: QrVersions.auto,
-                size: 190.0,
-                eyeStyle: const QrEyeStyle(
-                  eyeShape: QrEyeShape.square,
-                  color: ThebesColors.primary,
-                ),
-                dataModuleStyle: const QrDataModuleStyle(
-                  dataModuleShape: QrDataModuleShape.square,
-                  color: ThebesColors.primary,
-                ),
+                size: 160.0,
+                eyeStyle: const QrEyeStyle(eyeShape: QrEyeShape.square, color: ThebesColors.navy),
+                dataModuleStyle: const QrDataModuleStyle(dataModuleShape: QrDataModuleShape.square, color: ThebesColors.navy),
               ),
             ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: ThebesColors.emerald.withAlpha(20),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: ThebesColors.emerald),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.check_circle_rounded, color: ThebesColors.emerald, size: 16),
-                  const SizedBox(width: 8),
-                  Text(
-                    isArabic ? 'تصريح ساري وصالح للمرور الفوري' : 'Pass Valid for Immediate Entry',
-                    style: GoogleFonts.cairo(
-                      color: ThebesColors.emerald,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(ctx),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: ThebesColors.gold,
-                foregroundColor: ThebesColors.primaryNavy,
-                minimumSize: const Size(double.infinity, 48),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              ),
-              child: Text(
-                isArabic ? 'تم' : 'Done',
-                style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
-              ),
+            const SizedBox(height: 12),
+            Text(
+              isArabic ? 'صالح للمسح في بوابات المعاهد حتى في وضع عدم الاتصال' : 'Valid for automated turnstiles even offline',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.cairo(fontSize: 11.5, color: isDark ? Colors.white70 : ThebesColors.slate),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildIdRow(String label, String value, {bool highlight = false}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '$label: ',
-            style: TextStyle(
-              color: Colors.white.withAlpha(150),
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: TextStyle(
-                color: highlight ? ThebesColors.gold : Colors.white,
-                fontSize: 11.5,
-                fontWeight: highlight ? FontWeight.bold : FontWeight.w600,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+        actions: [
+          Center(
+            child: TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(isArabic ? 'إغلاق' : 'Close', style: GoogleFonts.cairo(fontWeight: FontWeight.w700, color: ThebesColors.cobalt)),
             ),
           ),
         ],

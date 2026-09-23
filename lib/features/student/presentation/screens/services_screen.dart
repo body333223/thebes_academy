@@ -46,24 +46,55 @@ class _ServicesScreenState extends State<ServicesScreen> with SingleTickerProvid
     final isTabletOrDesktop = context.isTablet || context.isDesktop;
 
     return Scaffold(
+      backgroundColor: isDark ? ThebesColors.darkBackground : const Color(0xFFF6F8FA),
       appBar: AppBar(
-        title: Text(locale.tr('services_and_finance')),
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: ThebesColors.gold,
-          indicatorWeight: 3,
-          labelColor: ThebesColors.gold,
-          unselectedLabelColor: Colors.white70,
-          tabs: [
-            Tab(
-              icon: const Icon(Icons.account_balance_wallet_outlined, size: 20),
-              text: locale.tr('tab_finance'),
+        backgroundColor: ThebesColors.navy,
+        elevation: 0,
+        centerTitle: true,
+        title: Text(
+          locale.tr('services_and_finance'),
+          style: GoogleFonts.cairo(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white),
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(54),
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: Colors.white.withAlpha(25),
+              borderRadius: BorderRadius.circular(14),
             ),
-            Tab(
-              icon: const Icon(Icons.description_outlined, size: 20),
-              text: locale.tr('tab_requests'),
+            child: TabBar(
+              controller: _tabController,
+              indicator: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x1A000000),
+                    blurRadius: 6,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              indicatorSize: TabBarIndicatorSize.tab,
+              labelColor: ThebesColors.navy,
+              unselectedLabelColor: Colors.white.withAlpha(200),
+              labelStyle: GoogleFonts.cairo(fontSize: 12.5, fontWeight: FontWeight.w700),
+              unselectedLabelStyle: GoogleFonts.cairo(fontSize: 12, fontWeight: FontWeight.w500),
+              dividerColor: Colors.transparent,
+              tabs: [
+                Tab(
+                  icon: const Icon(Icons.account_balance_wallet_rounded, size: 18),
+                  text: locale.tr('tab_finance'),
+                ),
+                Tab(
+                  icon: const Icon(Icons.description_rounded, size: 18),
+                  text: locale.tr('tab_requests'),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
       body: Center(
@@ -76,19 +107,19 @@ class _ServicesScreenState extends State<ServicesScreen> with SingleTickerProvid
               ListView(
                 padding: context.responsiveScreenPadding,
                 children: [
-                  // Financial Summary Hero Card
+                  // Financial Summary Hero Card (Apple Wallet Card)
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(22),
                     decoration: BoxDecoration(
-                      gradient: ThebesColors.primaryGradient,
-                      borderRadius: BorderRadius.circular(22),
-                      border: Border.all(color: ThebesColors.gold, width: 1.5),
+                      gradient: ThebesColors.primaryHeaderGradient,
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: Colors.white.withAlpha(25), width: 1),
                       boxShadow: [
                         BoxShadow(
-                          color: ThebesColors.opacity(ThebesColors.primaryDark, 0.35),
-                          blurRadius: 14,
-                          offset: const Offset(0, 6),
+                          color: ThebesColors.navy.withAlpha(45),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
                         ),
                       ],
                     ),
@@ -97,90 +128,127 @@ class _ServicesScreenState extends State<ServicesScreen> with SingleTickerProvid
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            Row(
                               children: [
-                                Text(
-                                  locale.tr('total_fees'),
-                                  style: const TextStyle(color: Colors.white70, fontSize: 12),
+                                Container(
+                                  width: 38,
+                                  height: 38,
+                                  decoration: BoxDecoration(
+                                    gradient: ThebesColors.orangeCtaGradient,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: const Center(
+                                    child: Text(
+                                      'TA',
+                                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16),
+                                    ),
+                                  ),
                                 ),
-                                const SizedBox(height: 4),
+                                const SizedBox(width: 10),
                                 Text(
-                                  '${controller.totalTuition.toInt()} ج.م',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 26,
-                                    fontWeight: FontWeight.bold,
+                                  isArabic ? 'حساب الرسوم والمصروفات' : 'Student Tuition Pass',
+                                  style: GoogleFonts.cairo(
+                                    color: Colors.white.withAlpha(220),
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               ],
                             ),
-                            Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: ThebesColors.opacity(ThebesColors.gold, 0.2),
-                              ),
-                              child: const Icon(Icons.payments_rounded, color: ThebesColors.gold, size: 30),
-                            ),
+                            const Icon(Icons.contactless_rounded, color: Colors.white70, size: 26),
                           ],
                         ),
-                        const SizedBox(height: 16),
-                        Divider(color: Colors.white.withAlpha(40), height: 1),
-                        const SizedBox(height: 14),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  locale.tr('paid_amount'),
-                                  style: const TextStyle(color: Colors.white60, fontSize: 11),
+                        const SizedBox(height: 20),
+                        Align(
+                          alignment: isArabic ? Alignment.centerRight : Alignment.centerLeft,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                locale.tr('total_fees'),
+                                style: GoogleFonts.cairo(color: const Color(0xFFE8EEFF), fontSize: 11, fontWeight: FontWeight.w500),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                '${controller.totalTuition.toInt()} ج.م',
+                                style: GoogleFonts.cairo(
+                                  color: Colors.white,
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: -0.5,
                                 ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  '${controller.paidTuition.toInt()} ج.م',
-                                  style: const TextStyle(
-                                    color: ThebesColors.success,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withAlpha(15),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: const BoxDecoration(
+                                      color: ThebesColors.mint,
+                                      shape: BoxShape.circle,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  locale.tr('remaining_amount'),
-                                  style: const TextStyle(color: Colors.white60, fontSize: 11),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  '${controller.remainingTuition.toInt()} ج.م',
-                                  style: const TextStyle(
-                                    color: ThebesColors.warning,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    '${locale.tr('paid_amount')}: ${controller.paidTuition.toInt()} ج.م',
+                                    style: GoogleFonts.cairo(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ],
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: const BoxDecoration(
+                                      color: ThebesColors.orange,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    '${locale.tr('remaining_amount')}: ${controller.remainingTuition.toInt()} ج.م',
+                                    style: GoogleFonts.cairo(
+                                      color: ThebesColors.orangeLight,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 22),
 
                   Text(
                     locale.tr('installments'),
-                    style: TextStyle(
+                    style: GoogleFonts.cairo(
                       fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : ThebesColors.primaryDark,
+                      fontWeight: FontWeight.w700,
+                      color: isDark ? Colors.white : ThebesColors.navy,
+                      letterSpacing: -0.3,
                     ),
                   ),
 

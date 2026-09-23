@@ -59,12 +59,12 @@ class AdaptiveScaffold extends StatelessWidget {
                 color: isDark ? ThebesColors.slateLight : ThebesColors.slate,
                 size: 22,
               ),
-              selectedLabelTextStyle: GoogleFonts.poppins(
+              selectedLabelTextStyle: GoogleFonts.cairo(
                 color: ThebesColors.orange,
                 fontWeight: FontWeight.w700,
                 fontSize: 11,
               ),
-              unselectedLabelTextStyle: GoogleFonts.poppins(
+              unselectedLabelTextStyle: GoogleFonts.cairo(
                 color: isDark ? ThebesColors.slateLight : ThebesColors.slate,
                 fontSize: 10,
                 fontWeight: FontWeight.w500,
@@ -217,7 +217,7 @@ class _TheebaBottomBar extends StatelessWidget {
         const SizedBox(height: 2),
         Text(
           d.label,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.cairo(
             fontSize: 10,
             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
             color: isSelected ? activeColor : inactiveColor,
@@ -258,7 +258,7 @@ class _TheebaBottomBar extends StatelessWidget {
         const SizedBox(height: 2),
         Text(
           d.label,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.cairo(
             fontSize: 10,
             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
             color: isSelected ? ThebesColors.orange : ThebesColors.slate,
